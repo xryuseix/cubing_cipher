@@ -4,11 +4,11 @@
 暗号化プログラム
 
 ## input.txt
-cubing.cppが参照するファイル
+cubing.cppが参照するファイル  
 平文を入力する
 
 ## output.txt
-cubing.cppが参照するファイル
+cubing.cppが参照するファイル  
 暗号文が出力される
 
 ## the structure~~
