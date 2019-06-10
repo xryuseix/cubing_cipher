@@ -1,0 +1,4 @@
+This is asamplesentenceforprogramofencryption.
+aaa
+bbb
+ccc
