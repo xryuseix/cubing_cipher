@@ -5,17 +5,18 @@
 #include <fstream>
 #include <vector>
 
+using CubeType = std::vector<std::vector<char>>;
 
 void outputfn(std::string);
 std::string inputfn();
 std::string cubing_key();
-std::vector<std::vector<char>> cubing_en(std::vector<std::vector<char>>, std::string);
-std::vector<std::vector<char>> string_to_cubing(std::string);
-std::string cubing_to_string(std::vector<std::vector<char>>);
-std::vector<std::vector<char>> shuffle(std::vector<std::vector<char>>);
-std::vector<std::vector<char>> sequential(std::vector<std::vector<char>>);
-std::vector<std::vector<char>> hash(std::vector<std::vector<char>>);
-std::vector<std::vector<char>> randnum(std::vector<std::vector<char>>);
+CubeType cubing_en(CubeType, std::string);
+CubeType string_to_cubing(std::string);
+std::string cubing_to_string(CubeType);
+CubeType shuffle(CubeType);
+CubeType sequential(CubeType);
+CubeType hash(CubeType);
+CubeType randnum(CubeType);
 
 // メモ
 // g++ -std=c++1z cuning.cpp
@@ -29,7 +30,7 @@ struct Cube {
     std::string plain;
     std::string cipher;
     std::string key;
-    std::vector<std::vector<char>> cubing;
+    CubeType cubing;
 
     void Input() {
         plain = inputfn();
@@ -110,8 +111,8 @@ std::string cubing_key() {
     return key;
 }
 
-std::vector<std::vector<char>> string_to_cubing(std::string s) {
-    std::vector<std::vector<char>> cubing(s.length()/46 + 1, std::vector<char>(54));
+CubeType string_to_cubing(std::string s) {
+    CubeType cubing(s.length()/46 + 1, std::vector<char>(54));
 
     for(int i = 0; i < s.length()/46 + 1; i++) { // 平文をcubing配列に格納
         for(int j = 0; j < 45; j++) {
@@ -125,7 +126,7 @@ std::vector<std::vector<char>> string_to_cubing(std::string s) {
     return cubing;
 }
 
-std::vector<std::vector<char>> cubing_en(std::vector<std::vector<char>> cubing, std::string key) {
+CubeType cubing_en(CubeType cubing, std::string key) {
     /*
     //Visualizer
     //配列の中の数字がどのように格納されているのか見てわかるように表示する
@@ -220,7 +221,7 @@ std::vector<std::vector<char>> cubing_en(std::vector<std::vector<char>> cubing, 
     return cubing;
 }
 
-std::string cubing_to_string(std::vector<std::vector<char>> cubing) {
+std::string cubing_to_string(CubeType cubing) {
     std::string s = "";
     for(int i = 0; i < cubing.size(); i++) { // 出力用 
         for(int j = 0; j < 54; j++) {
@@ -231,7 +232,7 @@ std::string cubing_to_string(std::vector<std::vector<char>> cubing) {
 }
 
 // Fisher–Yates
-std::vector<std::vector<char>> shuffle(std::vector<std::vector<char>> ary) {
+CubeType shuffle(CubeType ary) {
 
     for(int i = ary.size() - 1; i > 0; i--) {
         int j = rand() % i;
@@ -244,7 +245,7 @@ std::vector<std::vector<char>> shuffle(std::vector<std::vector<char>> ary) {
     return ary;
 }
 
-std::vector<std::vector<char> > hash(std::vector<std::vector<char>> cubing){
+std::vector<std::vector<char> > hash(CubeType cubing){
     for(int j = 0; j < cubing.size(); j++) { //ハッシュ計算
         for(int i = 0; i < 5; i++) { //5面 
             int sum = 0;
@@ -258,7 +259,7 @@ std::vector<std::vector<char> > hash(std::vector<std::vector<char>> cubing){
     return cubing;
 }
 
-std::vector<std::vector<char> > sequential(std::vector<std::vector<char>> cubing) {
+std::vector<std::vector<char> > sequential(CubeType cubing) {
     for(int i = 0; i < cubing.size(); i++) { //シーケンス番号
         if(i < 26*52) {
             cubing[i][50] = 'A' + (i/26);
@@ -275,7 +276,7 @@ std::vector<std::vector<char> > sequential(std::vector<std::vector<char>> cubing
     return cubing;
 }
 
-std::vector<std::vector<char> > randnum(std::vector<std::vector<char>> cubing){
+std::vector<std::vector<char> > randnum(CubeType cubing){
     for(int i = 0; i < cubing.size(); i++) { // 乱数文字付与
         if(rand() % 10 == 0) {
             cubing[i][52] = rand() % 26 + 'A'; // 小文字or大文字の乱数
