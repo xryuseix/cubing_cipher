@@ -1,7 +1,10 @@
 # SecCamp_2019_Crypt
 
 ## cubing.cpp
-暗号化プログラム
+暗号化プログラム（入出力部・main）
+
+##encrypt.h
+暗号化プログラム（暗号化部）
 
 ## input.txt
 cubing.cppが参照するファイル  
