@@ -11,13 +11,6 @@ using CubeType = std::vector<std::vector<char>>;
 void outputfn(std::string);
 std::string inputfn();
 std::string cubing_key();
-CubeType cubing_en(CubeType, std::string);
-CubeType string_to_cubing(std::string);
-std::string cubing_to_string(CubeType);
-CubeType shuffle(CubeType);
-CubeType sequential(CubeType);
-CubeType hash(CubeType);
-CubeType randnum(CubeType);
 
 // メモ
 // g++ -std=c++1z cubing.cpb
@@ -27,57 +20,19 @@ std::string OutputFileName="output.txt";
 time_t timer; // 経過時間を表示する為の宣言
 struct tm *t_st;
 
-struct Cube {
-    std::string plain;
-    std::string cipher;
-    std::string key;
-    CubeType cubing;
 
-    void Input() {
-        plain = inputfn();
-    }
-    void Output() {
-        outputfn(cipher);
-    }
-    void Cubing_key() {
-        key = cubing_key();
-    }
-    void String_to_Cubing() {
-        cubing = string_to_cubing(plain);
-    }
-    void Cubing_to_String() {
-        cipher = cubing_to_string(cubing);
-    }
-    void Cubing_encrypt() {
-        cubing = cubing_en(cubing, key);
-    }
-    void Shuffle() {
-        cubing = shuffle(cubing);
-    }
-    void Hash() {
-        cubing = hash(cubing);
-    }
-    void Sequential() {
-        cubing = sequential(cubing);
-    }
-    void Randnum() {
-        cubing = randnum(cubing);
-    }
-};
 
 int main(void) {
-    Cube cube;
+    std::string str;
+    std::string key;
 
-    cube.Input();
-    cube.Cubing_key();
-    cube.String_to_Cubing();
-    cube.Hash();
-    cube.Sequential();
-    cube.Randnum();
+    str = inputfn();
+    key = cubing_key();
+    
+    Cube cube = {str,key};      //あとで引数をポインタに変える
     cube.Cubing_encrypt();
-    cube.Shuffle();
-    cube.Cubing_to_String();
-    cube.Output();
+
+    outputfn(cube.str);         //ここもcube.str->strに変える
 
     return 0;
 }
@@ -230,66 +185,4 @@ std::string cubing_to_string(CubeType cubing) {
         }
     }
     return s;
-}
-
-// Fisher–Yates
-CubeType shuffle(CubeType ary) {
-
-    for(int i = ary.size() - 1; i > 0; i--) {
-        int j = rand() % i;
-        for(int k = 0; k < 54; k++) {
-            char c = ary[i][k];
-            ary[i][k] = ary[j][k];
-            ary[j][k] = c;
-        }    
-    }
-    return ary;
-}
-
-std::vector<std::vector<char> > hash(CubeType cubing){
-    for(int j = 0; j < cubing.size(); j++) { //ハッシュ計算
-        for(int i = 0; i < 5; i++) { //5面 
-            int sum = 0;
-            for(int k = 0; k < 9; k++) { //9文字 
-                sum += cubing[j][i*9 + k];
-            }
-            sum = sum%26 + 97;
-            cubing[j][45 + i] = sum; //ハッシュ代入
-        }
-    }
-    return cubing;
-}
-
-std::vector<std::vector<char> > sequential(CubeType cubing) {
-    for(int i = 0; i < cubing.size(); i++) { //シーケンス番号
-        if(i < 26*52) {
-            cubing[i][50] = 'A' + (i/26);
-        } else {
-            cubing[i][50] = 'a' + (i/26);
-        }
-
-        if(i < 25) {
-            cubing[i][51] = 'A' + (i%26);
-        } else {
-            cubing[i][51] = 'a' + (i%26);
-        }
-    }
-    return cubing;
-}
-
-std::vector<std::vector<char> > randnum(CubeType cubing){
-    for(int i = 0; i < cubing.size(); i++) { // 乱数文字付与
-        if(rand() % 10 == 0) {
-            cubing[i][52] = rand() % 26 + 'A'; // 小文字or大文字の乱数
-        } else {
-            cubing[i][52]=rand()%26+'a';
-        }
-        
-        if(rand() % 10 == 0) {
-            cubing[i][53] = rand() % 26 + 'A';
-        } else {
-            cubing[i][53] = rand() % 26 + 'a';
-        }
-    }
-	return cubing;
 }
