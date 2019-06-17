@@ -13,7 +13,7 @@ std::string inputfn();
 std::string cubing_key();
 
 // メモ
-// g++ -std=c++1z cubing.cpb
+// g++ -std=c++1z cubing.cpp
 
 std::string InputFileName="input.txt";
 std::string OutputFileName="output.txt";
@@ -29,10 +29,10 @@ int main(void) {
     str = inputfn();
     key = cubing_key();
     
-    Cube cube = {str,key};      //あとで引数をポインタに変える
+    Cube cube = { &str, &key };
     cube.Cubing_encrypt();
 
-    outputfn(cube.str);         //ここもcube.str->strに変える
+    outputfn(str);
 
     return 0;
 }

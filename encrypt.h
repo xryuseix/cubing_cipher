@@ -12,18 +12,18 @@ CubeType hash(CubeType);
 CubeType randnum(CubeType);
 
 struct Cube {
-    std::string str;
-    std::string key;
+    std::string *str;
+    std::string *key;
     CubeType cubing;
 
     void Cubing_encrypt() {
-        cubing = string_to_cubing(str);
+        cubing = string_to_cubing(*str);
         cubing = hash(cubing);
         cubing = sequential(cubing);
         cubing = randnum(cubing);
-        cubing = cubing_en(cubing, key);
+        cubing = cubing_en(cubing, *key);
         cubing = shuffle(cubing);
-        str = cubing_to_string(cubing);
+        *str = cubing_to_string(cubing);
     }
 };
 
