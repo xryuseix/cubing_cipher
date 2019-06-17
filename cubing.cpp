@@ -4,6 +4,7 @@
 #include <string>
 #include <fstream>
 #include <vector>
+#include "encrypt.h"
 
 using CubeType = std::vector<std::vector<char>>;
 
@@ -19,7 +20,7 @@ CubeType hash(CubeType);
 CubeType randnum(CubeType);
 
 // メモ
-// g++ -std=c++1z cuning.cpp
+// g++ -std=c++1z cubing.cpb
 
 std::string InputFileName="input.txt";
 std::string OutputFileName="output.txt";
