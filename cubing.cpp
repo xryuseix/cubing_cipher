@@ -1,55 +1,32 @@
 #include <iostream>
 #include <ctime>
 #include <cstdlib>
-#include <string>
 #include <fstream>
 #include <vector>
 #include "encrypt.h"
 
 using CubeType = std::vector<std::vector<char>>;
 
-void outputfn(std::string);
-std::string inputfn();
-std::string cubing_key();
-
 // メモ
 // g++ -std=c++1z cubing.cpp
 
-std::string InputFileName="input.txt";
-std::string OutputFileName="output.txt";
+char InputFileName[] = "input.txt";
+char OutputFileName[] = "output.txt";
 time_t timer; // 経過時間を表示する為の宣言
 struct tm *t_st;
 
-
-
-int main(void) {
-    std::string str;
-    std::string key;
-
-    str = inputfn();
-    key = cubing_key();
+int cubing_key(char *key) {
+    std::cout << std::endl << "転置鍵を入力してください" << std::endl;
+    char c;
+    int idx = 0;
     
-    Cube cube = { &str, &key };
-    cube.Cubing_encrypt();
+    scanf("%s", key);
 
-    outputfn(str);
-
-    return 0;
-}
-
-std::string inputfn() { // 文字入力関数
-    std::string s = "", buf;
-    std::ifstream reading_file(InputFileName);
-
-    while (!reading_file.eof()) {
-        getline(reading_file, buf);
-        s += buf + "\n";
+    while(key[idx] != '\0'){
+        idx++;
     }
-
-    s = s.substr(0, s.length() - 1);
-    std::cout << s << std::endl;
-    std::cout << std::endl << "が入力されました" << std::endl;
-    return s;
+    idx = idx - idx%3; // keyの長さを3の倍数にする
+    return idx;
 }
 
 void outputfn(std::string s) { //文字出力関数
@@ -59,130 +36,32 @@ void outputfn(std::string s) { //文字出力関数
     std::cout << "ファイルへの出力が完了しました" << std::endl;
 }
 
-std::string cubing_key() {
-    std::cout << std::endl << "転置鍵を入力してください" << std::endl;
-    std::string key;
-    std::cin >> key;
-    key = key.substr(0, key.length() - key.length() % 3); // keyの長さを3の倍数にする
-    return key;
-}
+int main(void) {
+    char str[46];
+    char key[46];
+    char c;
+    int strlen;
+    int keylen;
 
-CubeType string_to_cubing(std::string s) {
-    CubeType cubing(s.length()/46 + 1, std::vector<char>(54));
+    FILE *fp;
+    fp = fopen(InputFileName, "r");
 
-    for(int i = 0; i < s.length()/46 + 1; i++) { // 平文をcubing配列に格納
-        for(int j = 0; j < 45; j++) {
-            cubing[i][j] = s[i*45 + j];
-        }
+    strlen = 0;
+
+    while((c = fgetc(fp)) != EOF) {
+        str[strlen] = c;
+        strlen++;
     }
 
-    for(int i = 44; i >= s.length() % 46; i--) {
-        cubing[cubing.size() - 1][i] = '*'; // 末尾に＊をつける
-    }
-    return cubing;
-}
+    printf("%s\n", str);
+    printf("\nが入力されました\n");
 
-CubeType cubing_en(CubeType cubing, std::string key) {
-    /*
-    //Visualizer
-    //配列の中の数字がどのように格納されているのか見てわかるように表示する
-    //デバッグ用
-    std::cout << "平文" << std::endl;
-    for(int i = 0; i <= cubing.size()/45; i++) {
-        for(j = 0; j < 54; j++) {
-            if(j == 0 || j == 3 || j == 6 || j == 45 || j == 48 || j == 51) {
-                std::cout << "   " ;
-            }
-            std::cout << cubing[i][j];
-            if(j == 2 || j == 5 || j == 8 || j == 20 || j == 32 || j == 44 || j == 47 || j == 50 || j == 53) {
-                std::cout << std::endl;
-            }
-        }
-        std::cout << std::endl;;
-    }
-    */
+    keylen = cubing_key(key);
+    
+    struct Cube cube = { &str[46], &key[46], &strlen, &keylen };
+    cube.Cubing_encrypt();
 
-    for(int n = 0; n < key.length(); n++) { // keyはkey.len回文字を変えて暗号化する
-        for(int j = 0; j < cubing.size(); j++) { // 行数回ループ
-            for(int i = 0; i < key.length(); i = i + 3) { // 転置
-                int num = 2 + key[i + 2] - '3'; // 型変換('1'->0,'2'->1)
-                char letter;
-                
-                if(key[i] == '1') { // 方向 // 縦方向 
-                    for(int k = 0; k < 3 - ('3' - key[i + 2]); k++) { // 回数 
-                        letter=cubing[j][0 + num]; // numは転値対象列(0~2)
-                        
-                        // ここの変則的な数字は配列にしてもいい
-                        // が、ネストが増える上にプログラムの意味がわからなくなりそうなので残す
-                        
-                        cubing[j][0 + num] = cubing[j][3 + num];
-                        cubing[j][3 + num] = cubing[j][6 + num];
-                        cubing[j][6 + num] = cubing[j][12 + num];
-                        cubing[j][12 + num] = cubing[j][24 + num];
-                        cubing[j][24 + num] = cubing[j][36 + num];
-                        cubing[j][36 + num] = cubing[j][45 + num];
-                        cubing[j][45 + num] = cubing[j][48 + num];
-                        cubing[j][48 + num] = cubing[j][51 + num];
-                        cubing[j][51 + num] = cubing[j][44 - num];
-                        cubing[j][44 - num] = cubing[j][32 - num];
-                        cubing[j][32 - num] = cubing[j][20 - num];
-                        cubing[j][20 - num] = letter;
-                    }
-                } else if(key[i] == '2'){ // 横方向
-                    for(int k = 0; k < 3 - ('3' - key[i + 2]); k++) {
-                        letter = cubing[j][9 + 12*num];
-                        for(int m = 0; m < 11; m++) {
-                          cubing[j][9 + 12*num + m] = cubing[j][10 + 12*num + m];
-                        }
-                        cubing[j][20 + 12*num] = letter;
-                    }
-                } else if(key[i] == '3') { // 回転方向
-                    for(int k = 0; k < 3 - ('3' - key[i + 2]); k++) {
-                        letter = cubing[j][6 - 3*num];
-                        cubing[j][6 - 3*num] = cubing[j][7 - 3*num];
-                        cubing[j][7 - 3*num] = cubing[j][8 - 3*num];
-                        cubing[j][8 - 3*num] = cubing[j][15 + num];
-                        cubing[j][15 + num] = cubing[j][27 + num];
-                        cubing[j][27 + num] = cubing[j][39 + num];
-                        cubing[j][39 + num] = cubing[j][47 + 3*num];
-                        cubing[j][47 + 3*num] = cubing[j][46 + 3*num];
-                        cubing[j][46 + 3*num] = cubing[j][45 + 3*num];
-                        cubing[j][45 + 3*num] = cubing[j][35 - num];
-                        cubing[j][35 - num] = cubing[j][23 - num];
-                        cubing[j][23 - num] = cubing[j][11 - num];
-                        cubing[j][11 - num] = letter;
-                    }
-                }
-            }
-        }
-        key = key.substr(1) + key[0]; // 鍵を１文字ずらす
-    }
+    outputfn(str);
 
-    /*
-    //Visualizer    
-    std::cout << "暗号文" << std::endl;
-    for(j = 0; j < cubing.size(); j++) {
-        for(int k = 0; k < 54; k++) {
-            if(k == 0 || k == 3 || k == 6 || k == 45 || k == 48 || k == 51) {
-                std::cout << "   ";
-            }
-            std::cout << cubing[j][k];
-            if(k == 2 || k == 5 || k == 8 || k == 20 || k == 32 || k == 44 || k == 47 || k == 50 || k == 53) {
-                std::cout << std::endl;
-            }
-        }
-        std::cout << std::endl;
-    }
-    */
-    return cubing;
-}
-
-std::string cubing_to_string(CubeType cubing) {
-    std::string s = "";
-    for(int i = 0; i < cubing.size(); i++) { // 出力用 
-        for(int j = 0; j < 54; j++) {
-            s += cubing[i][j];
-        }
-    }
-    return s;
+    return 0;
 }

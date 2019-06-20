@@ -1,4 +1,1 @@
-This is asamplesentenceforprogramofencryption.
-aaa
-bbb
-ccc
+This is a sample sentence.
