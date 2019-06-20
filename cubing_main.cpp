@@ -3,13 +3,17 @@
 using CubeType = std::vector<std::vector<char>>;
 
 struct Cube {
-    CubeType cube;
+    CubeType cubing;
     Cube () {
       // write here
     }
   
-    void shuffle() {
-      // write here
+    void encryupt() {
+        cubing = hash(cubing);
+        cubing = sequential(cubing);
+        cubing = randnum(cubing);
+        cubing = cubing_en(cubing, key);
+        cubing = shuffle(cubing);
     }
   
     void print() {
@@ -18,12 +22,13 @@ struct Cube {
                 printf("%c",cube[i][j]);
             }
         }
+        printf("\n");
     }
 };
 
 int main(int ac, char **av) {
     Cube cube;
-    cube.shuffle();
+    cube.encryupt();
     cube.print();
     return 0;
 }
