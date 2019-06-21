@@ -17,9 +17,9 @@ struct Cube {
     }
   
     void print() {
-        for(int i = 0; i < cube.size(); i++){
-            for(int j = 0; j < cube[i].size(); j++){
-                printf("%c",cube[i][j]);
+        for(int i = 0; i < cubing.size(); i++){
+            for(int j = 0; j < cubing[i].size(); j++){
+                printf("%c",cubing[i][j]);
             }
         }
         printf("\n");
