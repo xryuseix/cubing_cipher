@@ -1,34 +1,28 @@
 #include <vector>
 
 struct Cube {
-    std::vector<std::vector<char>> cubing;
-    Cube () {
-      // write here
-    }
-  
-    void shuffle() {
-        for(int i = cubing.size() - 1; i > 0; i--) {
-            int j = rand() % i;
-            for(int k = 0; k < 54; k++) {
-                char c = cubing[i][k];
-                cubing[i][k] = cubing[j][k];
-                cubing[j][k] = c;
-            }    
+    std::vector<char> cubing;
+    Cube (int length, char* str) {
+        for(int i = 0; i < length; i++) {
+            cubing[i] = str[i];
         }
     }
   
+    void shuffle() {
+        //
+    }
+  
     void print() {
-        for(int i = 0; i < cubing.size(); i++){
-            for(int j = 0; j < cubing[i].size(); j++){
-                printf("%c",cubing[i][j]);
-            }
+        for(int i = 0; i < cubing.size(); i++) {
+            printf("%c",cubing[i]);
         }
         printf("\n");
     }
 };
 
 int main(int ac, char **av) {
-    Cube cube;
+    char str[45] = {'a','b','c','d','e'};
+    Cube cube(5, str);
     cube.shuffle();
     cube.print();
     return 0;
