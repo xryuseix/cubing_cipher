@@ -2,9 +2,13 @@
 
 struct Cube {
     std::vector<char> cubing;
+
     Cube (int length, char* str) {
         for(int i = 0; i < length; i++) {
-            cubing[i] = str[i];
+            cubing.push_back(str[i]);
+        }
+        for(int i = length; i < 54; i++) {
+            cubing.push_back('*');
         }
     }
   
