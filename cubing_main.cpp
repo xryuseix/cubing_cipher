@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 
 struct CubeOP {
     int direction;
@@ -8,14 +7,14 @@ struct CubeOP {
 };
 
 struct Cube {
-    std::vector<char> cubing;
+    char cubing[54];
 
     Cube (char* str, int slength) {
         for(int i = 0; i < slength; i++) {
-            cubing.push_back(str[i]);
+            cubing[i]=str[i];
         }
         for(int i = slength; i < 54; i++) {
-            cubing.push_back('*');
+            cubing[i]='*';
         }
     }
   
@@ -70,12 +69,16 @@ struct Cube {
     }
   
     void print() {
-        for(int i = 0; i < cubing.size(); i++) {
+        for(int i = 0; i < 54; i++) {
             printf("%c",cubing[i]);
         }
         printf("\n");
     }
 };
+
+bool isEqual(Cube a, Cube b){
+    return true;
+}
 
 int main(int ac, char **av) {
     char str[45] = {'a','b','c','d','e'};
