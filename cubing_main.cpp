@@ -77,7 +77,13 @@ struct Cube {
 };
 
 bool isEqual(Cube a, Cube b){
-    return true;
+    bool equal = true;
+    for(int i = 0; i < 54; i++) {
+        if(a.cubing[i] != b.cubing[i]) {
+            equal = false;
+        }
+    }
+    return equal;
 }
 
 int main(int ac, char **av) {
@@ -90,6 +96,21 @@ int main(int ac, char **av) {
     Cube cube(str, 5);
     //encode(cube, str);
     cube.rotate(key, 1);
+    
+
+    //比較関数テスト
+    
+    char IdealStr[54] = {'a','*','c','d','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','e','*','*','*','*','*','*','*','*','*','*','*','b','*','*','*','*','*','*','*','*','*','*'};
+    char str2[45] = {'a'};
+    Cube ideal(str2,1);
+    for(int i = 0; i < 54; i++) {
+        ideal.cubing[i] = IdealStr[i];
+    }
+    printf("%d\n",isEqual(cube,ideal));
+
+    //比較関数テストここまで
+    
+
     //decode(cube, res);
     cube.print();
     return 0;
