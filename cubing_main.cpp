@@ -11,10 +11,10 @@ struct Cube {
 
     Cube (char* str, int slength) {
         for(int i = 0; i < slength; i++) {
-            cubing[i]=str[i];
+            cubing[i] = str[i];
         }
         for(int i = slength; i < 54; i++) {
-            cubing[i]='*';
+            cubing[i] = '*';
         }
     }
   
@@ -67,6 +67,16 @@ struct Cube {
             }
         }
     }
+
+    bool isEqual(Cube a){
+        bool equal = true;
+        for(int i = 0; i < 54; i++) {
+            if(cubing[i] != a.cubing[i]) {
+                equal = false;
+            }
+        }
+        return equal;
+    }
   
     void print() {
         for(int i = 0; i < 54; i++) {
@@ -75,16 +85,6 @@ struct Cube {
         printf("\n");
     }
 };
-
-bool isEqual(Cube a, Cube b){
-    bool equal = true;
-    for(int i = 0; i < 54; i++) {
-        if(a.cubing[i] != b.cubing[i]) {
-            equal = false;
-        }
-    }
-    return equal;
-}
 
 int main(int ac, char **av) {
     char str[45] = {'a','b','c','d','e'};
@@ -100,13 +100,9 @@ int main(int ac, char **av) {
 
     //比較関数テスト
     
-    char IdealStr[54] = {'a','*','c','d','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','e','*','*','*','*','*','*','*','*','*','*','*','b','*','*','*','*','*','*','*','*','*','*'};
-    char str2[45] = {'a'};
-    Cube ideal(str2,1);
-    for(int i = 0; i < 54; i++) {
-        ideal.cubing[i] = IdealStr[i];
-    }
-    printf("%d\n",isEqual(cube,ideal));
+    char ExpectedStr[54] = {'a','*','c','d','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','e','*','*','*','*','*','*','*','*','*','*','*','b','*','*','*','*','*','*','*','*','*','*'};
+    Cube expect(ExpectedStr,54);
+    printf("%d\n",cube.isEqual(expect));
 
     //比較関数テストここまで
     
