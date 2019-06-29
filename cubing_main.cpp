@@ -86,28 +86,33 @@ struct Cube {
     }
 };
 
-int main(int ac, char **av) {
+void cube_assert(Cube a, Cube b){
+    printf("AC\n");
+    return;
+}
+
+void unit_test() {
+    {
     char str[45] = {'a','b','c','d','e'};
+    char ExpectedStr[54] = {'a','*','c','d','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','e','*','*','*','*','*','*','*','*','*','*','*','b','*','*','*','*','*','*','*','*','*','*'};
+    
+    Cube cube(str, 5);
+    Cube expect(ExpectedStr,54);
+
     CubeOP key[100];
     CubeOP op = {1,2,3};
     key[0] = op;
-    //std::vector<Key> key = genKey();
 
-    Cube cube(str, 5);
-    //encode(cube, str);
     cube.rotate(key, 1);
-    
+    cube_assert(cube,expect);
+    }
+    return;
+}
 
-    //比較関数テスト
-    
-    char ExpectedStr[54] = {'a','*','c','d','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','e','*','*','*','*','*','*','*','*','*','*','*','b','*','*','*','*','*','*','*','*','*','*'};
-    Cube expect(ExpectedStr,54);
-    printf("%d\n",cube.isEqual(expect));
 
-    //比較関数テストここまで
-    
 
-    //decode(cube, res);
-    cube.print();
+int main(int ac, char **av) {
+    unit_test();
+    // cube.print();
     return 0;
 }
