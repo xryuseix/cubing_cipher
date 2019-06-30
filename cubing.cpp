@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <vector>
-#include "encrypt.h"
+// #include "encrypt.h"
 
 using CubeType = std::vector<std::vector<char>>;
 

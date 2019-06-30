@@ -87,7 +87,12 @@ struct Cube {
 };
 
 void cube_assert(Cube a, Cube b){
-    printf("AC\n");
+    if(a.isEqual(b)) {
+        printf("AC\n");
+    }
+    else {
+        printf("WA\n");
+    }
     return;
 }
 
@@ -97,14 +102,14 @@ void unit_test() {
     char ExpectedStr[54] = {'a','*','c','d','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','e','*','*','*','*','*','*','*','*','*','*','*','b','*','*','*','*','*','*','*','*','*','*'};
     
     Cube cube(str, 5);
-    Cube expect(ExpectedStr,54);
+    Cube expected(ExpectedStr,54);
 
     CubeOP key[100];
     CubeOP op = {1,2,3};
     key[0] = op;
 
     cube.rotate(key, 1);
-    cube_assert(cube,expect);
+    cube_assert(cube,expected);
     }
     return;
 }
