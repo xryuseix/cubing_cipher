@@ -25,7 +25,7 @@ struct Cube {
             if(key[i].direction == 1) { // 方向 // 縦方向 
                 for(int k = 0; k < key[i].times; k++) { // 回数 
 
-                    letter=cubing[0 + col]; // colは転値対象列(0~2)
+                    letter = cubing[0 + col]; // colは転値対象列(0~2)
                     cubing[0 + col] = cubing[3 + col];
                     cubing[3 + col] = cubing[6 + col];
                     cubing[6 + col] = cubing[12 + col];
@@ -68,11 +68,12 @@ struct Cube {
         }
     }
 
-    bool isEqual(Cube a){
+    bool equals(Cube a){
         bool equal = true;
         for(int i = 0; i < 54; i++) {
             if(cubing[i] != a.cubing[i]) {
                 equal = false;
+                printf("[ Failed ] Testing rotate number ( %d )\n", i+1);
             }
         }
         return equal;
@@ -80,14 +81,14 @@ struct Cube {
   
     void print() {
         for(int i = 0; i < 54; i++) {
-            printf("%c",cubing[i]);
+            printf("%c", cubing[i]);
         }
         printf("\n");
     }
 };
 
 void cube_assert(Cube a, Cube b){
-    if(a.isEqual(b)) {
+    if(a.equals(b)) {
         printf("AC\n");
     }
     else {
@@ -98,18 +99,18 @@ void cube_assert(Cube a, Cube b){
 
 void unit_test() {
     {
-    char str[45] = {'a','b','c','d','e'};
-    char ExpectedStr[54] = {'a','*','c','d','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','*','e','*','*','*','*','*','*','*','*','*','*','*','b','*','*','*','*','*','*','*','*','*','*'};
+    char str[45] = {'a', 'b', 'c', 'd', 'e'};
+    char ExpectedStr[54] = {'a', '*', 'c', 'd', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', 'e', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', 'b', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'};
     
     Cube cube(str, 5);
-    Cube expected(ExpectedStr,54);
+    Cube expected(ExpectedStr, 54);
 
     CubeOP key[100];
-    CubeOP op = {1,2,3};
+    CubeOP op = {1, 2, 3};
     key[0] = op;
 
     cube.rotate(key, 1);
-    cube_assert(cube,expected);
+    cube_assert(cube, expected);
     }
     return;
 }
