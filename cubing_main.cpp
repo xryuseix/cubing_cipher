@@ -73,7 +73,6 @@ struct Cube {
         for(int i = 0; i < 54; i++) {
             if(cubing[i] != a.cubing[i]) {
                 equal = false;
-                printf("[ Failed ] Testing rotate number ( %d )\n", i+1);
             }
         }
         return equal;
@@ -98,7 +97,8 @@ void cube_assert(Cube a, Cube b){
 }
 
 void unit_test() {
-    {
+
+    { //縦方向テスト
     char str[45] = {'a', 'b', 'c', 'd', 'e'};
     char ExpectedStr[54] = {'a', '*', 'c', 'd', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', 'e', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', 'b', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'};
     
@@ -107,6 +107,36 @@ void unit_test() {
 
     CubeOP key[100];
     CubeOP op = {1, 2, 3};
+    key[0] = op;
+
+    cube.rotate(key, 1);
+    cube_assert(cube, expected);
+    }
+
+    { //横方向テスト
+    char str[45] = {'a', 'b', 'c', 'd', 'e'};
+    char ExpectedStr[54] = {'a', 'b', 'c', 'd', 'e', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'};
+    
+    Cube cube(str, 5);
+    Cube expected(ExpectedStr, 54);
+
+    CubeOP key[100];
+    CubeOP op = {2, 2, 3};
+    key[0] = op;
+
+    cube.rotate(key, 1);
+    cube_assert(cube, expected);
+    }
+
+    { //回転方向テスト
+    char str[45] = {'a', 'b', 'c', 'd', 'e'};
+    char ExpectedStr[54] = {'a', 'b', 'c', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', 'e', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', 'd', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'};
+    
+    Cube cube(str, 5);
+    Cube expected(ExpectedStr, 54);
+
+    CubeOP key[100];
+    CubeOP op = {3, 2, 3};
     key[0] = op;
 
     cube.rotate(key, 1);
