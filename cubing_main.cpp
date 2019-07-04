@@ -145,10 +145,55 @@ void unit_test() {
     return;
 }
 
+Cube encode(Cube cube) {
+    //ハッシュ計算
+    for(int i = 0; i < 5; i++) { //5面 
+        int sum = 0;
+        for(int k = 0; k < 9; k++) { //9文字 
+            sum += cube.cubing[i*9 + k];
+        }
+        sum = sum%26 + 97;
+        cube.cubing[45 + i] = sum; //ハッシュ代入
+    }
 
+    //シーケンス番号
+    cube.cubing[50] = 'A';
+    cube.cubing[51] = 'A';
+
+    // 乱数文字付与
+    if(rand() % 2 == 0) {
+        cube.cubing[52] = rand()%26 + 'A';
+    } else {
+        cube.cubing[52]=rand()%26 + 'a';
+    }
+    if(rand() % 2 == 0) {
+        cube.cubing[53] = rand()%26 + 'A';
+    } else {
+        cube.cubing[53] = rand()%26 + 'a';
+    }
+    
+    return cube;
+}
+
+Cube decode(Cube cube) {
+    for(int i = 45; i < 54; i++) {
+        cube.cubing[i] = '*';
+    }
+    return cube;
+}
+
+void en_decode_test(){
+    char str[45] = {'a', 'b', 'c', 'd', 'e'};
+    Cube cube(str, 5);
+    if(decode(encode(cube)).equals(cube)) {
+        printf("AC\n");
+    }
+    return;
+}
 
 int main(int ac, char **av) {
     unit_test();
+    en_decode_test();
     // cube.print();
     return 0;
 }
