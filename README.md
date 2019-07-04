@@ -14,5 +14,5 @@ cubing.cppが参照するファイル
 cubing.cppが参照するファイル  
 暗号文が出力される
 
-## the structure of a cubing code.mp4.zip
-暗号化の仕組みのを視覚化した動画の圧縮ファイル
+## cubing_main
+cubing暗号プログラムの移行ファイル
