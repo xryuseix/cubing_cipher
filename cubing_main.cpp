@@ -9,12 +9,9 @@ struct CubeOP {
 struct Cube {
     char cubing[54];
 
-    Cube (char* str, int slength) {
-        for(int i = 0; i < slength; i++) {
+    Cube (char* str) {
+        for(int i = 0; i < 54; i++) {
             cubing[i] = str[i];
-        }
-        for(int i = slength; i < 54; i++) {
-            cubing[i] = '*';
         }
     }
   
@@ -102,8 +99,8 @@ void unit_test() {
     char str[45] = {'a', 'b', 'c', 'd', 'e'};
     char ExpectedStr[54] = {'a', '*', 'c', 'd', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', 'e', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', 'b', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'};
     
-    Cube cube(str, 5);
-    Cube expected(ExpectedStr, 54);
+    Cube cube(str);
+    Cube expected(ExpectedStr);
 
     CubeOP key[100];
     CubeOP op = {1, 2, 3};
@@ -117,8 +114,8 @@ void unit_test() {
     char str[45] = {'a', 'b', 'c', 'd', 'e'};
     char ExpectedStr[54] = {'a', 'b', 'c', 'd', 'e', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'};
     
-    Cube cube(str, 5);
-    Cube expected(ExpectedStr, 54);
+    Cube cube(str);
+    Cube expected(ExpectedStr);
 
     CubeOP key[100];
     CubeOP op = {2, 2, 3};
@@ -132,8 +129,8 @@ void unit_test() {
     char str[45] = {'a', 'b', 'c', 'd', 'e'};
     char ExpectedStr[54] = {'a', 'b', 'c', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', 'e', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', 'd', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'};
     
-    Cube cube(str, 5);
-    Cube expected(ExpectedStr, 54);
+    Cube cube(str);
+    Cube expected(ExpectedStr);
 
     CubeOP key[100];
     CubeOP op = {3, 2, 3};
@@ -145,47 +142,24 @@ void unit_test() {
     return;
 }
 
-Cube encode(Cube cube) {
-    //ハッシュ計算
-    for(int i = 0; i < 5; i++) { //5面 
-        int sum = 0;
-        for(int k = 0; k < 9; k++) { //9文字 
-            sum += cube.cubing[i*9 + k];
-        }
-        sum = sum%26 + 97;
-        cube.cubing[45 + i] = sum; //ハッシュ代入
-    }
-
-    //シーケンス番号
-    cube.cubing[50] = 'A';
-    cube.cubing[51] = 'A';
-
-    // 乱数文字付与
-    if(rand() % 2 == 0) {
-        cube.cubing[52] = rand()%26 + 'A';
-    } else {
-        cube.cubing[52]=rand()%26 + 'a';
-    }
-    if(rand() % 2 == 0) {
-        cube.cubing[53] = rand()%26 + 'A';
-    } else {
-        cube.cubing[53] = rand()%26 + 'a';
-    }
-    
-    return cube;
+Cube str2cube(char *str) {
+    Cube cube (str);
+    return std::move(cube);
 }
 
-Cube decode(Cube cube) {
-    for(int i = 45; i < 54; i++) {
-        cube.cubing[i] = '*';
+char cube2str(Cube cube) {
+    char str[54];
+    for(int i = 0; i < 54; i++) {
+        str[i] = cube.cubing[i];
     }
-    return cube;
+    return *str;
 }
 
 void en_decode_test(){
-    char str[45] = {'a', 'b', 'c', 'd', 'e'};
-    Cube cube(str, 5);
-    if(decode(encode(cube)).equals(cube)) {
+    char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'a', 'b'};
+    Cube cube = str2cube(str);
+    
+    if(cube2str(cube)==*str) {
         printf("AC\n");
     }
     return;
