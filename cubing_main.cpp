@@ -147,21 +147,36 @@ Cube str2cube(char *str) {
     return std::move(cube);
 }
 
-char cube2str(Cube cube) {
-    char str[54];
+void cube2str(Cube cube, char *str) {
     for(int i = 0; i < 54; i++) {
         str[i] = cube.cubing[i];
     }
-    return *str;
+    return;
 }
 
-void en_decode_test(){
+bool equals(char *str, char *str2) {
+    bool check=true;
+    for(int i = 0; i < 54; i++) {
+        if(str2[i] != str[i]) {
+            check = false;
+        }
+    }
+    return check;
+}
+
+void en_decode_test() {
     char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'a', 'b'};
+    char str2[54];
     Cube cube = str2cube(str);
-    
-    if(cube2str(cube)==*str) {
+    cube2str(cube, str2);
+
+    if(equals(str, str2)) {
         printf("AC\n");
     }
+    else{
+        printf("WA\n");
+    }
+    
     return;
 }
 
