@@ -9,13 +9,13 @@ struct CubeOP {
 struct Cube {
     char cubing[54];
 
-    Cube (char* str) {
+    Cube (char (&str)[54]) {
         for(int i = 0; i < 54; i++) {
             cubing[i] = str[i];
         }
     }
   
-    void rotate(CubeOP* key, int klength) {
+    void rotate(CubeOP (&key)[100], int klength) {
         for(int i = 0; i < klength; i = i + 3) { // 転置
             char letter;
             int col = key[i].column - 1;
@@ -96,7 +96,7 @@ void cube_assert(Cube a, Cube b){
 void unit_test() {
 
     { //縦方向テスト
-    char str[45] = {'a', 'b', 'c', 'd', 'e'};
+    char str[54] = {'a', 'b', 'c', 'd', 'e', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'};
     char ExpectedStr[54] = {'a', '*', 'c', 'd', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', 'e', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', 'b', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'};
     
     Cube cube(str);
@@ -111,7 +111,7 @@ void unit_test() {
     }
 
     { //横方向テスト
-    char str[45] = {'a', 'b', 'c', 'd', 'e'};
+    char str[54] = {'a', 'b', 'c', 'd', 'e', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'};
     char ExpectedStr[54] = {'a', 'b', 'c', 'd', 'e', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'};
     
     Cube cube(str);
@@ -126,7 +126,7 @@ void unit_test() {
     }
 
     { //回転方向テスト
-    char str[45] = {'a', 'b', 'c', 'd', 'e'};
+    char str[54] = {'a', 'b', 'c', 'd', 'e', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'};
     char ExpectedStr[54] = {'a', 'b', 'c', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', 'e', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', 'd', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'};
     
     Cube cube(str);
@@ -142,45 +142,43 @@ void unit_test() {
     return;
 }
 
-Cube str2cube(char *str) {
+Cube str2cube(char (&str)[54]) {
     Cube cube (str);
     return std::move(cube);
 }
 
-void cube2str(Cube cube, char *str) {
+void cube2str(Cube cube, char (&str)[54]) {
     for(int i = 0; i < 54; i++) {
         str[i] = cube.cubing[i];
     }
     return;
 }
 
-bool equals(char *str, char *str2) {
-    bool check=true;
-    for(int i = 0; i < 54; i++) {
-        if(str2[i] != str[i]) {
-            check = false;
-        }
-    }
-    return check;
-}
-
 void en_decode_test() {
     char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'a', 'b'};
+    char ExpectedStr[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'a', 'b'};
     char str2[54];
     Cube cube = str2cube(str);
     cube2str(cube, str2);
 
-    if(equals(str, str2)) {
-        printf("AC\n");
+    if(strncmp(cube.cubing, ExpectedStr, 54) == 0) { //f(x) == y
+        printf("encode: AC\n");
     }
     else{
-        printf("WA\n");
+        printf("encode: WA\n");
+    }
+
+    if(strncmp(str, str2, 54) == 0) { //f(y) == x
+        printf("decode: AC\n");
+    }
+    else{
+        printf("decode: WA\n");
     }
     
     return;
 }
 
-int main(int ac, char **av) {
+int main(int ac, char **av) { 
     unit_test();
     en_decode_test();
     // cube.print();
