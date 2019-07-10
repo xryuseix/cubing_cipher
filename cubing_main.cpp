@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 struct CubeOP {
     int direction;
@@ -15,8 +16,8 @@ struct Cube {
         }
     }
   
-    void rotate(CubeOP (&key)[100], int klength) {
-        for(int i = 0; i < klength; i = i + 3) { // 転置
+    void rotate(std::vector<CubeOP> &key) {
+        for(int i = 0; i < key.size(); i = i + 3) { // 転置
             char letter;
             int col = key[i].column - 1;
             if(key[i].direction == 1) { // 方向 // 縦方向 
@@ -86,8 +87,7 @@ struct Cube {
 void cube_assert(Cube a, Cube b){
     if(a.equals(b)) {
         printf("AC\n");
-    }
-    else {
+    } else {
         printf("WA\n");
     }
     return;
@@ -96,47 +96,47 @@ void cube_assert(Cube a, Cube b){
 void unit_test() {
 
     { //縦方向テスト
-    char str[54] = {'a', 'b', 'c', 'd', 'e', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'};
-    char ExpectedStr[54] = {'a', '*', 'c', 'd', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', 'e', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', 'b', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'};
+    char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
+    char ExpectedStr[54] = {'a', 'n', 'c', 'd', 'z', 'f', 'g', 'L', 'i', 'j', 'k', 'l', 'm', 'U', 'o', 'p', 'q', 'r', 's', 'h', 'u', 'v', 'w', 'x', 'y', 'X', 'A', 'B', 'C', 'D', 'E', 'e', 'G', 'H', 'I', 'J', 'K', '!', 'M', 'N', 'O', 'P', 'Q', 'b', 'S', 'T', 'R', 'V', 'W', 'F', 'Y', 'Z', 't', '?'};
     
     Cube cube(str);
     Cube expected(ExpectedStr);
 
-    CubeOP key[100];
+    std::vector<CubeOP> key;
     CubeOP op = {1, 2, 3};
-    key[0] = op;
+    key.push_back(op);
 
-    cube.rotate(key, 1);
+    cube.rotate(key);
     cube_assert(cube, expected);
     }
 
     { //横方向テスト
-    char str[54] = {'a', 'b', 'c', 'd', 'e', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'};
-    char ExpectedStr[54] = {'a', 'b', 'c', 'd', 'e', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'};
+    char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
+    char ExpectedStr[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'v', 'w', 'x', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
     
     Cube cube(str);
     Cube expected(ExpectedStr);
 
-    CubeOP key[100];
+    std::vector<CubeOP> key;
     CubeOP op = {2, 2, 3};
-    key[0] = op;
+    key.push_back(op);
 
-    cube.rotate(key, 1);
+    cube.rotate(key);
     cube_assert(cube, expected);
     }
 
     { //回転方向テスト
-    char str[54] = {'a', 'b', 'c', 'd', 'e', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'};
-    char ExpectedStr[54] = {'a', 'b', 'c', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', 'e', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', 'd', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'};
+    char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
+    char ExpectedStr[54] = {'a', 'b', 'c', 'q', 'C', 'O', 'g', 'h', 'i', 'j', 'f', 'l', 'm', 'n', 'o', 'p', 'Y', 'r', 's', 't', 'u', 'v', 'e', 'x', 'y', 'z', 'A', 'B', 'X', 'D', 'E', 'F', 'G', 'H', 'd', 'J', 'K', 'L', 'M', 'N', 'W', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'k', 'w', 'I', 'Z', '!', '?'};
     
     Cube cube(str);
     Cube expected(ExpectedStr);
 
-    CubeOP key[100];
+    std::vector<CubeOP> key;
     CubeOP op = {3, 2, 3};
-    key[0] = op;
+    key.push_back(op);
 
-    cube.rotate(key, 1);
+    cube.rotate(key);
     cube_assert(cube, expected);
     }
     return;
@@ -155,24 +155,32 @@ void cube2str(Cube cube, char (&str)[54]) {
 }
 
 void en_decode_test() {
-    char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'a', 'b'};
-    char ExpectedStr[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'a', 'b'};
-    char str2[54];
-    Cube cube = str2cube(str);
-    cube2str(cube, str2);
+    {
+        char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
+        char ExpectedStr[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
+        
+        Cube cube = str2cube(str);
 
-    if(strncmp(cube.cubing, ExpectedStr, 54) == 0) { //f(x) == y
-        printf("encode: AC\n");
-    }
-    else{
-        printf("encode: WA\n");
+        if(strncmp(cube.cubing, ExpectedStr, 54) == 0) { //f(x) == y
+            printf("encode: AC\n");
+        } else {
+            printf("encode: WA\n");
+        }
     }
 
-    if(strncmp(str, str2, 54) == 0) { //f(y) == x
-        printf("decode: AC\n");
-    }
-    else{
-        printf("decode: WA\n");
+    {
+        char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
+        char ExpectedStr[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
+        char buf[54];
+        
+        Cube cube(str);
+        cube2str(cube, buf);
+        
+        if(strncmp(buf, ExpectedStr, 54) == 0) { //f(y) == x
+            printf("decode: AC\n");
+        } else {
+            printf("decode: WA\n");
+        }
     }
     
     return;
