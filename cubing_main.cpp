@@ -65,7 +65,7 @@ struct Cube {
             }
         }
     }
-
+/* 
     bool equals(Cube a){
         bool equal = true;
         for(int i = 0; i < 54; i++) {
@@ -75,7 +75,7 @@ struct Cube {
         }
         return equal;
     }
-  
+*/
     void print() {
         for(int i = 0; i < 54; i++) {
             printf("%c", cubing[i]);
@@ -84,14 +84,25 @@ struct Cube {
     }
 };
 
-void cube_assert(Cube a, Cube b){
-    if(a.equals(b)) {
+template <class T>
+void equals(T& a, T& b) {
+    bool equal = true;
+    for(int i = 0; i < 54; i++) {
+        if(a[i] != b[i]) {
+            equal = false;
+        }
+    }
+    if(equal) {
         printf("AC\n");
     } else {
         printf("WA\n");
     }
-    return;
 }
+/*
+void cube_assert(Cube a, Cube b){
+    equals(a.cubing, b.cubing);
+    return;
+}*/
 
 void unit_test() {
 
@@ -107,7 +118,7 @@ void unit_test() {
     key.push_back(op);
 
     cube.rotate(key);
-    cube_assert(cube, expected);
+    equals(cube.cubing, expected.cubing);
     }
 
     { //横方向テスト
@@ -122,7 +133,7 @@ void unit_test() {
     key.push_back(op);
 
     cube.rotate(key);
-    cube_assert(cube, expected);
+    equals(cube.cubing, expected.cubing);
     }
 
     { //回転方向テスト
@@ -137,7 +148,7 @@ void unit_test() {
     key.push_back(op);
 
     cube.rotate(key);
-    cube_assert(cube, expected);
+    equals(cube.cubing, expected.cubing);
     }
     return;
 }
@@ -161,11 +172,7 @@ void en_decode_test() {
         
         Cube cube = str2cube(str);
 
-        if(strncmp(cube.cubing, ExpectedStr, 54) == 0) { //f(x) == y
-            printf("encode: AC\n");
-        } else {
-            printf("encode: WA\n");
-        }
+        equals(cube.cubing, ExpectedStr);
     }
 
     {
@@ -176,11 +183,7 @@ void en_decode_test() {
         Cube cube(str);
         cube2str(cube, buf);
         
-        if(strncmp(buf, ExpectedStr, 54) == 0) { //f(y) == x
-            printf("decode: AC\n");
-        } else {
-            printf("decode: WA\n");
-        }
+        equals(buf, ExpectedStr);
     }
     
     return;
