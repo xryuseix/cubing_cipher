@@ -65,8 +65,8 @@ struct Cube {
             }
         }
     }
-/* 
-    bool equals(Cube a){
+
+    bool equals(const Cube a){
         bool equal = true;
         for(int i = 0; i < 54; i++) {
             if(cubing[i] != a.cubing[i]) {
@@ -75,7 +75,7 @@ struct Cube {
         }
         return equal;
     }
-*/
+
     void print() {
         for(int i = 0; i < 54; i++) {
             printf("%c", cubing[i]);
@@ -85,14 +85,18 @@ struct Cube {
 };
 
 template <class T>
-void equals(T& a, T& b) {
-    bool equal = true;
-    for(int i = 0; i < 54; i++) {
-        if(a[i] != b[i]) {
-            equal = false;
-        }
-    }
-    if(equal) {
+bool Equal(const T& a, const T& b) {
+    return a == b;
+}
+
+template <>
+bool Equal(const Cube& a, const Cube& b) {
+    return a.equals(b);
+}
+
+template <class T>
+void assertEqual(const T& a, const T& b) {
+    if(Equal(a, b)) {
         printf("AC\n");
     } else {
         printf("WA\n");
@@ -118,7 +122,7 @@ void unit_test() {
     key.push_back(op);
 
     cube.rotate(key);
-    equals(cube.cubing, expected.cubing);
+    assertEqual(cube.cubing, expected.cubing);
     }
 
     { //横方向テスト
@@ -133,7 +137,7 @@ void unit_test() {
     key.push_back(op);
 
     cube.rotate(key);
-    equals(cube.cubing, expected.cubing);
+    assertEqual(cube.cubing, expected.cubing);
     }
 
     { //回転方向テスト
@@ -148,7 +152,7 @@ void unit_test() {
     key.push_back(op);
 
     cube.rotate(key);
-    equals(cube.cubing, expected.cubing);
+    assertEqual(cube.cubing, expected.cubing);
     }
     return;
 }
@@ -172,7 +176,7 @@ void en_decode_test() {
         
         Cube cube = str2cube(str);
 
-        equals(cube.cubing, ExpectedStr);
+        assertEqual(cube.cubing, ExpectedStr);
     }
 
     {
@@ -183,7 +187,7 @@ void en_decode_test() {
         Cube cube(str);
         cube2str(cube, buf);
         
-        equals(buf, ExpectedStr);
+        assertEqual(buf, ExpectedStr);
     }
     
     return;
