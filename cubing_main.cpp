@@ -66,7 +66,7 @@ struct Cube {
         }
     }
 
-    bool equals(const Cube a){
+    bool equals (const Cube& a) const {
         bool equal = true;
         for(int i = 0; i < 54; i++) {
             if(cubing[i] != a.cubing[i]) {
@@ -94,6 +94,15 @@ bool Equal(const Cube& a, const Cube& b) {
     return a.equals(b);
 }
 
+template <int N>
+bool Equal(const char (&a)[N], const char (&b)[N]) {
+    if(strncmp(a,b,N) == 0) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
 template <class T>
 void assertEqual(const T& a, const T& b) {
     if(Equal(a, b)) {
@@ -102,11 +111,6 @@ void assertEqual(const T& a, const T& b) {
         printf("WA\n");
     }
 }
-/*
-void cube_assert(Cube a, Cube b){
-    equals(a.cubing, b.cubing);
-    return;
-}*/
 
 void unit_test() {
 
