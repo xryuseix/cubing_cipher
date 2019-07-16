@@ -213,11 +213,9 @@ void encrypt(const std::vector<CubeOP>& key, const char (&str)[54], char (&ct)[5
     return;
 }
 
-int main(int ac, char **av) { 
-    // unit_test();
-    // en_decode_test();
-
+void encrypt_test() {
     char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
+    char ExpectedStr[54] = {'a', 'n', 'c', 'd', 'z', 'f', 'g', 'L', 'i', 'j', 'k', 'l', 'm', 'U', 'o', 'p', 'q', 'r', 's', 'h', 'u', 'v', 'w', 'x', 'y', 'X', 'A', 'B', 'C', 'D', 'E', 'e', 'G', 'H', 'I', 'J', 'K', '!', 'M', 'N', 'O', 'P', 'Q', 'b', 'S', 'T', 'R', 'V', 'W', 'F', 'Y', 'Z', 't', '?'};
     char ct[54];
     
     std::vector<CubeOP> key;
@@ -225,8 +223,16 @@ int main(int ac, char **av) {
     key.push_back(op);
     
     encrypt(key, str, ct);
+    assertEqual(ct, ExpectedStr);
 
-    printf("%s\n", ct);
+    return;
+}
+
+int main(int ac, char **av) { 
+    // unit_test();
+    // en_decode_test();
+
+    encrypt_test();
 
     return 0;
 }
