@@ -17,7 +17,7 @@ struct Cube {
     }
   
     void rotate(std::vector<CubeOP> &key) {
-        for(int i = 0; i < key.size(); i = i + 3) { // 転置
+        for(int i = 0; i < key.size(); i++) { // 転置
             char letter;
             int col = key[i].column - 1;
             if(key[i].direction == 1) { // 方向 // 縦方向 
