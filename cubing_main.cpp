@@ -10,13 +10,13 @@ struct CubeOP {
 struct Cube {
     char cubing[54];
 
-    Cube (char (&str)[54]) {
+    Cube (const char (&str)[54]) {
         for(int i = 0; i < 54; i++) {
             cubing[i] = str[i];
         }
     }
   
-    void rotate(CubeOP &key) {
+    void rotate(const CubeOP &key) {
         char letter;
         int col = key.column - 1;
         if(key.direction == 1) { // 方向 // 縦方向 
@@ -166,7 +166,7 @@ void unit_test() {
     return;
 }
 
-Cube str2cube(char (&str)[54]) {
+Cube str2cube(const char (&str)[54]) {
     Cube cube (str);
     return std::move(cube);
 }
@@ -202,7 +202,7 @@ void en_decode_test() {
     return;
 }
 
-void encrypt(std::vector<CubeOP>& key, char (&str)[54], char (&ct)[54]) {
+void encrypt(const std::vector<CubeOP>& key, const char (&str)[54], char (&ct)[54]) {
     
     Cube cube = str2cube(str);
     for(int i = 0; i < key.size(); i++) {
