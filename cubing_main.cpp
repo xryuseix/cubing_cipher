@@ -71,12 +71,13 @@ struct Cube {
         for(int i = 0; i < 54; i++) {
             if(cubing[i] != a.cubing[i]) {
                 equal = false;
+                break;
             }
         }
         return equal;
     }
 
-    void print() {
+    void print() const {
         for(int i = 0; i < 54; i++) {
             printf("%c", cubing[i]);
         }
@@ -197,9 +198,30 @@ void en_decode_test() {
     return;
 }
 
+void encrypt(Cube& cube, std::vector<CubeOP>& key, char (&ct)[54]) {
+
+    cube.rotate(key);
+    cube2str(cube, ct);
+
+    return;
+}
+
 int main(int ac, char **av) { 
-    unit_test();
-    en_decode_test();
-    // cube.print();
+    // unit_test();
+    // en_decode_test();
+
+    char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
+    char ct[54];
+
+    std::vector<CubeOP> key;
+    CubeOP op = {1, 2, 3};
+    key.push_back(op);
+    
+    Cube cube = str2cube(str);
+
+    encrypt(cube, key, ct);
+
+    printf("%s\n", ct);
+
     return 0;
 }
