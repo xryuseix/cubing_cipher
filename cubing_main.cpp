@@ -16,52 +16,50 @@ struct Cube {
         }
     }
   
-    void rotate(std::vector<CubeOP> &key) {
-        for(int i = 0; i < key.size(); i++) { // 転置
-            char letter;
-            int col = key[i].column - 1;
-            if(key[i].direction == 1) { // 方向 // 縦方向 
-                for(int k = 0; k < key[i].times; k++) { // 回数 
+    void rotate(CubeOP &key) {
+        char letter;
+        int col = key.column - 1;
+        if(key.direction == 1) { // 方向 // 縦方向 
+            for(int k = 0; k < key.times; k++) { // 回数 
 
-                    letter = cubing[0 + col]; // colは転値対象列(0~2)
-                    cubing[0 + col] = cubing[3 + col];
-                    cubing[3 + col] = cubing[6 + col];
-                    cubing[6 + col] = cubing[12 + col];
-                    cubing[12 + col] = cubing[24 + col];
-                    cubing[24 + col] = cubing[36 + col];
-                    cubing[36 + col] = cubing[45 + col];
-                    cubing[45 + col] = cubing[48 + col];
-                    cubing[48 + col] = cubing[51 + col];
-                    cubing[51 + col] = cubing[44 - col];
-                    cubing[44 - col] = cubing[32 - col];
-                    cubing[32 - col] = cubing[20 - col];
-                    cubing[20 - col] = letter;
+                letter = cubing[0 + col]; // colは転値対象列(0~2)
+                cubing[0 + col] = cubing[3 + col];
+                cubing[3 + col] = cubing[6 + col];
+                cubing[6 + col] = cubing[12 + col];
+                cubing[12 + col] = cubing[24 + col];
+                cubing[24 + col] = cubing[36 + col];
+                cubing[36 + col] = cubing[45 + col];
+                cubing[45 + col] = cubing[48 + col];
+                cubing[48 + col] = cubing[51 + col];
+                cubing[51 + col] = cubing[44 - col];
+                cubing[44 - col] = cubing[32 - col];
+                cubing[32 - col] = cubing[20 - col];
+                cubing[20 - col] = letter;
 
+            }
+        } else if(key.direction == 2){ // 横方向
+            for(int k = 0; k < key.times; k++) { // 回数 
+                letter = cubing[9 + 12*col];
+                for(int m = 0; m < 11; m++) {
+                    cubing[9 + 12*col + m] = cubing[10 + 12*col + m];
                 }
-            } else if(key[i].direction == 2){ // 横方向
-                for(int k = 0; k < key[i].times; k++) { // 回数 
-                    letter = cubing[9 + 12*col];
-                    for(int m = 0; m < 11; m++) {
-                        cubing[9 + 12*col + m] = cubing[10 + 12*col + m];
-                    }
-                    cubing[20 + 12*col] = letter;
-                }
-            } else if(key[i].direction == 3) { // 回転方向
-                for(int k = 0; k < key[i].times; k++) { // 回数 
-                    letter = cubing[6 - 3*col];
-                    cubing[6 - 3*col] = cubing[7 - 3*col];
-                    cubing[7 - 3*col] = cubing[8 - 3*col];
-                    cubing[8 - 3*col] = cubing[15 + col];
-                    cubing[15 + col] = cubing[27 + col];
-                    cubing[27 + col] = cubing[39 + col];
-                    cubing[39 + col] = cubing[47 + 3*col];
-                    cubing[47 + 3*col] = cubing[46 + 3*col];
-                    cubing[46 + 3*col] = cubing[45 + 3*col];
-                    cubing[45 + 3*col] = cubing[35 - col];
-                    cubing[35 - col] = cubing[23 - col];
-                    cubing[23 - col] = cubing[11 - col];
-                    cubing[11 - col] = letter;
-                }
+                cubing[20 + 12*col] = letter;
+            }
+        } else if(key.direction == 3) { // 回転方向
+            for(int k = 0; k < key.times; k++) { // 回数 
+                letter = cubing[6 - 3*col];
+                cubing[6 - 3*col] = cubing[7 - 3*col];
+                cubing[7 - 3*col] = cubing[8 - 3*col];
+                cubing[8 - 3*col] = cubing[15 + col];
+                cubing[15 + col] = cubing[27 + col];
+                cubing[27 + col] = cubing[39 + col];
+                cubing[39 + col] = cubing[47 + 3*col];
+                cubing[47 + 3*col] = cubing[46 + 3*col];
+                cubing[46 + 3*col] = cubing[45 + 3*col];
+                cubing[45 + 3*col] = cubing[35 - col];
+                cubing[35 - col] = cubing[23 - col];
+                cubing[23 - col] = cubing[11 - col];
+                cubing[11 - col] = letter;
             }
         }
     }
@@ -126,7 +124,9 @@ void unit_test() {
     CubeOP op = {1, 2, 3};
     key.push_back(op);
 
-    cube.rotate(key);
+    for(int i = 0; i < key.size(); i++) {
+        cube.rotate(key[i]);
+    }
     assertEqual(cube.cubing, expected.cubing);
     }
 
@@ -141,7 +141,9 @@ void unit_test() {
     CubeOP op = {2, 2, 3};
     key.push_back(op);
 
-    cube.rotate(key);
+    for(int i = 0; i < key.size(); i++) {
+        cube.rotate(key[i]);
+    }
     assertEqual(cube.cubing, expected.cubing);
     }
 
@@ -156,7 +158,9 @@ void unit_test() {
     CubeOP op = {3, 2, 3};
     key.push_back(op);
 
-    cube.rotate(key);
+    for(int i = 0; i < key.size(); i++) {
+        cube.rotate(key[i]);
+    }
     assertEqual(cube.cubing, expected.cubing);
     }
     return;
@@ -198,9 +202,12 @@ void en_decode_test() {
     return;
 }
 
-void encrypt(Cube& cube, std::vector<CubeOP>& key, char (&ct)[54]) {
-
-    cube.rotate(key);
+void encrypt(std::vector<CubeOP>& key, char (&str)[54], char (&ct)[54]) {
+    
+    Cube cube = str2cube(str);
+    for(int i = 0; i < key.size(); i++) {
+        cube.rotate(key[i]);
+    }
     cube2str(cube, ct);
 
     return;
@@ -212,14 +219,12 @@ int main(int ac, char **av) {
 
     char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
     char ct[54];
-
+    
     std::vector<CubeOP> key;
     CubeOP op = {1, 2, 3};
     key.push_back(op);
     
-    Cube cube = str2cube(str);
-
-    encrypt(cube, key, ct);
+    encrypt(key, str, ct);
 
     printf("%s\n", ct);
 
