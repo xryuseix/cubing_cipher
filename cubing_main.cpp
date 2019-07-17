@@ -95,6 +95,7 @@ bool Equal(const Cube& a, const Cube& b) {
 
 template <int N>
 bool Equal(const char (&a)[N], const char (&b)[N]) {
+
     if(strncmp(a,b,N) == 0) {
         return 1;
     } else {
@@ -104,74 +105,78 @@ bool Equal(const char (&a)[N], const char (&b)[N]) {
 
 template <class T>
 void assertEqual(const T& a, const T& b) {
+
     if(Equal(a, b)) {
         printf("AC\n");
     } else {
         printf("WA\n");
     }
+    return;
 }
 
 void unit_test() {
 
     { //縦方向テスト
-    char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
-    char ExpectedStr[54] = {'a', 'n', 'c', 'd', 'z', 'f', 'g', 'L', 'i', 'j', 'k', 'l', 'm', 'U', 'o', 'p', 'q', 'r', 's', 'h', 'u', 'v', 'w', 'x', 'y', 'X', 'A', 'B', 'C', 'D', 'E', 'e', 'G', 'H', 'I', 'J', 'K', '!', 'M', 'N', 'O', 'P', 'Q', 'b', 'S', 'T', 'R', 'V', 'W', 'F', 'Y', 'Z', 't', '?'};
-    
-    Cube cube(str);
-    Cube expected(ExpectedStr);
+        char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
+        char ExpectedStr[54] = {'a', 'n', 'c', 'd', 'z', 'f', 'g', 'L', 'i', 'j', 'k', 'l', 'm', 'U', 'o', 'p', 'q', 'r', 's', 'h', 'u', 'v', 'w', 'x', 'y', 'X', 'A', 'B', 'C', 'D', 'E', 'e', 'G', 'H', 'I', 'J', 'K', '!', 'M', 'N', 'O', 'P', 'Q', 'b', 'S', 'T', 'R', 'V', 'W', 'F', 'Y', 'Z', 't', '?'};
+        
+        Cube cube(str);
+        Cube expected(ExpectedStr);
 
-    std::vector<CubeOP> key;
-    CubeOP op = {1, 2, 3};
-    key.push_back(op);
+        std::vector<CubeOP> key;
+        CubeOP op = {1, 2, 3};
+        key.push_back(op);
 
-    for(int i = 0; i < key.size(); i++) {
-        cube.rotate(key[i]);
-    }
-    assertEqual(cube.cubing, expected.cubing);
+        for(int i = 0; i < key.size(); i++) {
+            cube.rotate(key[i]);
+        }
+        assertEqual(cube.cubing, expected.cubing);
     }
 
     { //横方向テスト
-    char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
-    char ExpectedStr[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'v', 'w', 'x', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
-    
-    Cube cube(str);
-    Cube expected(ExpectedStr);
+        char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
+        char ExpectedStr[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'v', 'w', 'x', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
+        
+        Cube cube(str);
+        Cube expected(ExpectedStr);
 
-    std::vector<CubeOP> key;
-    CubeOP op = {2, 2, 3};
-    key.push_back(op);
+        std::vector<CubeOP> key;
+        CubeOP op = {2, 2, 3};
+        key.push_back(op);
 
-    for(int i = 0; i < key.size(); i++) {
-        cube.rotate(key[i]);
-    }
-    assertEqual(cube.cubing, expected.cubing);
+        for(int i = 0; i < key.size(); i++) {
+            cube.rotate(key[i]);
+        }
+        assertEqual(cube.cubing, expected.cubing);
     }
 
     { //回転方向テスト
-    char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
-    char ExpectedStr[54] = {'a', 'b', 'c', 'q', 'C', 'O', 'g', 'h', 'i', 'j', 'f', 'l', 'm', 'n', 'o', 'p', 'Y', 'r', 's', 't', 'u', 'v', 'e', 'x', 'y', 'z', 'A', 'B', 'X', 'D', 'E', 'F', 'G', 'H', 'd', 'J', 'K', 'L', 'M', 'N', 'W', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'k', 'w', 'I', 'Z', '!', '?'};
-    
-    Cube cube(str);
-    Cube expected(ExpectedStr);
+        char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
+        char ExpectedStr[54] = {'a', 'b', 'c', 'q', 'C', 'O', 'g', 'h', 'i', 'j', 'f', 'l', 'm', 'n', 'o', 'p', 'Y', 'r', 's', 't', 'u', 'v', 'e', 'x', 'y', 'z', 'A', 'B', 'X', 'D', 'E', 'F', 'G', 'H', 'd', 'J', 'K', 'L', 'M', 'N', 'W', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'k', 'w', 'I', 'Z', '!', '?'};
+        
+        Cube cube(str);
+        Cube expected(ExpectedStr);
 
-    std::vector<CubeOP> key;
-    CubeOP op = {3, 2, 3};
-    key.push_back(op);
+        std::vector<CubeOP> key;
+        CubeOP op = {3, 2, 3};
+        key.push_back(op);
 
-    for(int i = 0; i < key.size(); i++) {
-        cube.rotate(key[i]);
-    }
-    assertEqual(cube.cubing, expected.cubing);
+        for(int i = 0; i < key.size(); i++) {
+            cube.rotate(key[i]);
+        }
+        assertEqual(cube.cubing, expected.cubing);
     }
     return;
 }
 
 Cube str2cube(const char (&str)[54]) {
+
     Cube cube (str);
     return std::move(cube);
 }
 
 void cube2str(Cube cube, char (&str)[54]) {
+
     for(int i = 0; i < 54; i++) {
         str[i] = cube.cubing[i];
     }
@@ -214,6 +219,7 @@ void encrypt(const std::vector<CubeOP>& key, const char (&str)[54], char (&ct)[5
 }
 
 void encrypt_test() {
+
     char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
     char ExpectedStr[54] = {'a', 'n', 'c', 'd', 'z', 'f', 'g', 'L', 'i', 'j', 'k', 'l', 'm', 'U', 'o', 'p', 'q', 'r', 's', 'h', 'u', 'v', 'w', 'x', 'y', 'X', 'A', 'B', 'C', 'D', 'E', 'e', 'G', 'H', 'I', 'J', 'K', '!', 'M', 'N', 'O', 'P', 'Q', 'b', 'S', 'T', 'R', 'V', 'W', 'F', 'Y', 'Z', 't', '?'};
     char ct[54];
@@ -224,6 +230,33 @@ void encrypt_test() {
     
     encrypt(key, str, ct);
     assertEqual(ct, ExpectedStr);
+
+    return;
+}
+
+void decrypt(const std::vector<CubeOP>& key, const char (&str)[54], char (&pt)[54]) {
+
+    Cube cube = str2cube(str);
+    for(int i = 0; i < key.size(); i++) {
+        cube.rotate(key[i]);
+    }
+    cube2str(cube, ct);
+
+    return;
+}
+
+void decrypt_test() {
+
+    char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
+    char ExpectedStr[54] = {'a', 'n', 'c', 'd', 'z', 'f', 'g', 'L', 'i', 'j', 'k', 'l', 'm', 'U', 'o', 'p', 'q', 'r', 's', 'h', 'u', 'v', 'w', 'x', 'y', 'X', 'A', 'B', 'C', 'D', 'E', 'e', 'G', 'H', 'I', 'J', 'K', '!', 'M', 'N', 'O', 'P', 'Q', 'b', 'S', 'T', 'R', 'V', 'W', 'F', 'Y', 'Z', 't', '?'};
+    char pt[54];
+
+    std::vector<CubeOP> key;
+    CubeOP op = {1, 2, 3};
+    key.push_back(op);
+
+    decrypt(key, str, pt);
+    assertEqual(pt, ExpectedStr);
 
     return;
 }
