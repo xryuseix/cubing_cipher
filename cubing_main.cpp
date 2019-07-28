@@ -257,13 +257,26 @@ void decrypt_test() {
 }
 
 int main(int ac, char **av) { 
-    unit_test();
-    en_decode_test();
-    encrypt_test();
+    // unit_test();
+    // en_decode_test();
+    // encrypt_test();
+    // printf("--------\n");
+    // decrypt_test();
 
-    printf("--------\n");
+    cubingmode()
 
-    decrypt_test();
 
     return 0;
 }
+
+/*
+cubingmode(){
+
+loop{
+encoding()
+encrypt()
+}
+shuffle()
+
+}
+ */
