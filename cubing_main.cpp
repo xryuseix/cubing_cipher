@@ -256,27 +256,43 @@ void decrypt_test() {
     return;
 }
 
-int main(int ac, char **av) { 
+void cubingmode(const std::vector<CubeOP>& key, const std::vector<char> (&str), std::vector<char> (&ct)) {
+
+    //, char (&ct)[N]
+
+    // for(){~~//長い平文のブロック数分実行される
+    // encoding();
+    // encrypt(key, str, ct);
+    // }
+    // shuffle();
+
+    return;
+}
+
+void cubingmode_test() {
+
+    std::vector<char> str{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!'};
+    std::vector<char> ct(216);
+
+    std::vector<CubeOP> key;
+    CubeOP op = {1, 2, 1};
+    key.push_back(op);
+    
+    cubingmode(key, str, ct);
+    //assert
+    
+    return;
+}
+int main(int ac, char **av) {
+
     // unit_test();
     // en_decode_test();
     // encrypt_test();
     // printf("--------\n");
     // decrypt_test();
 
-    cubingmode()
+    cubingmode_test();
 
 
     return 0;
 }
-
-/*
-cubingmode(){
-
-loop{
-encoding()
-encrypt()
-}
-shuffle()
-
-}
- */
