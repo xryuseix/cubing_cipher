@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <cmath>
 
 struct CubeOP {
     int direction;
@@ -256,14 +257,58 @@ void decrypt_test() {
     return;
 }
 
+void encoding(const char (&plainblock)[45], char (&encoded_block)[54], const int blocknum) {
+
+    for(int i = 0; i < 45; i++) {
+        encoded_block[i] = plainblock[i];
+    }
+    for(int i = 0; i < 5; i++) {
+        int sum = 0;
+        for(int j = 0; j < 9; j++) {
+            sum += plainblock[i*9 + j];
+        }
+        encoded_block[45 + i] = (char)(sum%26 + 97);
+    }
+    char alphanum[62] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+    encoded_block[50] = alphanum[blocknum]/62;
+    encoded_block[51] = alphanum[blocknum]%62;
+    
+    int chartype1 = rand()%62;
+    int chartype2 = rand()%62;
+
+    if(chartype1 < 26) {
+        encoded_block[52] = rand()%26 + 'A';
+    } else if(chartype1 < 52) {
+        encoded_block[52] = rand()%26 + 'a';
+    } else {
+        encoded_block[52] = rand()%10 + '0';
+    }
+
+    if(chartype2 < 26) {
+        encoded_block[53] = rand()%26 + 'A';
+    } else if(chartype2 < 52) {
+        encoded_block[53] = rand()%26 + 'a';
+    } else {
+        encoded_block[53] = rand()%10 + '0';
+    }
+    
+    return;
+}
+
 void cubingmode(const std::vector<CubeOP>& key, const std::vector<char> (&str), std::vector<char> (&ct)) {
 
-    //, char (&ct)[N]
-
-    // for(){~~//長い平文のブロック数分実行される
-    // encoding();
-    // encrypt(key, str, ct);
-    // }
+    int blocknum = ceil((double)str.size()/45.0);
+    for(int i = 0; i < blocknum; i++) {
+        char plainblock[45];
+        char encoded_block[54];
+        char cipherblock[54];
+        for(int j = 0; j < 45; j++) {
+            plainblock[j] = str[i*45 + j];
+        }
+        encoding(plainblock, encoded_block, i);
+        encrypt(key, encoded_block, cipherblock);
+    }
+    // ここにテスト？？
     // shuffle();
 
     return;
@@ -277,12 +322,13 @@ void cubingmode_test() {
     std::vector<CubeOP> key;
     CubeOP op = {1, 2, 1};
     key.push_back(op);
-    
+
     cubingmode(key, str, ct);
-    //assert
+    //assert //このテスト、シャッフル後ならexpectedがかけない？？
     
     return;
 }
+
 int main(int ac, char **av) {
 
     // unit_test();

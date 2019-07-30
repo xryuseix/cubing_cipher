@@ -79,7 +79,7 @@ std::vector<std::vector<char> > randnum(CubeType cubing){
         if(rand() % 10 == 0) {
             cubing[i][52] = rand() % 26 + 'A'; // 小文字or大文字の乱数
         } else {
-            cubing[i][52]=rand()%26+'a';
+            cubing[i][52]=rand()%26 + 'a';
         }
         
         if(rand() % 10 == 0) {
