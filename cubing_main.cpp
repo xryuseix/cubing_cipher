@@ -270,8 +270,8 @@ void encoding(const char (&plainblock)[45], char (&encoded_block)[54], const int
         encoded_block[45 + i] = (char)(sum%26 + 97);
     }
     char alphanum[62] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-    encoded_block[50] = alphanum[blocknum]/62;
-    encoded_block[51] = alphanum[blocknum]%62;
+    encoded_block[50] = alphanum[blocknum/62];
+    encoded_block[51] = alphanum[blocknum%62];
     
     int chartype1 = rand()%62;
     int chartype2 = rand()%62;
@@ -291,25 +291,65 @@ void encoding(const char (&plainblock)[45], char (&encoded_block)[54], const int
     } else {
         encoded_block[53] = rand()%10 + '0';
     }
-    
+
     return;
+}
+
+void encoding_test(const char (&plainblock)[45], char (&encoded_block)[54], const int blocknum) {
+
+    char BeforeRandBlock[52];
+    for(int i = 0; i < 52; i ++) {//後ろのrand以外をコピー
+        BeforeRandBlock[i] = encoded_block[i];
+    }
+    char Expectedblock_1[52] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'z', 'c', 'z', 'g', 'j', 'A', 'A'};
+    assertEqual(BeforeRandBlock, Expectedblock_1);
+}
+
+void shuffle(std::vector<std::vector<char>> (&str)) {
+
+    for(int i = str.size() - 1; i > 0; i--) {
+        int j = rand() % i;
+        for(int k = 0; k < 54; k++) {
+            char c = str[i][k];
+            str[i][k] = str[j][k];
+            str[j][k] = c;
+        }
+    }
 }
 
 void cubingmode(const std::vector<CubeOP>& key, const std::vector<char> (&str), std::vector<char> (&ct)) {
 
+    std::vector<std::vector<char>> ShuffleText;
     int blocknum = ceil((double)str.size()/45.0);
+
     for(int i = 0; i < blocknum; i++) {
+
         char plainblock[45];
         char encoded_block[54];
         char cipherblock[54];
+        std::vector<char> tmp;
+
         for(int j = 0; j < 45; j++) {
             plainblock[j] = str[i*45 + j];
         }
         encoding(plainblock, encoded_block, i);
+        encoding_test(plainblock, encoded_block, i);
         encrypt(key, encoded_block, cipherblock);
+
+        for(int j = 0; j < 54; j ++) {
+            tmp.push_back(cipherblock[j]);//char-vector変換
+        }
+
+        ShuffleText.push_back(tmp);
     }
-    // ここにテスト？？
-    // shuffle();
+
+    shuffle(ShuffleText);
+
+    for(int i = 0; i < ShuffleText.size(); i++) {
+        for(int j = 0; j < 54; j ++) {
+            ct.push_back(ShuffleText[i][j]);
+        }
+    }
 
     return;
 }
@@ -317,14 +357,13 @@ void cubingmode(const std::vector<CubeOP>& key, const std::vector<char> (&str), 
 void cubingmode_test() {
 
     std::vector<char> str{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!'};
-    std::vector<char> ct(216);
+    std::vector<char> ct;
 
     std::vector<CubeOP> key;
     CubeOP op = {1, 2, 1};
     key.push_back(op);
 
     cubingmode(key, str, ct);
-    //assert //このテスト、シャッフル後ならexpectedがかけない？？
     
     return;
 }
