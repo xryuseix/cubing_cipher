@@ -295,7 +295,12 @@ void encoding(const char (&plainblock)[45], char (&encoded_block)[54], const int
     return;
 }
 
-void encoding_test(const char (&plainblock)[45], char (&encoded_block)[54], const int blocknum) {
+void encoding_test() {
+
+    const char plainblock[45] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S'};
+    char encoded_block[54];
+
+    encoding(plainblock, encoded_block, 0);
 
     char BeforeRandBlock[52];
     for(int i = 0; i < 52; i ++) {//後ろのrand以外をコピー
@@ -317,7 +322,7 @@ void shuffle(std::vector<std::vector<char>> (&str)) {
     }
 }
 
-void cubingmode(const std::vector<CubeOP>& key, const std::vector<char> (&str), std::vector<char> (&ct)) {
+void cubingmode_en(const std::vector<CubeOP>& key, const std::vector<char> (&str), std::vector<char> (&ct)) {
 
     std::vector<std::vector<char>> ShuffleText;
     int blocknum = ceil((double)str.size()/45.0);
@@ -329,17 +334,16 @@ void cubingmode(const std::vector<CubeOP>& key, const std::vector<char> (&str), 
         char cipherblock[54];
         std::vector<char> tmp;
 
-        for(int j = 0; j < 45; j++) {
+        for(int j = 0; j < 45; j++) { //平文から平文ブロック作成
             plainblock[j] = str[i*45 + j];
         }
         encoding(plainblock, encoded_block, i);
-        encoding_test(plainblock, encoded_block, i);
+
         encrypt(key, encoded_block, cipherblock);
 
-        for(int j = 0; j < 54; j ++) {
-            tmp.push_back(cipherblock[j]);//char-vector変換
+        for(int j = 0; j < 54; j ++) { //char-vector変換
+            tmp.push_back(cipherblock[j]);
         }
-
         ShuffleText.push_back(tmp);
     }
 
@@ -363,7 +367,7 @@ void cubingmode_test() {
     CubeOP op = {1, 2, 1};
     key.push_back(op);
 
-    cubingmode(key, str, ct);
+    cubingmode_en(key, str, ct);
     
     return;
 }
@@ -376,6 +380,7 @@ int main(int ac, char **av) {
     // printf("--------\n");
     // decrypt_test();
 
+    encoding_test();
     cubingmode_test();
 
 
