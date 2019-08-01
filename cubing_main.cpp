@@ -233,8 +233,10 @@ void decrypt(std::vector<CubeOP>& key, const char (&str)[54], char (&pt)[54]) {
 
     Cube cube = str2cube(str);
     for(int i = key.size()-1; i >= 0; i--) {
+        int beforetimes = key[i].times;
         key[i].times = 4 - key[i].times;
         cube.rotate(key[i]);
+        key[i].times = beforetimes;
     }
     cube2str(cube, pt);
 
@@ -322,10 +324,30 @@ void shuffle(std::vector<std::vector<char>> (&str)) {
     }
 }
 
-void cubingmode_en(const std::vector<CubeOP>& key, const std::vector<char> (&str), std::vector<char> (&ct)) {
+void cubingmode_en(const std::vector<CubeOP>& key, std::vector<char> (&str), std::vector<char> (&ct)) {
 
     std::vector<std::vector<char>> ShuffleText;
-    int blocknum = ceil((double)str.size()/45.0);
+    std::vector<char> pt;
+    for(int i = 0; i < str.size(); i++) {
+        pt.push_back(str[i]);
+    }
+    if(pt.size()%45 != 0) {
+        pt.push_back('\0');
+    }
+    while(pt.size()%45 != 0){
+        int chartype = rand()%62;
+        char c;
+        if(chartype < 26) {
+            c = rand()%26 + 'A';
+        } else if(chartype < 52) {
+            c = rand()%26 + 'a';
+        } else {
+            c = rand()%10 + '0';
+        }
+        pt.push_back(c);
+    }
+
+    int blocknum = pt.size()/45;
 
     for(int i = 0; i < blocknum; i++) {
 
@@ -335,7 +357,7 @@ void cubingmode_en(const std::vector<CubeOP>& key, const std::vector<char> (&str
         std::vector<char> tmp;
 
         for(int j = 0; j < 45; j++) { //平文から平文ブロック作成
-            plainblock[j] = str[i*45 + j];
+            plainblock[j] = pt[i*45 + j];
         }
         encoding(plainblock, encoded_block, i);
 
@@ -358,7 +380,7 @@ void cubingmode_en(const std::vector<CubeOP>& key, const std::vector<char> (&str
     return;
 }
 
-void cubingmode_test() {
+void cubingmode_en_test() {
 
     std::vector<char> str{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!'};
     std::vector<char> ct;
@@ -372,6 +394,110 @@ void cubingmode_test() {
     return;
 }
 
+int sequencenum(char f, char s) {
+
+    char alphanum[62] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+    int left,right;
+    for(int i = 0; i < 62; i++) {
+        if(alphanum[i] == f) {
+            left = i;
+        }
+    }
+    for(int i = 0; i < 62; i++) {
+        if(alphanum[i] == s) {
+            right = i;
+        }
+    }
+    return left*62 + right;
+}
+
+void decoding(std::vector<std::vector<char>> (&BeforeShuffleText), std::vector<char> (&pt)) {
+    
+    for(int i = 0; i < BeforeShuffleText.size(); i++) {//バブルソート
+        for(int j = BeforeShuffleText.size()-2; j >= i; j--) {
+            
+            int leftnum = sequencenum(BeforeShuffleText[j][50], BeforeShuffleText[j][51]);
+            int rightnum = sequencenum(BeforeShuffleText[j+1][50], BeforeShuffleText[j+1][51]);
+            
+            if(leftnum > rightnum) {
+                for(int k = 0; k < 54; k++) {
+                    std::swap(BeforeShuffleText[j][k],BeforeShuffleText[j+1][k]);
+                }
+            }
+        }
+    }
+    for(int i = 0; i < BeforeShuffleText.size(); i++) {
+        for(int j = 0; j < 45; j++) {
+            if(BeforeShuffleText[i][j]=='\0')return;
+            pt.push_back(BeforeShuffleText[i][j]);
+        }
+    }
+}
+
+void cubingmode_de(std::vector<CubeOP>& key, const std::vector<char> (&str), std::vector<char> (&pt)) {
+
+    int blocknum = str.size()/54;
+    std::vector<std::vector<char>> BeforeShuffleText; 
+
+    for(int i = 0; i < blocknum; i++) {
+
+        char cipherblock[54];
+        char decrypted_block[54];
+        char plainblock[45];
+        std::vector<char> tmp;
+
+        for(int j = 0; j < 54; j++) { //暗号文から暗号文ブロック作成
+            cipherblock[j] = str[i*54 + j];
+        }
+        decrypt(key, cipherblock, decrypted_block);
+
+        for(int j = 0; j < 54; j++){
+            tmp.push_back(decrypted_block[j]);
+        }
+        BeforeShuffleText.push_back(tmp);
+        
+    }
+
+    decoding(BeforeShuffleText, pt);
+    return;
+}
+
+void encode_decode_test() {
+    char str[45] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S'};
+    char chencoded[54], chdecoded[45];
+    std::vector<char> vcdecoded, vcencoded;
+    std::vector<std::vector<char>> todecode;
+
+    std::vector<CubeOP> key;
+    CubeOP op = {1, 2, 1};
+    key.push_back(op);
+
+    encoding(str, chencoded, 0);
+    for(int i = 0; i < 54; i++) {
+        vcencoded.push_back(chencoded[i]);
+    }
+    todecode.push_back(vcencoded);
+    decoding(todecode, vcdecoded);
+    for(int i = 0; i < 45; i++) {
+        chdecoded[i] = vcencoded[i];
+    }
+    assertEqual(str, chdecoded);
+}
+
+void cubingmode_ende_test() {
+    std::vector<char> str{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!'};
+    std::vector<char> ct;
+    std::vector<char> pt;
+
+    std::vector<CubeOP> key;
+    CubeOP op = {1, 2, 1};
+    key.push_back(op);
+
+    cubingmode_en(key, str, ct);
+    cubingmode_de(key, ct, pt);
+    assertEqual(str, pt);
+}
+
 int main(int ac, char **av) {
 
     // unit_test();
@@ -380,8 +506,10 @@ int main(int ac, char **av) {
     // printf("--------\n");
     // decrypt_test();
 
-    encoding_test();
-    cubingmode_test();
+    // encoding_test();
+    // cubingmode_en_test();
+    cubingmode_ende_test();
+    encode_decode_test();
 
 
     return 0;
