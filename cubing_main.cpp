@@ -388,18 +388,20 @@ void decoding(std::vector<std::vector<char>> (&BeforeShuffleText), std::vector<c
         for(int j = BeforeShuffleText.size()-2; j >= i; j--) {
             
             int leftnum = sequencenum(BeforeShuffleText[j][50], BeforeShuffleText[j][51]);
-            int rightnum = sequencenum(BeforeShuffleText[j+1][50], BeforeShuffleText[j+1][51]);
+            int rightnum = sequencenum(BeforeShuffleText[j + 1][50], BeforeShuffleText[j + 1][51]);
             
             if(leftnum > rightnum) {
                 for(int k = 0; k < 54; k++) {
-                    std::swap(BeforeShuffleText[j][k],BeforeShuffleText[j+1][k]);
+                    std::swap(BeforeShuffleText[j][k], BeforeShuffleText[j+1][k]);
                 }
             }
         }
     }
     for(int i = 0; i < BeforeShuffleText.size(); i++) {
         for(int j = 0; j < 45; j++) {
-            if(BeforeShuffleText[i][j]=='\0')return;
+            if(BeforeShuffleText[i][j] == '\0') {
+                return;
+            }
             pt.push_back(BeforeShuffleText[i][j]);
         }
     }
@@ -471,15 +473,25 @@ void cubingmode_ende_test() {
 
 int main(int ac, char **av) {
 
-    // unit_test();
-    // en_decode_test();
-    // encrypt_test();
-    // printf("--------\n");
-    // decrypt_test();
+    printf("\n----unit_test----\n");
+    unit_test();
 
-    // encoding_test();
-    // cubingmode_en_test();
+    printf("\n----en_decode_test(Cube)----\n");
+    en_decode_test();
+
+    printf("\n----encrypt_test----\n");
+    encrypt_test();
+
+    printf("\n----decrypt_test----\n");
+    decrypt_test();
+
+    printf("\n----encoding_test----\n");
+    encoding_test();
+
+    printf("\n----cubingmode_ende_test----\n");
     cubingmode_ende_test();
+
+    printf("\n----encode_decode_test(cubingmode)----\n");
     encode_decode_test();
 
 
