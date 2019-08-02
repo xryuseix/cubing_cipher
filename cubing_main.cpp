@@ -84,6 +84,8 @@ struct Cube {
     }
 };
 
+const static char base62_table[62] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+
 template <class T>
 bool Equal(const T& a, const T& b) {
     return a == b;
@@ -269,30 +271,16 @@ void encoding(const char (&plainblock)[45], char (&encoded_block)[54], const int
         for(int j = 0; j < 9; j++) {
             sum += plainblock[i*9 + j];
         }
-        encoded_block[45 + i] = (char)(sum%26 + 97);
+        encoded_block[45 + i] = (char)(sum%26 + 'a');
     }
-    char alphanum[62] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-    encoded_block[50] = alphanum[blocknum/62];
-    encoded_block[51] = alphanum[blocknum%62];
+    encoded_block[50] = base62_table[blocknum/62];
+    encoded_block[51] = base62_table[blocknum%62];
     
     int chartype1 = rand()%62;
     int chartype2 = rand()%62;
 
-    if(chartype1 < 26) {
-        encoded_block[52] = rand()%26 + 'A';
-    } else if(chartype1 < 52) {
-        encoded_block[52] = rand()%26 + 'a';
-    } else {
-        encoded_block[52] = rand()%10 + '0';
-    }
-
-    if(chartype2 < 26) {
-        encoded_block[53] = rand()%26 + 'A';
-    } else if(chartype2 < 52) {
-        encoded_block[53] = rand()%26 + 'a';
-    } else {
-        encoded_block[53] = rand()%10 + '0';
-    }
+    encoded_block[52] = base62_table[chartype1];
+    encoded_block[53] = base62_table[chartype2];
 
     return;
 }
@@ -334,17 +322,9 @@ void cubingmode_en(const std::vector<CubeOP>& key, std::vector<char> (&str), std
     if(pt.size()%45 != 0) {
         pt.push_back('\0');
     }
-    while(pt.size()%45 != 0){
+    while(pt.size()%45 != 0) { //パディング処理
         int chartype = rand()%62;
-        char c;
-        if(chartype < 26) {
-            c = rand()%26 + 'A';
-        } else if(chartype < 52) {
-            c = rand()%26 + 'a';
-        } else {
-            c = rand()%10 + '0';
-        }
-        pt.push_back(c);
+        pt.push_back(base62_table[chartype]);
     }
 
     int blocknum = pt.size()/45;
@@ -396,18 +376,9 @@ void cubingmode_en_test() {
 
 int sequencenum(char f, char s) {
 
-    char alphanum[62] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
     int left,right;
-    for(int i = 0; i < 62; i++) {
-        if(alphanum[i] == f) {
-            left = i;
-        }
-    }
-    for(int i = 0; i < 62; i++) {
-        if(alphanum[i] == s) {
-            right = i;
-        }
-    }
+    left = static_cast<int>(std::distance(std::begin(base62_table), std::find(std::begin(base62_table), std::end(base62_table), f)));
+    right = static_cast<int>(std::distance(std::begin(base62_table), std::find(std::begin(base62_table), std::end(base62_table), s)));
     return left*62 + right;
 }
 
