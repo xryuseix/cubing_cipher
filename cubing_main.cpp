@@ -382,21 +382,16 @@ int sequencenum(char f, char s) {
     return left*62 + right;
 }
 
+bool sortcomp(const std::vector<char>& l, const std::vector<char>& r) {
+    int leftnum = sequencenum(l[50], l[51]);
+    int rightnum = sequencenum(r[50], r[51]);
+
+    return leftnum < rightnum;
+}
+
 void decoding(std::vector<std::vector<char>> (&BeforeShuffleText), std::vector<char> (&pt)) {
-    
-    for(int i = 0; i < BeforeShuffleText.size(); i++) {//バブルソート
-        for(int j = BeforeShuffleText.size()-2; j >= i; j--) {
-            
-            int leftnum = sequencenum(BeforeShuffleText[j][50], BeforeShuffleText[j][51]);
-            int rightnum = sequencenum(BeforeShuffleText[j + 1][50], BeforeShuffleText[j + 1][51]);
-            
-            if(leftnum > rightnum) {
-                for(int k = 0; k < 54; k++) {
-                    std::swap(BeforeShuffleText[j][k], BeforeShuffleText[j+1][k]);
-                }
-            }
-        }
-    }
+
+    sort(BeforeShuffleText.begin(), BeforeShuffleText.end(), sortcomp);
     for(int i = 0; i < BeforeShuffleText.size(); i++) {
         for(int j = 0; j < 45; j++) {
             if(BeforeShuffleText[i][j] == '\0') {
@@ -409,6 +404,10 @@ void decoding(std::vector<std::vector<char>> (&BeforeShuffleText), std::vector<c
 
 void cubingmode_de(std::vector<CubeOP>& key, const std::vector<char> (&str), std::vector<char> (&pt)) {
 
+    if(str.size()%54 != 0) {
+        printf("decryption error\n");
+        return;
+    }
     int blocknum = str.size()/54;
     std::vector<std::vector<char>> BeforeShuffleText; 
 
