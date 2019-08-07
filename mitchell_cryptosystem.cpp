@@ -79,7 +79,7 @@ struct Cube {
         bool equal = true;
         for(int i = 0; i < 54; i++) {
             if(cubing[i] != a.cubing[i]) {
-                printf("%c,%c,%d\n",cubing[i],a.cubing[i],i);
+                printf("%c,%c,%d\n",cubing[i], a.cubing[i], i);
                 equal = false;
                 break;
             }
@@ -108,7 +108,7 @@ bool Equal(const Cube& a, const Cube& b) {
 template <int N>
 bool Equal(const char (&a)[N], const char (&b)[N]) {
 
-    if(strncmp(a,b,N) == 0) {
+    if(strncmp(a, b, N) == 0) {
         return 1;
     } else {
         return 0;
@@ -117,6 +117,7 @@ bool Equal(const char (&a)[N], const char (&b)[N]) {
 
 template <>
 bool Equal(const std::vector<CubeOP> (&a), const std::vector<CubeOP> (&b)) {
+
     bool equal = true;
     for(int i = 0; i < a.size(); i++) {
         if(a[i].dir != b[i].dir || a[i].times != b[i].times) {
@@ -139,6 +140,7 @@ void assertEqual(const T& a, const T& b) {
 }
 
 void shuffle(char (&str)[54]) {
+
     for(int i = 1; i < 5; i++) {
         int j = rand() % (6 - i) + i;
         for(int k = 0; k < 9; k ++) {
@@ -148,6 +150,7 @@ void shuffle(char (&str)[54]) {
 }
 
 void encode(const char (&str)[48], char (&encoded_str)[54]) {
+
     int pos;
     int strpos = 0;
     for(int i = 0; i < 54; i++) {
@@ -172,6 +175,7 @@ void encode(const char (&str)[48], char (&encoded_str)[54]) {
 }
 
 void encode_test() {
+
     char str[48] = {'I', 'F', 'M', 'A', 'T', 'H', 'E', 'M', 'A', 'T', 'I', 'C', 'S', 'I', 'S', 'T', 'H', 'E', 'W', 'A', 'Y', 'O', 'F', 'L', 'I', 'F', 'E', 'D', 'O', 'N', 'T', 'F', 'O', 'R', 'G', 'E', 'T', 'T', 'H', 'E', 'T', 'H', 'E', 'O', 'R', 'E', 'M', 'S'};
     char encoded_str[54];
     encode(str, encoded_str);
@@ -179,7 +183,7 @@ void encode_test() {
         if(i%9 == 0) {
             printf("\n");
         }
-        printf("%c ",encoded_str[i]);
+        printf("%c ", encoded_str[i]);
     }
     printf("\n");
 }
@@ -197,6 +201,7 @@ std::vector<CubeOP> make_key(char (&key)[N]) {
 }
 
 void key_test() {
+
     char str[] = {'R', '4', 'C', '1', 'L', '5'};
     std::vector<CubeOP> key = make_key(str);
 
@@ -217,6 +222,7 @@ void key_test() {
 }
 
 void rotate_test() {
+
     {//Row_test
         char str[54] = {'1', 'I', 'F', 'M', 'A', 'T', 'H', 'E', 'M', 'A', '2', 'T', 'I', 'C', 'S', 'I', 'S', 'T', '4', 'I', 'F', 'E', 'D', 'O', 'N', 'T', 'F', 'T', '6', 'H', 'E', 'O', 'R', 'E', 'M', 'S', 'H', '3', 'E', 'W', 'A', 'Y', 'O', 'F', 'L', 'O', 'R', 'G', 'E', 'T', '5', 'T', 'H', 'E'};
         char Expectedstr[54] = {'1', 'I', 'F', 'M', 'A', 'T', 'T', 'H', 'E', 'A', '2', 'T', 'I', 'C', 'S', 'I', 'S', 'T', '4', 'I', 'F', 'E', 'D', 'O', 'H', 'E', 'M', 'T', '6', 'H', 'E', 'O', 'R', 'E', 'M', 'S', 'H', '3', 'E', 'W', 'A', 'Y', 'N', 'T', 'F', 'O', 'R', 'G', 'E', 'T', '5', 'O', 'F', 'L'};
@@ -229,7 +235,7 @@ void rotate_test() {
         key.push_back(op);
 
         cube.rotate(key[0]);
-        assertEqual(cube,Expectedcube);
+        assertEqual(cube, Expectedcube);
     }
     {
         char str[54] = {'1', 'I', 'F', 'M', 'A', 'T', 'H', 'E', 'M', 'A', '2', 'T', 'I', 'C', 'S', 'I', 'S', 'T', '4', 'I', 'F', 'E', 'D', 'O', 'N', 'T', 'F', 'T', '6', 'H', 'E', 'O', 'R', 'E', 'M', 'S', 'H', '3', 'E', 'W', 'A', 'Y', 'O', 'F', 'L', 'O', 'R', 'G', 'E', 'T', '5', 'T', 'H', 'E'};
@@ -243,7 +249,7 @@ void rotate_test() {
         key.push_back(op);
 
         cube.rotate(key[0]);
-        assertEqual(cube,Expectedcube);
+        assertEqual(cube, Expectedcube);
     }
     {
         char str[54] = {'1', 'I', 'F', 'M', 'A', 'T', 'H', 'E', 'M', 'A', '2', 'T', 'I', 'C', 'S', 'I', 'S', 'T', '4', 'I', 'F', 'E', 'D', 'O', 'N', 'T', 'F', 'T', '6', 'H', 'E', 'O', 'R', 'E', 'M', 'S', 'H', '3', 'E', 'W', 'A', 'Y', 'O', 'F', 'L', 'O', 'R', 'G', 'E', 'T', '5', 'T', 'H', 'E'};
@@ -257,24 +263,27 @@ void rotate_test() {
         key.push_back(op);
 
         cube.rotate(key[0]);
-        assertEqual(cube,Expectedcube);
+        assertEqual(cube, Expectedcube);
     }
     
 }
 
 void encrypt(Cube &cube, const std::vector<CubeOP> &key) {
+
     for(int i = 0; i < key.size(); i++){
         cube.rotate(key[i]);
     }
 }
 
 void decode(Cube &cube, char (&ci)[54]) {
+
     for(int i = 0; i < 54; i++) {
         ci[i] = cube.cubing[i];
     }
 }
 
 void unit_test() {
+
     char str[48] = {'I', 'F', 'M', 'A', 'T', 'H', 'E', 'M', 'A', 'T', 'I', 'C', 'S', 'I', 'S', 'T', 'H', 'E', 'W', 'A', 'Y', 'O', 'F', 'L', 'I', 'F', 'E', 'D', 'O', 'N', 'T', 'F', 'O', 'R', 'G', 'E', 'T', 'T', 'H', 'E', 'T', 'H', 'E', 'O', 'R', 'E', 'M', 'S'};
     char Expectedstr[54] = {'1', 'I', 'F', 'M', 'A', 'T', 'T', 'H', 'E', 'A', '2', 'T', 'I', 'C', 'S', 'I', 'S', 'T', '4', 'I', 'F', 'E', 'D', 'O', 'H', 'E', 'M', 'T', '6', 'H', 'E', 'O', 'R', 'E', 'M', 'S', 'H', '3', 'E', 'W', 'A', 'Y', 'N', 'T', 'F', 'O', 'R', 'G', 'E', 'T', '5', 'O', 'F', 'L'};
     char encoded_str[54];
@@ -291,7 +300,7 @@ void unit_test() {
     decode(cube, cipher_str);
 
 
-    printf("%s\n",cipher_str);
+    printf("%s\n", cipher_str);
 
 }
 
