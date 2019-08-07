@@ -262,6 +262,39 @@ void rotate_test() {
     
 }
 
+void encrypt(Cube &cube, const std::vector<CubeOP> &key) {
+    for(int i = 0; i < key.size(); i++){
+        cube.rotate(key[i]);
+    }
+}
+
+void decode(Cube &cube, char (&ci)[54]) {
+    for(int i = 0; i < 54; i++) {
+        ci[i] = cube.cubing[i];
+    }
+}
+
+void unit_test() {
+    char str[48] = {'I', 'F', 'M', 'A', 'T', 'H', 'E', 'M', 'A', 'T', 'I', 'C', 'S', 'I', 'S', 'T', 'H', 'E', 'W', 'A', 'Y', 'O', 'F', 'L', 'I', 'F', 'E', 'D', 'O', 'N', 'T', 'F', 'O', 'R', 'G', 'E', 'T', 'T', 'H', 'E', 'T', 'H', 'E', 'O', 'R', 'E', 'M', 'S'};
+    char Expectedstr[54] = {'1', 'I', 'F', 'M', 'A', 'T', 'T', 'H', 'E', 'A', '2', 'T', 'I', 'C', 'S', 'I', 'S', 'T', '4', 'I', 'F', 'E', 'D', 'O', 'H', 'E', 'M', 'T', '6', 'H', 'E', 'O', 'R', 'E', 'M', 'S', 'H', '3', 'E', 'W', 'A', 'Y', 'N', 'T', 'F', 'O', 'R', 'G', 'E', 'T', '5', 'O', 'F', 'L'};
+    char encoded_str[54];
+    char cipher_str[54];
+    encode(str, encoded_str);
+
+    Cube cube(encoded_str);
+
+    std::vector<CubeOP> key;
+    CubeOP op = {'R', 4};
+    key.push_back(op);
+
+    encrypt(cube, key);
+    decode(cube, cipher_str);
+
+
+    printf("%s\n",cipher_str);
+
+}
+
 int main(int ac, char **av) {
 
     srand((unsigned) time(NULL));
@@ -274,6 +307,9 @@ int main(int ac, char **av) {
 
     printf("\n----rotate_test----\n");
     rotate_test();
+
+    printf("\n----unit_test----\n");
+    unit_test();
 
     return 0;
 }
