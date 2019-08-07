@@ -15,59 +15,71 @@ struct Cube {
         }
     }
   
-    // void rotate(const CubeOP &key) {
-    //     char letter;
-    //     int col = (key.times - 1)/3; //0は内側，１は外側
-    //     int times = (key.times - 1)%3 + 1;
-    //     if(key.dir == 0) { // 方向,Row 
-    //         for(int k = 0; k < times*3; k++) { // 回数, *３はcubeの面が3*3だから
+    void rotate(const CubeOP &key) {
+        char letter;
+        int col = (key.times - 1)/3; //0は内側，１は外側
+        int times = (key.times - 1)%3 + 1;
+        
+        if(key.dir == 'R') { // 方向,Row 
+            for(int k = 0; k < times*3; k++) { // 回数, *３はcubeの面が3*3だから
+            
+                letter = cubing[4 + col*3];
+                cubing[4 + col*3] = cubing[3 + col*3];
+                cubing[3 + col*3] = cubing[50 + col*3];
+                cubing[50 + col*3] = cubing[49 + col*3];
+                cubing[49 + col*3] = cubing[48 + col*3];
+                cubing[48 + col*3] = cubing[41 + col*3];
+                cubing[41 + col*3] = cubing[40 + col*3];
+                cubing[40 + col*3] = cubing[39 + col*3];
+                cubing[39 + col*3] = cubing[23 + col*3];
+                cubing[23 + col*3] = cubing[22 + col*3];
+                cubing[22 + col*3] = cubing[21 + col*3];
+                cubing[21 + col*3] = cubing[5 + col*3];
+                cubing[5 + col*3] = letter;
+                
+            }
+        } else if(key.dir == 'C') { // Column
+            for(int k = 0; k < times*3; k++) { // 回数 
+                
+                letter = cubing[1 + col];
+                cubing[1 + col] = cubing[4 + col];
+                cubing[4 + col] = cubing[7 + col];
+                cubing[7 + col] = cubing[30 - col*3];
+                cubing[30 - col*3] = cubing[31 - col*3];
+                cubing[31 - col*3] = cubing[32 - col*3];
+                cubing[32 - col*3] = cubing[43 - col];
+                cubing[43 - col] = cubing[40 - col];
+                cubing[40 - col] = cubing[37 - col];
+                cubing[37 - col] = cubing[14 + col*3];
+                cubing[14 + col*3] = cubing[13 + col*3];
+                cubing[13 + col*3] = cubing[12 + col*3];
+                cubing[12 + col*3] = letter;
 
-    //             letter = cubing[0 + col]; // colは転値対象列(0~2)
-    //             cubing[0 + col] = cubing[3 + col];
-    //             cubing[3 + col] = cubing[6 + col];
-    //             cubing[6 + col] = cubing[12 + col];
-    //             cubing[12 + col] = cubing[24 + col];
-    //             cubing[24 + col] = cubing[36 + col];
-    //             cubing[36 + col] = cubing[45 + col];
-    //             cubing[45 + col] = cubing[48 + col];
-    //             cubing[48 + col] = cubing[51 + col];
-    //             cubing[51 + col] = cubing[44 - col];
-    //             cubing[44 - col] = cubing[32 - col];
-    //             cubing[32 - col] = cubing[20 - col];
-    //             cubing[20 - col] = letter;
-
-    //         }
-    //     } else if(key.dir == 1) { // Column
-    //         for(int k = 0; k < times*3; k++) { // 回数 
-    //             letter = cubing[9 + 12*col];
-    //             for(int m = 0; m < 11; m++) {
-    //                 cubing[9 + 12*col + m] = cubing[10 + 12*col + m];
-    //             }
-    //             cubing[20 + 12*col] = letter;
-    //         }
-    //     } else if(key.dir == 2) { // Level
-    //         for(int k = 0; k < times*3; k++) { // 回数 
-    //             letter = cubing[6 - 3*col];
-    //             cubing[6 - 3*col] = cubing[7 - 3*col];
-    //             cubing[7 - 3*col] = cubing[8 - 3*col];
-    //             cubing[8 - 3*col] = cubing[15 + col];
-    //             cubing[15 + col] = cubing[27 + col];
-    //             cubing[27 + col] = cubing[39 + col];
-    //             cubing[39 + col] = cubing[47 + 3*col];
-    //             cubing[47 + 3*col] = cubing[46 + 3*col];
-    //             cubing[46 + 3*col] = cubing[45 + 3*col];
-    //             cubing[45 + 3*col] = cubing[35 - col];
-    //             cubing[35 - col] = cubing[23 - col];
-    //             cubing[23 - col] = cubing[11 - col];
-    //             cubing[11 - col] = letter;
-    //         }
-    //     }
-    // }
+            }
+        } else if(key.dir == 'L') { // Level
+            for(int k = 0; k < times*3; k++) { // 回数 
+                letter = cubing[10 + col];
+                cubing[10 + col] = cubing[13 + col];
+                cubing[13 + col] = cubing[16 + col];
+                cubing[16 + col] = cubing[19 + col];
+                cubing[19 + col] = cubing[22 + col];
+                cubing[22 + col] = cubing[25 + col];
+                cubing[25 + col] = cubing[28 + col];
+                cubing[28 + col] = cubing[31 + col];
+                cubing[31 + col] = cubing[34 + col];
+                cubing[34 + col] = cubing[52 - col];
+                cubing[52 - col] = cubing[49 - col];
+                cubing[49 - col] = cubing[46 - col];
+                cubing[46 - col] = letter;
+            }
+        }
+    }
 
     bool equals (const Cube& a) const {
         bool equal = true;
         for(int i = 0; i < 54; i++) {
             if(cubing[i] != a.cubing[i]) {
+                printf("%c,%c,%d\n",cubing[i],a.cubing[i],i);
                 equal = false;
                 break;
             }
@@ -182,27 +194,69 @@ std::vector<CubeOP> make_key(char (&key)[N]) {
 }
 
 void key_test() {
-    char str[] = {'R', '1', 'L', '2', 'C', '4'};
+    char str[] = {'R', '4', 'C', '1', 'L', '5'};
     std::vector<CubeOP> key = make_key(str);
 
     std::vector<CubeOP> Expected;
     {
-        CubeOP op = {'R', 1};
+        CubeOP op = {'R', 4};
         Expected.push_back(op);
     }
     {
-        CubeOP op = {'L', 2};
+        CubeOP op = {'C', 1};
         Expected.push_back(op);
     }
     {
-        CubeOP op = {'C', 4};
+        CubeOP op = {'L', 5};
         Expected.push_back(op);
     }
     assertEqual(key, Expected);
 }
 
 void rotate_test() {
-    char str[54] = {'1', 'I', 'F', 'M', 'A', 'T', 'H', 'E', 'M', 'T', 'H', '6', 'E', 'O', 'R', 'E', 'M', 'S', 'A', 'T', 'I', 'C', 'S', 'I', 'S', 'T', '2', 'H', 'E', 'W', 'A', 'Y', 'O', '3', 'F', 'L', 'I', '4', 'F', 'E', 'D', 'O', 'N', 'T', 'F', 'O', 'R', 'G', 'E', 'T', 'T', 'H', '5', 'E'};
+    {//Row_test
+        char str[54] = {'1', 'I', 'F', 'M', 'A', 'T', 'H', 'E', 'M', 'A', '2', 'T', 'I', 'C', 'S', 'I', 'S', 'T', '4', 'I', 'F', 'E', 'D', 'O', 'N', 'T', 'F', 'T', '6', 'H', 'E', 'O', 'R', 'E', 'M', 'S', 'H', '3', 'E', 'W', 'A', 'Y', 'O', 'F', 'L', 'O', 'R', 'G', 'E', 'T', '5', 'T', 'H', 'E'};
+        char Expectedstr[54] = {'1', 'I', 'F', 'M', 'A', 'T', 'T', 'H', 'E', 'A', '2', 'T', 'I', 'C', 'S', 'I', 'S', 'T', '4', 'I', 'F', 'E', 'D', 'O', 'H', 'E', 'M', 'T', '6', 'H', 'E', 'O', 'R', 'E', 'M', 'S', 'H', '3', 'E', 'W', 'A', 'Y', 'N', 'T', 'F', 'O', 'R', 'G', 'E', 'T', '5', 'O', 'F', 'L'};
+
+        Cube cube(str);
+        Cube Expectedcube(Expectedstr);
+
+        std::vector<CubeOP> key;
+        CubeOP op = {'R', 4};
+        key.push_back(op);
+        
+        cube.rotate(key[0]);
+        assertEqual(cube,Expectedcube);
+    }
+    {
+        char str[54] = {'1', 'I', 'F', 'M', 'A', 'T', 'H', 'E', 'M', 'A', '2', 'T', 'I', 'C', 'S', 'I', 'S', 'T', '4', 'I', 'F', 'E', 'D', 'O', 'N', 'T', 'F', 'T', '6', 'H', 'E', 'O', 'R', 'E', 'M', 'S', 'H', '3', 'E', 'W', 'A', 'Y', 'O', 'F', 'L', 'O', 'R', 'G', 'E', 'T', '5', 'T', 'H', 'E'};
+        char Expectedstr[54] = {'1', 'E', 'F', 'M', 'O', 'T', 'H', 'R', 'M', 'A', '2', 'T', 'E', 'A', 'I', 'I', 'S', 'T', '4', 'I', 'F', 'E', 'D', 'O', 'N', 'T', 'F', 'T', '6', 'H', 'F', 'A', '3', 'E', 'M', 'S', 'H', 'I', 'E', 'W', 'C', 'Y', 'O', 'S', 'L', 'O', 'R', 'G', 'E', 'T', '5', 'T', 'H', 'E'};
+
+        Cube cube(str);
+        Cube Expectedcube(Expectedstr);
+
+        std::vector<CubeOP> key;
+        CubeOP op = {'C', 1};
+        key.push_back(op);
+        
+        cube.rotate(key[0]);
+        assertEqual(cube,Expectedcube);
+    }
+    {
+        char str[54] = {'1', 'I', 'F', 'M', 'A', 'T', 'H', 'E', 'M', 'A', '2', 'T', 'I', 'C', 'S', 'I', 'S', 'T', '4', 'I', 'F', 'E', 'D', 'O', 'N', 'T', 'F', 'T', '6', 'H', 'E', 'O', 'R', 'E', 'M', 'S', 'H', '3', 'E', 'W', 'A', 'Y', 'O', 'F', 'L', 'O', 'R', 'G', 'E', 'T', '5', 'T', 'H', 'E'};
+        char Expectedstr[54] = {'1', 'I', 'F', 'M', 'A', 'T', 'H', 'E', 'M', 'A', '2', 'H', 'I', 'C', 'R', 'I', 'S', 'S', '4', 'I', 'T', 'E', 'D', 'E', 'N', 'T', 'O', 'T', '6', 'T', 'E', 'O', 'S', 'E', 'M', 'T', 'H', '3', 'E', 'W', 'A', 'Y', 'O', 'F', 'L', 'F', 'R', 'G', 'O', 'T', '5', 'F', 'H', 'E'};
+
+        Cube cube(str);
+        Cube Expectedcube(Expectedstr);
+
+        std::vector<CubeOP> key;
+        CubeOP op = {'L', 5};
+        key.push_back(op);
+        
+        cube.rotate(key[0]);
+        assertEqual(cube,Expectedcube);
+    }
+    
 }
 
 int main(int ac, char **av) {
@@ -216,8 +270,8 @@ int main(int ac, char **av) {
     key_test();
     
 
-    //printf("\n----test----\n");
-    //test();
+    printf("\n----rotate_test----\n");
+    rotate_test();
 
     return 0;
 }
