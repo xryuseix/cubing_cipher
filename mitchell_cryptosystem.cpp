@@ -1,4 +1,5 @@
 #include <iostream>
+#include<vector>
 
 struct CubeOP {
     char dir;
@@ -82,6 +83,49 @@ struct Cube {
     }
 };
 
+template <class T>
+bool Equal(const T& a, const T& b) {
+    return a == b;
+}
+
+template <>
+bool Equal(const Cube& a, const Cube& b) {
+    return a.equals(b);
+}
+
+template <int N>
+bool Equal(const char (&a)[N], const char (&b)[N]) {
+
+    if(strncmp(a,b,N) == 0) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+template <>
+bool Equal(const std::vector<CubeOP> (&a), const std::vector<CubeOP> (&b)) {
+    bool equal = true;
+    for(int i = 0; i < a.size(); i++) {
+        if(a[i].dir != b[i].dir || a[i].times != b[i].times) {
+            equal = false;
+            break;
+        }
+    }
+    return equal;
+}
+
+template <class T>
+void assertEqual(const T& a, const T& b) {
+
+    if(Equal(a, b)) {
+        printf("AC\n");
+    } else {
+        printf("WA\n");
+    }
+    return;
+}
+
 void shuffle(char (&str)[54]) {
     for(int i = 1; i < 5; i++) {
         int j = rand() % (6 - i) + i;
@@ -125,9 +169,41 @@ void encode_test() {
     printf("\n");
 }
 
-// void rotate_test() {
-//     //
-// }
+template<int N>
+std::vector<CubeOP> make_key(char (&key)[N]) {
+
+    std::vector<CubeOP> newkey;
+    CubeOP op;
+    for(int i = 0; i < N; i+=2) {
+        CubeOP op = {key[i], key[i+1] - '0'};
+        newkey.push_back(op);
+    }
+    return newkey;
+}
+
+void key_test() {
+    char str[] = {'R', '1', 'L', '2', 'C', '4'};
+    std::vector<CubeOP> key = make_key(str);
+
+    std::vector<CubeOP> Expected;
+    {
+        CubeOP op = {'R', 1};
+        Expected.push_back(op);
+    }
+    {
+        CubeOP op = {'L', 2};
+        Expected.push_back(op);
+    }
+    {
+        CubeOP op = {'C', 4};
+        Expected.push_back(op);
+    }
+    assertEqual(key, Expected);
+}
+
+void rotate_test() {
+    char str[54] = {'1', 'I', 'F', 'M', 'A', 'T', 'H', 'E', 'M', 'T', 'H', '6', 'E', 'O', 'R', 'E', 'M', 'S', 'A', 'T', 'I', 'C', 'S', 'I', 'S', 'T', '2', 'H', 'E', 'W', 'A', 'Y', 'O', '3', 'F', 'L', 'I', '4', 'F', 'E', 'D', 'O', 'N', 'T', 'F', 'O', 'R', 'G', 'E', 'T', 'T', 'H', '5', 'E'};
+}
 
 int main(int ac, char **av) {
 
@@ -136,11 +212,12 @@ int main(int ac, char **av) {
     printf("\n----encode_test----\n");
     encode_test();
 
-    // printf("\n----rotate_test----\n");
-    // rotate_test();
+    printf("\n----key_test----\n");
+    key_test();
     
 
     //printf("\n----test----\n");
     //test();
+
     return 0;
 }
