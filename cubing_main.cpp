@@ -472,6 +472,8 @@ void cubingmode_ende_test() {
 
 int main(int ac, char **av) {
 
+    srand((unsigned) time(NULL));
+
     printf("\n----unit_test----\n");
     unit_test();
 
