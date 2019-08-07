@@ -162,6 +162,9 @@ void encode(const char (&str)[48], char (&encoded_str)[54]) {
             continue;
         } else {
             encoded_str[i] = str[strpos];
+            if(encoded_str[i] == ' ' && rand()%2 == 0) {
+                encoded_str[i] = '\0';
+            }
             strpos++;
         }
     }
@@ -224,7 +227,7 @@ void rotate_test() {
         std::vector<CubeOP> key;
         CubeOP op = {'R', 4};
         key.push_back(op);
-        
+
         cube.rotate(key[0]);
         assertEqual(cube,Expectedcube);
     }
@@ -238,7 +241,7 @@ void rotate_test() {
         std::vector<CubeOP> key;
         CubeOP op = {'C', 1};
         key.push_back(op);
-        
+
         cube.rotate(key[0]);
         assertEqual(cube,Expectedcube);
     }
@@ -252,7 +255,7 @@ void rotate_test() {
         std::vector<CubeOP> key;
         CubeOP op = {'L', 5};
         key.push_back(op);
-        
+
         cube.rotate(key[0]);
         assertEqual(cube,Expectedcube);
     }
@@ -268,7 +271,6 @@ int main(int ac, char **av) {
 
     printf("\n----key_test----\n");
     key_test();
-    
 
     printf("\n----rotate_test----\n");
     rotate_test();
