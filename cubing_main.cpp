@@ -470,10 +470,67 @@ void cubingmode_ende_test() {
     assertEqual(str, pt);
 }
 
+void usecubing(){
+
+    char InputFileName[] = "input.txt";
+    std::vector<char> str;
+    std::vector<char> ct;
+
+    FILE *fp;
+    fp = fopen(InputFileName, "r");
+
+    char c;
+    while((c = fgetc(fp)) != EOF) {
+        str.push_back(c);
+    }
+
+    std::cout<<std::endl;
+    for(int i = 0; i < str.size();i++){
+        std::cout << str[i];
+    }
+    std::cout<<std::endl<<std::endl;
+
+    std::vector<CubeOP> key;
+    CubeOP op = {1, 2, 1};
+    for(int i = 0; i < 200; i++) {
+        op.column = 1 + rand()%3;
+        op.direction = 1 + rand()%3;
+        op.times = 1 + rand()%3;
+        key.push_back(op);
+    }
+
+    printf("key: ");
+    for(int i = 0; i < key.size(); i++) {
+        printf("%d%d%d", key[i].direction, key[i].column, key[i].times);
+    }
+    printf("\n");
+
+    cubingmode_en(key, str, ct);
+
+    printf("ct: ");
+    for(int i = 0; i < ct.size(); i++) {
+        if(ct[i]=='\0'){
+            printf("$");
+            continue;
+        }
+        printf("%c", ct[i]);
+    }
+    printf("\n");
+
+    std::vector<char> pt;
+    cubingmode_de(key, ct, pt);
+
+    printf("\npt: ");
+    for(int i = 0; i < pt.size(); i++) {
+        printf("%c", pt[i]);
+    }
+    printf("\n");
+}
+
 int main(int ac, char **av) {
 
     srand((unsigned) time(NULL));
-
+/*
     printf("\n----unit_test----\n");
     unit_test();
 
@@ -493,7 +550,9 @@ int main(int ac, char **av) {
     cubingmode_ende_test();
 
     printf("\n----encode_decode_test(cubingmode)----\n");
-    encode_decode_test();
+    encode_decode_test();*/
+
+    usecubing();
 
 
     return 0;
