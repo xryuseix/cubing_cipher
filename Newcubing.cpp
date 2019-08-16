@@ -302,27 +302,58 @@ void encoding_test() {
     assertEqual(BeforeRandBlock, Expectedblock_1);
 }
 
-void en_masking(const char (&plain)[54], char (&masked)[54], std::vector<int> (&iv)) {
-    for(int i = 0; i < 54; i++) {
+void en_masking1(const char (&plain)[45], char (&masked)[45], std::vector<int> (&iv)) {
+
+    for(int i = 0; i < 45; i++) {
         iv.push_back(rand()%tablesize);
-        int idx = (iv[i] + static_cast<int>(std::distance(std::begin(printable_table), std::find(std::begin(printable_table), std::end(printable_table), plain[i]))))%tablesize;
+        int idx = (iv[iv.size() - 1] + static_cast<int>(std::distance(std::begin(printable_table), std::find(std::begin(printable_table), std::end(printable_table), plain[i]))))%tablesize;
         masked[i] = printable_table[idx];
     }
 }
 
-void de_masking(const char (&plain)[54], char (&masked)[54], std::vector<int> (&iv)) {
-    for(int i = 0; i < 54; i++) {
+void en_masking2(const char (&plain)[54], char (&masked)[54], std::vector<int> (&iv)) {
+
+    for(int i = 0; i < 45; i++) {
+        masked[i] = plain[i];
+    }
+    for(int i = 0; i < 7; i++) {
+        iv.push_back(rand()%tablesize);
+        int idx = (iv[iv.size() - 1] + static_cast<int>(std::distance(std::begin(printable_table), std::find(std::begin(printable_table), std::end(printable_table), plain[i]))))%tablesize;
+        masked[45 + i] = printable_table[idx];
+    }
+    masked[52] = plain[52];
+    masked[53] = plain[53];
+}
+
+void de_masking1(std::vector<char> (&plain), char (&masked)[45], std::vector<int> (&iv), const int nowblock) {
+
+    for(int i = 0; i < 45; i++) {
         int tablepos = static_cast<int>(std::distance(std::begin(printable_table), std::find(std::begin(printable_table), std::end(printable_table), plain[i])));
-        int idx = (tablesize + tablepos - (int)iv[i])%tablesize;
+        int idx = (tablesize + tablepos - iv[nowblock*45 + i])%tablesize;
         masked[i] = printable_table[idx];
     }
+}
+
+void de_masking2(const char (&plain)[54], char (&masked)[54], std::vector<int> (&iv), const int nowblock) {
+
+    for(int i = 0; i < 45; i++) {
+        masked[i] = plain[i];
+    }
+    for(int i = 45; i < 52; i++) {
+        int tablepos = static_cast<int>(std::distance(std::begin(printable_table), std::find(std::begin(printable_table), std::end(printable_table), plain[i])));
+        int idx = (tablesize + tablepos - iv[nowblock*7 + i - 45])%tablesize;
+        masked[i] = printable_table[idx];
+    }
+    masked[52] = plain[52];
+    masked[53] = plain[53];
+    
 }
 
 void shuffle(std::vector<std::vector<char>> (&str)) {
 
     for(int i = str.size() - 1; i > 0; i--) {
         int j = rand() % i;
-        for(int k = 0; k < 54; k++) {
+        for(int k = 0; k < 54 + 14; k++) {
             char c = str[i][k];
             str[i][k] = str[j][k];
             str[j][k] = c;
@@ -330,7 +361,7 @@ void shuffle(std::vector<std::vector<char>> (&str)) {
     }
 }
 
-void cubingmode_en(const std::vector<CubeOP>& key, std::vector<char> (&str), std::vector<char> (&ct), std::vector<int> (&iv)) {
+void cubingmode_en(const std::vector<CubeOP>& key, std::vector<char> (&str), std::vector<char> (&ct), std::vector<int> (&iv1), std::vector<int> (&iv2)) {
 
     std::vector<std::vector<char>> ShuffleText;
     std::vector<char> pt;
@@ -352,20 +383,33 @@ void cubingmode_en(const std::vector<CubeOP>& key, std::vector<char> (&str), std
         char plainblock[45];
         char encoded_block[54];
         char cipherblock[54];
-        char masked_block[54];
+        char masked_block1[45];
+        char masked_block2[54];
         std::vector<char> tmp;
 
         for(int j = 0; j < 45; j++) { //平文から平文ブロック作成
             plainblock[j] = pt[i*45 + j];
         }
-        encoding(plainblock, encoded_block, i);
-        en_masking(encoded_block, masked_block, iv);
+        en_masking1(plainblock, masked_block1, iv1);
         
-        encrypt(key, masked_block, cipherblock);
+        encoding(masked_block1, encoded_block, i);
+        
+        en_masking2(encoded_block, masked_block2, iv2);
+        // printf("masked2: %s\n\n",masked_block2);
+        encrypt(key, masked_block2, cipherblock);
 
         for(int j = 0; j < 54; j ++) { //char-vector変換
             tmp.push_back(cipherblock[j]);
-            iv.push_back(masked_block[i]);
+        }
+
+        for(int j = 0; j < 7; j++) {
+            if(iv2[7*i + j] < 10) {
+                tmp.push_back('0');
+                tmp.push_back(iv2[7*i + j] + '0');
+            } else {
+                tmp.push_back(iv2[7*i + j]/10 + '0');
+                tmp.push_back(iv2[7*i + j]%10 + '0');
+            }
         }
         ShuffleText.push_back(tmp);
     }
@@ -373,14 +417,10 @@ void cubingmode_en(const std::vector<CubeOP>& key, std::vector<char> (&str), std
     shuffle(ShuffleText);
 
     for(int i = 0; i < ShuffleText.size(); i++) {
-        for(int j = 0; j < 54; j ++) {
+        for(int j = 0; j < 54 + 14; j ++) {
             ct.push_back(ShuffleText[i][j]);
         }
     }
-    // for(int i = 0; i < iv.size(); i++) {
-    //     std::cout<<iv[i]<<" ";
-    // }
-
     return;
 }
 
@@ -413,49 +453,69 @@ bool sortcomp(const std::vector<char>& l, const std::vector<char>& r) {
     return leftnum < rightnum;
 }
 
-void decoding(std::vector<std::vector<char>> (&BeforeShuffleText), std::vector<char> (&pt)) {
+void decoding(std::vector<std::vector<char>> (&BeforeShuffleText), std::vector<char> (&pt), std::vector<int> (&iv)) {
 
+    char tmp[45];
     sort(BeforeShuffleText.begin(), BeforeShuffleText.end(), sortcomp);
     for(int i = 0; i < BeforeShuffleText.size(); i++) {
+        de_masking1(BeforeShuffleText[i], tmp, iv, i);
         for(int j = 0; j < 45; j++) {
-            if(BeforeShuffleText[i][j] == '\0') {
-                return;
-            }
-            pt.push_back(BeforeShuffleText[i][j]);
+            pt.push_back(tmp[j]);
         }
     }
 }
 
-void cubingmode_de(std::vector<CubeOP>& key, const std::vector<char> (&str), std::vector<char> (&pt), std::vector<int> (&iv)) {
+void cubingmode_de(std::vector<CubeOP>& key, const std::vector<char> (&str), std::vector<char> (&pt), std::vector<int> (&iv1)) {
 
-    if(str.size()%54 != 0) {
+    std::vector<char> ct;
+    std::vector<int> tmpiv2, iv2;
+    
+    for(int i = 0; i < str.size(); i++) {
+        if(i%68 < 54) {
+            ct.push_back(str[i]);
+        } else {
+            tmpiv2.push_back(str[i] - '0');
+        }
+    }
+
+    for(int i = 0; i < tmpiv2.size()-1; i+=2) {
+        iv2.push_back(tmpiv2[i]*10 + tmpiv2[i + 1]);
+    }
+    for(int i=0;i<iv2.size();i++){
+        printf("%d ",iv2[i]);
+    }
+    printf("\n");
+
+    if(ct.size()%54 != 0 || iv2.size()%14 != 0) {
         printf("decryption error\n");
         return;
     }
     int blocknum = str.size()/54;
-    std::vector<std::vector<char>> BeforeShuffleText; 
+    std::vector<std::vector<char>> BeforeShuffleText;
+    char plainblock[45];
 
     for(int i = 0; i < blocknum; i++) {
 
         char cipherblock[54];
         char decrypted_block[54];
-        char plainblock[45];
         char masked[54];
         std::vector<char> tmp;
 
         for(int j = 0; j < 54; j++) { //暗号文から暗号文ブロック作成
-            cipherblock[j] = str[i*54 + j];
+            cipherblock[j] = ct[i*54 + j];
         }
         decrypt(key, cipherblock, decrypted_block);
-        de_masking(decrypted_block, masked, iv);
+
+        de_masking2(decrypted_block, masked, iv2, i);
+
         for(int j = 0; j < 54; j++) {
             tmp.push_back(masked[j]);
         }
         BeforeShuffleText.push_back(tmp);
-        
+
     }
 
-    decoding(BeforeShuffleText, pt);
+    decoding(BeforeShuffleText, pt, iv1);
     return;
 }
 
@@ -474,7 +534,7 @@ void encode_decode_test() {
         vcencoded.push_back(chencoded[i]);
     }
     todecode.push_back(vcencoded);
-    decoding(todecode, vcdecoded);
+    // decoding(todecode, vcdecoded);
     for(int i = 0; i < 45; i++) {
         chdecoded[i] = vcencoded[i];
     }
@@ -511,17 +571,26 @@ void usecubing(){
 
     std::vector<CubeOP> key;
     CubeOP op = {1, 2, 1};
-    for(int i = 0; i < 200; i++) {
+    for(int i = 0; i < 50; i++) {
         op.column = 1 + rand()%3;
         op.direction = 1 + rand()%3;
         op.times = 1 + rand()%3;
         key.push_back(op);
     }
     
+    bool plaintext = 1;
     bool printkey = 1;
     bool printct = 1;
     bool printpt = 1;
     bool printiv = 1;
+
+    if(plaintext) {
+        printf("pt: ");
+        for(int i = 0; i < str.size(); i++) {
+            printf("%c", str[i]);
+        }
+        printf("\n\n");
+    }
 
     if(printkey) {
         printf("key: ");
@@ -531,15 +600,18 @@ void usecubing(){
         printf("\n");
     }
     
-    std::vector<int> iv;
+    std::vector<int> iv1, iv2;
 
-    cubingmode_en(key, str, ct, iv);
+    cubingmode_en(key, str, ct, iv1, iv2);
 
     if(printct) {
         printf("\nct: ");
         for(int i = 0; i < ct.size(); i++) {
             if(ct[i]=='\0'){
                 printf("$");
+                continue;
+            } else if(ct[i] == '\t') {
+                printf(" ");
                 continue;
             }
             printf("%c", ct[i]);
@@ -548,24 +620,32 @@ void usecubing(){
     }
 
     if(printiv) {
-        printf("\niv: ");
-        for(int i = 0; i < iv.size(); i++) {
-            printf("%d,", iv[i]);
+        printf("\niv1: ");
+        for(int i = 0; i < iv1.size(); i++) {
+            printf("%02d ", iv1[i]);
+        }
+        printf("(EOF)\n");
+        printf("\niv2: ");
+        for(int i = 0; i < iv2.size(); i++) {
+            printf("%02d ", iv2[i]);
         }
         printf("(EOF)\n");
     }
 
-    printf("\n----------------------------------\n");
+
+    if((printct||printiv)&&printpt) {
+        printf("\n----------------------------------\n");
+    }
+
     std::vector<char> pt;
-    // for(int i=0;i<iv.size();i++){
-    //     std::cout<<iv[i]<<" ";
-    // }
-    
-    cubingmode_de(key, ct, pt, iv);
+    cubingmode_de(key, ct, pt, iv1);
     
     if(printpt){
         printf("\npt: ");
         for(int i = 0; i < pt.size(); i++) {
+            if(pt[i] == '\0') {
+                break;
+            }
             printf("%c", pt[i]);
         }
         printf("(EOF)\n");
