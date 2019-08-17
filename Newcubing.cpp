@@ -346,7 +346,7 @@ void de_masking2(const char (&plain)[54], char (&masked)[54], std::vector<int> (
     }
     masked[52] = plain[52];
     masked[53] = plain[53];
-    
+
 }
 
 void shuffle(std::vector<std::vector<char>> (&str)) {
