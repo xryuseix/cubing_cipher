@@ -316,10 +316,10 @@ void en_masking2(const char (&plain)[54], char (&masked)[54], std::vector<int> (
     for(int i = 0; i < 45; i++) {
         masked[i] = plain[i];
     }
-    for(int i = 0; i < 7; i++) {
+    for(int i = 45; i < 52; i++) {
         iv.push_back(rand()%tablesize);
         int idx = (iv[iv.size() - 1] + static_cast<int>(std::distance(std::begin(printable_table), std::find(std::begin(printable_table), std::end(printable_table), plain[i]))))%tablesize;
-        masked[45 + i] = printable_table[idx];
+        masked[i] = printable_table[idx];
     }
     masked[52] = plain[52];
     masked[53] = plain[53];
@@ -395,9 +395,9 @@ void cubingmode_en(const std::vector<CubeOP>& key, std::vector<char> (&str), std
         encoding(masked_block1, encoded_block, i);
         
         en_masking2(encoded_block, masked_block2, iv2);
-        // printf("masked2: %s\n\n",masked_block2);
+        
         encrypt(key, masked_block2, cipherblock);
-
+        
         for(int j = 0; j < 54; j ++) { //char-vector変換
             tmp.push_back(cipherblock[j]);
         }
@@ -457,6 +457,7 @@ void decoding(std::vector<std::vector<char>> (&BeforeShuffleText), std::vector<c
 
     char tmp[45];
     sort(BeforeShuffleText.begin(), BeforeShuffleText.end(), sortcomp);
+    
     for(int i = 0; i < BeforeShuffleText.size(); i++) {
         de_masking1(BeforeShuffleText[i], tmp, iv, i);
         for(int j = 0; j < 45; j++) {
@@ -481,10 +482,6 @@ void cubingmode_de(std::vector<CubeOP>& key, const std::vector<char> (&str), std
     for(int i = 0; i < tmpiv2.size()-1; i+=2) {
         iv2.push_back(tmpiv2[i]*10 + tmpiv2[i + 1]);
     }
-    for(int i=0;i<iv2.size();i++){
-        printf("%d ",iv2[i]);
-    }
-    printf("\n");
 
     if(ct.size()%54 != 0 || iv2.size()%14 != 0) {
         printf("decryption error\n");
@@ -505,7 +502,7 @@ void cubingmode_de(std::vector<CubeOP>& key, const std::vector<char> (&str), std
             cipherblock[j] = ct[i*54 + j];
         }
         decrypt(key, cipherblock, decrypted_block);
-
+        
         de_masking2(decrypted_block, masked, iv2, i);
 
         for(int j = 0; j < 54; j++) {
@@ -514,6 +511,7 @@ void cubingmode_de(std::vector<CubeOP>& key, const std::vector<char> (&str), std
         BeforeShuffleText.push_back(tmp);
 
     }
+    
 
     decoding(BeforeShuffleText, pt, iv1);
     return;
@@ -569,9 +567,10 @@ void usecubing(){
         str.push_back(c);
     }
 
+    int keysize=30;
     std::vector<CubeOP> key;
     CubeOP op = {1, 2, 1};
-    for(int i = 0; i < 50; i++) {
+    for(int i = 0; i < keysize; i++) {
         op.column = 1 + rand()%3;
         op.direction = 1 + rand()%3;
         op.times = 1 + rand()%3;
