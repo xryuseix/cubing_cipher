@@ -1,6 +1,17 @@
 # SecCamp_2019_Crypt
 
-* Newcubing.cpp
-* cubing_main.cpp
-* cubingmode.md
-* Input.txt
+## Newcubing.cpp
+
+8/16考案のマスクをかけるアルゴリズム
+
+## cubing_main.cpp
+
+8/15以前のcubing暗号のアルゴリズム
+
+## cubingmode.md
+
+8/15以前の暗号利用モードcubingmodeの説明
+
+## Input.txt
+
+cubing_main,Newcubingに呼ばれる入力ファイル
