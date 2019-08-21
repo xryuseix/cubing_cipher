@@ -464,6 +464,7 @@ void decoding(std::vector<std::vector<char>> (&BeforeShuffleText), std::vector<c
             pt.push_back(tmp[j]);
         }
     }
+    pt.erase(pt.begin()+static_cast<int>(std::distance(std::begin(pt), std::find(std::begin(pt), std::end(pt), '\0'))),pt.end());
 }
 
 void cubingmode_de(std::vector<CubeOP>& key, const std::vector<char> (&str), std::vector<char> (&pt), std::vector<int> (&iv1)) {
@@ -483,7 +484,7 @@ void cubingmode_de(std::vector<CubeOP>& key, const std::vector<char> (&str), std
         iv2.push_back(tmpiv2[i]*10 + tmpiv2[i + 1]);
     }
 
-    if(ct.size()%54 != 0 || iv2.size()%14 != 0) {
+    if(ct.size()%54 != 0 || iv2.size()%7 != 0) {
         printf("decryption error\n");
         return;
     }
@@ -548,9 +549,16 @@ void cubingmode_ende_test() {
     CubeOP op = {1, 2, 1};
     key.push_back(op);
 
-    // cubingmode_en(key, str, ct);
-    // cubingmode_de(key, ct, pt);
+    std::vector<int> iv1,iv2;
+
+    cubingmode_en(key, str, ct, iv1, iv2);
+
+    cubingmode_de(key, ct, pt, iv1);
     assertEqual(str, pt);
+    for(int i=0;i<pt.size();i++){
+        printf("%c",pt[i]);
+    }
+    printf("\n");
 }
 
 void usecubing(){
@@ -642,9 +650,6 @@ void usecubing(){
     if(printpt){
         printf("\npt: ");
         for(int i = 0; i < pt.size(); i++) {
-            if(pt[i] == '\0') {
-                break;
-            }
             printf("%c", pt[i]);
         }
         printf("(EOF)\n");
@@ -654,7 +659,7 @@ void usecubing(){
 int main(int ac, char **av) {
 
     srand((unsigned) time(NULL));
-/*
+
     printf("\n----unit_test----\n");
     unit_test();
 
@@ -674,9 +679,9 @@ int main(int ac, char **av) {
     cubingmode_ende_test();
 
     printf("\n----encode_decode_test(cubingmode)----\n");
-    encode_decode_test();*/
+    encode_decode_test();
 
-    usecubing();
+    // usecubing();
 
 
     return 0;
