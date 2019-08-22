@@ -5,13 +5,14 @@
 * 平文ブロック長：45byte
 * 暗号文ブロック長：54byte
 * 鍵長：可変
-* 暗号化処理の並列化：可
-* 復号処理の並列化：可
+* 暗号化処理の並列化：可 (※但し，Shuffleがボトルネックとなる)
+* 復号処理の並列化：可 (※但し，Sortがボトルネックとなる)
 * Random Read：不可
 
 ## 図
 
-![CubingModeImage](./Image.png)
+![CubingModeImage](./Pictures/flow.png)
+![cubing_block](./Pictures/block.png)
 
 ## 流れ
 

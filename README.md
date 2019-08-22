@@ -2,7 +2,7 @@
 
 ## Newcubing.cpp
 
-8/16考案のマスクをかけるアルゴリズム
+8/16考案のcubing暗号のアルゴリズム
 
 ## cubing_main.cpp
 
