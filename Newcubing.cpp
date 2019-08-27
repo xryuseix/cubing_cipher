@@ -183,6 +183,7 @@ void cube2str(Cube cube, char (&str)[54]) {
 }
 
 void en_decode_test() {
+
     {
         char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
         char ExpectedStr[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
@@ -306,7 +307,8 @@ void en_masking1(const char (&plain)[45], char (&masked)[45], std::vector<int> (
 
     for(int i = 0; i < 45; i++) {
         iv.push_back(rand()%tablesize);
-        int idx = (iv[iv.size() - 1] + static_cast<int>(std::distance(std::begin(printable_table), std::find(std::begin(printable_table), std::end(printable_table), plain[i]))))%tablesize;
+        int dis = static_cast<int>(std::distance(std::begin(printable_table), std::find(std::begin(printable_table), std::end(printable_table), plain[i])));
+        int idx = (iv[iv.size() - 1] + dis)%tablesize;
         masked[i] = printable_table[idx];
     }
 }
@@ -318,7 +320,8 @@ void en_masking2(const char (&plain)[54], char (&masked)[54], std::vector<int> (
     }
     for(int i = 45; i < 52; i++) {
         iv.push_back(rand()%tablesize);
-        int idx = (iv[iv.size() - 1] + static_cast<int>(std::distance(std::begin(printable_table), std::find(std::begin(printable_table), std::end(printable_table), plain[i]))))%tablesize;
+        int dis = static_cast<int>(std::distance(std::begin(printable_table), std::find(std::begin(printable_table), std::end(printable_table), plain[i])));
+        int idx = (iv[iv.size() - 1] + dis)%tablesize;
         masked[i] = printable_table[idx];
     }
     masked[52] = plain[52];
@@ -328,8 +331,8 @@ void en_masking2(const char (&plain)[54], char (&masked)[54], std::vector<int> (
 void de_masking1(std::vector<char> (&plain), char (&masked)[45], std::vector<int> (&iv), const int nowblock) {
 
     for(int i = 0; i < 45; i++) {
-        int tablepos = static_cast<int>(std::distance(std::begin(printable_table), std::find(std::begin(printable_table), std::end(printable_table), plain[i])));
-        int idx = (tablesize + tablepos - iv[nowblock*45 + i])%tablesize;
+        int dis = static_cast<int>(std::distance(std::begin(printable_table), std::find(std::begin(printable_table), std::end(printable_table), plain[i])));
+        int idx = (tablesize + dis - iv[nowblock*45 + i])%tablesize;
         masked[i] = printable_table[idx];
     }
 }
@@ -340,8 +343,8 @@ void de_masking2(const char (&plain)[54], char (&masked)[54], std::vector<int> (
         masked[i] = plain[i];
     }
     for(int i = 45; i < 52; i++) {
-        int tablepos = static_cast<int>(std::distance(std::begin(printable_table), std::find(std::begin(printable_table), std::end(printable_table), plain[i])));
-        int idx = (tablesize + tablepos - iv[nowblock*7 + i - 45])%tablesize;
+        int dis = static_cast<int>(std::distance(std::begin(printable_table), std::find(std::begin(printable_table), std::end(printable_table), plain[i])));
+        int idx = (tablesize + dis - iv[nowblock*7 + i - 45])%tablesize;
         masked[i] = printable_table[idx];
     }
     masked[52] = plain[52];
@@ -353,10 +356,8 @@ void shuffle(std::vector<std::vector<char>> (&str)) {
 
     for(int i = str.size() - 1; i > 0; i--) {
         int j = rand() % i;
-        for(int k = 0; k < 54 + 14; k++) {
-            char c = str[i][k];
-            str[i][k] = str[j][k];
-            str[j][k] = c;
+        for(int k = 0; k < 68; k++) {
+            std::swap(str[i][k], str[j][k]);
         }
     }
 }
@@ -402,7 +403,7 @@ void cubingmode_en(const std::vector<CubeOP>& key, std::vector<char> (&str), std
             tmp.push_back(cipherblock[j]);
         }
 
-        for(int j = 0; j < 7; j++) {
+        for(int j = 0; j < 7; j++) { //ivはint型だが暗号文はchar型なので，型変換
             if(iv2[7*i + j] < 10) {
                 tmp.push_back('0');
                 tmp.push_back(iv2[7*i + j] + '0');
@@ -421,20 +422,6 @@ void cubingmode_en(const std::vector<CubeOP>& key, std::vector<char> (&str), std
             ct.push_back(ShuffleText[i][j]);
         }
     }
-    return;
-}
-
-void cubingmode_en_test() {
-
-    std::vector<char> str{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!'};
-    std::vector<char> ct;
-
-    std::vector<CubeOP> key;
-    CubeOP op = {1, 2, 1};
-    key.push_back(op);
-
-    // cubingmode_en(key, str, ct, mask);
-    
     return;
 }
 
@@ -464,7 +451,8 @@ void decoding(std::vector<std::vector<char>> (&BeforeShuffleText), std::vector<c
             pt.push_back(tmp[j]);
         }
     }
-    pt.erase(pt.begin()+static_cast<int>(std::distance(std::begin(pt), std::find(std::begin(pt), std::end(pt), '\0'))),pt.end());
+    //パディング削除
+    pt.erase(pt.begin() + static_cast<int>(std::distance(std::begin(pt), std::find(std::begin(pt), std::end(pt), '\0'))), pt.end());
 }
 
 void cubingmode_de(std::vector<CubeOP>& key, const std::vector<char> (&str), std::vector<char> (&pt), std::vector<int> (&iv1)) {
@@ -488,6 +476,7 @@ void cubingmode_de(std::vector<CubeOP>& key, const std::vector<char> (&str), std
         printf("decryption error\n");
         return;
     }
+
     int blocknum = str.size()/54;
     std::vector<std::vector<char>> BeforeShuffleText;
     char plainblock[45];
@@ -512,7 +501,6 @@ void cubingmode_de(std::vector<CubeOP>& key, const std::vector<char> (&str), std
         BeforeShuffleText.push_back(tmp);
 
     }
-    
 
     decoding(BeforeShuffleText, pt, iv1);
     return;
@@ -523,6 +511,7 @@ void encode_decode_test() {
     char chencoded[54], chdecoded[45];
     std::vector<char> vcdecoded, vcencoded;
     std::vector<std::vector<char>> todecode;
+    std::vector<int> iv(45,0);
 
     std::vector<CubeOP> key;
     CubeOP op = {1, 2, 1};
@@ -533,7 +522,8 @@ void encode_decode_test() {
         vcencoded.push_back(chencoded[i]);
     }
     todecode.push_back(vcencoded);
-    // decoding(todecode, vcdecoded);
+    
+    decoding(todecode, vcdecoded, iv);
     for(int i = 0; i < 45; i++) {
         chdecoded[i] = vcencoded[i];
     }
