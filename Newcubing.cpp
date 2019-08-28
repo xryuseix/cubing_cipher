@@ -455,12 +455,12 @@ void decoding(std::vector<std::vector<char>> (&BeforeShuffleText), std::vector<c
     pt.erase(pt.begin() + static_cast<int>(std::distance(std::begin(pt), std::find(std::begin(pt), std::end(pt), '\0'))), pt.end());
 }
 
-void cubingmode_de(std::vector<CubeOP>& key, const std::vector<char> (&str), std::vector<char> (&pt), std::vector<int> (&iv1)) {
+void cubingmode_de(std::vector<CubeOP>& key, const std::vector<char> (&str), std::vector<char> (&pt)) {
 
     std::vector<char> ct;
-    std::vector<int> tmpiv2, iv2;
-    
-    for(int i = 0; i < str.size(); i++) {
+    std::vector<int> iv1, tmpiv2, iv2;
+
+    for(int i = 0; i < (str.size()/158 + 1)*68; i++) { //暗号文68/158がct+iv2,残りがiv1
         if(i%68 < 54) {
             ct.push_back(str[i]);
         } else {
@@ -468,7 +468,11 @@ void cubingmode_de(std::vector<CubeOP>& key, const std::vector<char> (&str), std
         }
     }
 
-    for(int i = 0; i < tmpiv2.size()-1; i+=2) {
+    for(int i = str.size()/158*68; i < str.size(); i += 2) {
+        iv1.push_back((str[i] - '0')*10 + (str[i + 1] - '0'));
+    }
+
+    for(int i = 0; i < tmpiv2.size()-1; i += 2) {
         iv2.push_back(tmpiv2[i]*10 + tmpiv2[i + 1]);
     }
 
@@ -543,48 +547,67 @@ void cubingmode_ende_test() {
 
     cubingmode_en(key, str, ct, iv1, iv2);
 
-    cubingmode_de(key, ct, pt, iv1);
-    assertEqual(str, pt);
-    for(int i=0;i<pt.size();i++){
-        printf("%c",pt[i]);
+    for(int i=0;i<iv1.size();i++){
+        if(iv1[i] < 10) {
+            ct.push_back('0');
+        } else {
+            ct.push_back(iv1[i]/10 + '0');
+        }
+        ct.push_back(iv1[i]%10 + '0');
     }
-    printf("\n");
+    cubingmode_de(key, ct, pt);
+
+    assertEqual(str, pt);
 }
 
-void usecubing(){
+void usecubing_en(){
 
-    char InputFileName[] = "input.txt";
-    std::vector<char> str;
+    char InputFileName[] = "./io/input.txt";
+    char KeyFileName[] = "./io/key.txt";
+    char OutputFileName[] = "./io/cipher.txt";
+    std::vector<char> pt;
     std::vector<char> ct;
 
-    FILE *fp;
-    fp = fopen(InputFileName, "r");
+    { //plain input
+        FILE *fp;
+        fp = fopen(InputFileName, "r");
 
-    char c;
-    while((c = fgetc(fp)) != EOF) {
-        str.push_back(c);
+        char c;
+        while((c = fgetc(fp)) != EOF) {
+            pt.push_back(c);
+        }
+        fclose(fp);
     }
 
     int keysize=30;
     std::vector<CubeOP> key;
     CubeOP op = {1, 2, 1};
     for(int i = 0; i < keysize; i++) {
-        op.column = 1 + rand()%3;
         op.direction = 1 + rand()%3;
+        op.column = 1 + rand()%3;
         op.times = 1 + rand()%3;
         key.push_back(op);
     }
-    
+
+    { //key input
+        FILE *fp;
+        fp = fopen(KeyFileName, "w");
+
+        for(int i = 0; i < key.size(); i++) {
+            fprintf(fp, "%d%d%d", key[i].direction, key[i].column, key[i].times);
+        }
+        fclose(fp);
+    }
+
     bool plaintext = 1;
     bool printkey = 1;
     bool printct = 1;
-    bool printpt = 1;
     bool printiv = 1;
 
     if(plaintext) {
         printf("pt: ");
-        for(int i = 0; i < str.size(); i++) {
-            printf("%c", str[i]);
+        for(int i = 0; i < pt.size(); i++) {
+            printf("%c", pt[i]);
         }
         printf("\n\n");
     }
@@ -596,15 +619,15 @@ void usecubing(){
         }
         printf("\n");
     }
-    
+
     std::vector<int> iv1, iv2;
 
-    cubingmode_en(key, str, ct, iv1, iv2);
+    cubingmode_en(key, pt, ct, iv1, iv2);
 
     if(printct) {
         printf("\nct: ");
         for(int i = 0; i < ct.size(); i++) {
-            if(ct[i]=='\0'){
+            if(ct[i] == '\0'){
                 printf("$");
                 continue;
             } else if(ct[i] == '\t') {
@@ -629,20 +652,104 @@ void usecubing(){
         printf("(EOF)\n");
     }
 
+    { //cipher & iv input
+        FILE *fp;
+        fp = fopen(OutputFileName, "w");
 
-    if((printct||printiv)&&printpt) {
-        printf("\n----------------------------------\n");
+        for(int i = 0; i < ct.size(); i++) {
+            fprintf(fp, "%c", ct[i]);
+        }
+        for(int i = 0; i < iv1.size(); i++) {
+            fprintf(fp, "%02d", iv1[i]);
+        }
+        fclose(fp);
+    }
+}
+
+void usecubing_de(){
+    char InputFileName[] = "./io/cipher.txt";
+    char KeyFileName[] = "./io/key.txt";
+    char OutputFileName[] = "./io/plain.txt";
+    std::vector<char> ct;
+
+    { //cipher input
+        FILE *fp;
+        fp = fopen(InputFileName, "r");
+
+        char c;
+        while((c = fgetc(fp)) != EOF) {
+            ct.push_back(c);
+        }
+        fclose(fp);
     }
 
+    std::vector<CubeOP> key;
+    CubeOP op = {1, 2, 1};
+    { //key input
+        FILE *fp;
+        fp = fopen(KeyFileName, "r");
+
+        char c;
+        int oppos = 0;
+        while((c = fgetc(fp)) != EOF) {
+            if(oppos%3 == 0) {
+                op.direction = c - '0';
+            } else if(oppos%3 == 1) {
+                op.column = c - '0';
+            } else {
+                op.times = c - '0';
+                key.push_back(op);
+            }
+            oppos = (oppos + 1)%3;
+        }
+    }
+
+    bool printkey = 1;
+    bool printct = 1;
+    bool printpt = 1;
+
+    if(printct) {
+        printf("\nct: ");
+        for(int i = 0; i < ct.size(); i++) {
+            if(ct[i] == '\0'){
+                printf("$");
+                continue;
+            } else if(ct[i] == '\t') {
+                printf(" ");
+                continue;
+            }
+            printf("%c", ct[i]);
+        }
+        printf("(EOF)\n");
+    }
+
+    if(printkey) {
+        printf("key: ");
+        for(int i = 0; i < key.size(); i++) {
+            printf("%d%d%d", key[i].direction, key[i].column, key[i].times);
+        }
+        printf("\n");
+    }
+
+    std::vector<int> iv1, iv2;
     std::vector<char> pt;
-    cubingmode_de(key, ct, pt, iv1);
-    
+    cubingmode_de(key, ct, pt);
+
     if(printpt){
         printf("\npt: ");
         for(int i = 0; i < pt.size(); i++) {
             printf("%c", pt[i]);
         }
         printf("(EOF)\n");
+    }
+    { //plain output
+        FILE *fp;
+        fp = fopen(OutputFileName, "w");
+
+        for(int i = 0; i < pt.size(); i++) {
+            fprintf(fp, "%c", pt[i]);
+        }
+        fclose(fp);
     }
 }
 
@@ -671,7 +778,9 @@ int main(int ac, char **av) {
     printf("\n----encode_decode_test(cubingmode)----\n");
     encode_decode_test();
 
-    // usecubing();
+    usecubing_en();
+
+    usecubing_de();
 
 
     return 0;
