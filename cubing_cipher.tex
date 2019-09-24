@@ -1,0 +1,100 @@
+\documentstyle[12pt]{jarticle}
+\begin{document}
+\thispagestyle{empty}
+\begin{center}
+{\huge 卒~~業~~論~~文のテンプレート}
+\vspace*{3.5cm}
+
+{\LARGE\bf cubing暗号の提案}
+\vspace*{3cm}
+
+{\large 20XX年X月提出日}
+\vspace*{3cm}
+
+{\large 立命館大学 情報理工学部}
+\vspace*{5mm}
+
+{\Large 石~川~~琉~聖}
+\end{center}
+\newpage 
+
+\setcounter{page}{1}
+
+\section*{概要}
+
+研究論文の内容について、500 - 600 字程度でまとめる。
+この概要を読めば、大体どういうことを研究したのかがわかるように書く。
+具体的には、どういう問題について、どのような研究を行って、その結果どのような
+結論が得られたか、というポイントについて簡潔にまとめる。
+
+\newpage
+
+\tableofcontents
+\clearpage
+
+\section{はじめに}
+暗号がここらへんで使われててそこそこ大事って言う社会的背景を語る
+
+\section{準備}
+\subsection{記号の定義}
+\subsection{暗号化とは}
+ここは「1.はじめに」に含んでも良さそう
+先に下を書き，この用語の説明が必要と言ったものがあれば書く
+
+\section{本論}
+\subsection{cubing暗号の概要}
+\subsection{cubing暗号の暗号化手順}
+\subsubsection{パディング処理}
+\subsubsection{コンピュータ上での表現方法}
+配列への代入される順番などを書く
+\subsubsection{転置の仕様}
+\subsubsection{暗号文の取得}
+\subsection{cubingmodeの利用手順}
+\subsubsection{暗号化・復号の流れ}
+\subsubsection{62進数の説明}
+\subsubsection{エンコード処理}
+\subsubsection{表示可能文字}
+\subsubsection{mask(1)処理}
+\subsubsection{mask(2)処理}
+\subsubsection{encrypt処理}
+\subsubsection{decrypt処理}
+\subsubsection{shuffle処理}
+\subsubsection{sort処理}
+\subsubsection{送信内容}
+\subsubsection{ブロック数が多い時の対策}
+
+\section{評価実験}
+ここでは主に長所を実験結果をもとに書く
+\subsection{推奨する鍵の長さに関して}
+鍵の長さを変えた時，転置されている割合を計算
+\subsection{AES・RSAとの実行時間の比較}
+具体的なやり方は考えておらず，おそらくOpenSSLなるものを活用することになる
+\subsection{攻撃対策}
+\subsubsection{ブルートフォース攻撃}
+ここは計算量示すだけ
+\subsubsection{頻度分析}
+これより下はできないことを証明する
+\subsubsection{選択平文攻撃}
+\subsubsection{replay攻撃}
+\section{関連研究}
+\subsection{関連研究1(仮)}
+\subsection{関連研究2(仮)}
+\subsection{関連研究3(仮)}
+\section{まとめ}
+\subsection{まとめ1(仮)}
+\subsection{まとめ2(仮)}
+\subsection{まとめ3(仮)}
+\section{謝辞}
+
+\newpage 
+%% 参考文献テンプレ
+
+\begin{thebibliography}{}
+
+\bibitem{長尾} 長尾真：知識と推論，岩波講座ソフトウェア科学14 (1988). 
+
+\bibitem{実近} 実近憲昭: ゲームと AI，人工知能学会誌 vol.5, pp.527-537, 1990.
+
+\end{thebibliography}
+
+\end{document}
