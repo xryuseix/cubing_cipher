@@ -1,4 +1,5 @@
-\documentstyle[12pt]{jarticle}
+\documentclass{jsarticle}
+\usepackage[dvipdfmx]{graphicx}
 \begin{document}
 \thispagestyle{empty}
 \begin{center}
@@ -43,12 +44,83 @@
 
 \section{本論}
 \subsection{cubing暗号の概要}
-\subsection{cubing暗号の暗号化手順}
+cubing暗号の概要は以下の通りである．
+\begin{itemize}
+  \item 平文ブロック長：45byte
+  \item 暗号文ブロック長：108byte
+  \item 鍵長：可変
+  \item 暗号化処理の並列化：可 (※但し，Shuffle処理がボトルネックとなる)
+  \item 復号処理の並列化：可 (※但し，Sort処理がボトルネックとなる)
+  \item Random Read：不可
+\end{itemize}
+なお，cubing暗号は暗号利用モード「cubingmode(CBGモード)」の利用を前提とし，以下cubing暗号に対しcubingmodeを利用した際の手順を説明する．
+\subsection{cubing暗号の暗号化・復号手順}
+
+以下の順序で暗号化・復号を行う．
+
+\subsubsection{暗号化}
+\noindent
+1. 平文をブロックに分ける．\\
+2. 必要があればパディングを用意する．\\
+3. 全ての平文に対してマスク処理を行う．\\
+4. 全てのブロックに対し，エンコードを行う．\\
+5. 全てのブロックの平文以外の箇所に対してマスク処理を行う．\\
+6. ブロックごとに暗号化を行う．\\
+7. ブロックをシャッフルする．\\
+
+\subsubsection{復号}
+\noindent
+1. 暗号文をブロックに分ける．\\
+2. 全てのブロックに対して復号を行う．\\
+3. 暗号化の(5)で使用したマスク処理を元に戻す．\\
+4. (3)により現れるシーケンス番号を元に，ブロック間ソートを行う．\\
+5. 暗号化の(3)で使用したマスク処理を元に戻す．\\
+6. 全てのブロックに対し，デコードを行う．\\
+7. 全てのブロックを結合させ，平文を生成する．\\
+
 \subsubsection{パディング処理}
+平文ブロックが45Byteに満たない場合，1Byte分null入れ，残りはランダムな英数列を入れる．これにより，平文を45Byteに固定することができる．
+
 \subsubsection{コンピュータ上での表現方法}
-配列への代入される順番などを書く
+ルービックキューブをコンピュータ上で表現する際には配列を用いる．具体的には以下のルービックキューブの展開図と配列の添字が対応する．\\
+
+\begin{center}
+  \includegraphics[width=7cm]{./tex_pic/seq.jpg}\\
+\end{center}
+    
 \subsubsection{転置の仕様}
+cubing暗号転置処理は方向・列・回数の三つより決定される．方向に関しては以下の図のように三種類定義される．縦方向はルービックキューブで処理する際，以下の図のように回転させる方向のことである．なお，図には各方向に対する列が記載されている．
+\begin{center}
+  \includegraphics[width=7cm]{./tex_pic/tate.jpg}\\
+(画像は http://iamthecu.be/ より引用)\\
+\end{center}
+横方向に関しては以下のように定義されている．
+\begin{center}
+  \includegraphics[width=7cm]{./tex_pic/yoko.jpg}\\
+(画像は http://iamthecu.be/ より引用)\\
+\end{center}
+回転方向に関しては以下のように定義されている．
+\begin{center}
+  \includegraphics[width=7cm]{./tex_pic/kai.jpg}\\
+(画像は http://iamthecu.be/ より引用)\\
+\end{center}
+
+なお，cubing暗号の転置はルービックキューブの転置とは一部違った箇所がある．それは，「ある方向のある列を転置させる際，他の列およびマスは一切転置させない」ということである．具体的には以下の図のような転置がなされる．\\
+\\
+//暇な自分へ\\
+「1」「2」「3」\\
+↓\\
+「2」「3」「1」\\
+みたいな図入れて\\
+
+これにより，「ルービックキューブの角は常に同じ文字が隣り合っている」といった性質がなくなり，後述の頻度分析による解読の対策となる．
+
+
 \subsubsection{暗号文の取得}
+最後に，暗号文は以下の図の順で取り出す．
+\begin{center}
+  \includegraphics[width=7cm]{./tex_pic/seq.jpg}\\
+\end{center}
 \subsection{cubingmodeの利用手順}
 \subsubsection{暗号化・復号の流れ}
 \subsubsection{62進数の説明}
