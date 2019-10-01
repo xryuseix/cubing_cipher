@@ -59,17 +59,18 @@ cubing暗号の概要は以下の通りである．
 以下の順序で暗号化・復号を行う．
 
 \subsubsection{暗号化}
-\noindent
-1. 平文を用意する．\\
-2. 必要があればパディング処理を行う．\\
-3. encrypt処理を行う．\\
+\begin{enumerate}
+\item 平文を用意する．
+\item 必要があればパディング処理を行う．
+\item encrypt処理を行う．
+\end{enumerate}
 
 \subsubsection{復号}
-\noindent
-1. decrypt処理を行う．\\
-2. パディング処理を逆に行う．つまり，暗号化の際に付属した文字を取り除く．\\
-3. 平文を取得する．\\
-
+\begin{enumerate}
+\item decrypt処理を行う．
+\item パディング処理を逆に行う．つまり，暗号化の際に付属した文字を取り除く．
+\item 平文を取得する．
+\end{enumerate}
 
 \subsubsection{パディング処理}
 平文ブロックが45Byteに満たない場合，1Byte分null入れ，残りはランダムな英数列を入れる．これにより，平文を45Byteに固定することができる．
@@ -85,17 +86,17 @@ cubing暗号の概要は以下の通りである．
 cubing暗号転置処理は方向・列・回数の三つより決定される．方向に関しては以下の図のように三種類定義される．縦方向はルービックキューブで処理する際，以下の図のように回転させる方向のことである．なお，図には各方向に対する列が記載されている．
 \begin{center}
   \includegraphics[width=7cm]{./tex_pic/tate.jpg}\\
-(画像は http://iamthecu.be/ より引用)\\
+\footnote{http://iamthecu.be/}
 \end{center}
 横方向に関しては以下のように定義されている．
 \begin{center}
   \includegraphics[width=7cm]{./tex_pic/yoko.jpg}\\
-(画像は http://iamthecu.be/ より引用)\\
+\footnotemark[1]
 \end{center}
 回転方向に関しては以下のように定義されている．
 \begin{center}
   \includegraphics[width=7cm]{./tex_pic/kai.jpg}\\
-(画像は http://iamthecu.be/ より引用)\\
+\footnotemark[1]
 \end{center}
 
 なお，cubing暗号の転置はルービックキューブの転置とは一部違った箇所がある．それは，「ある方向のある列を転置させる際，他の列およびマスは一切転置させない」ということである．具体的には以下の図のような転置がなされる．\\
@@ -118,24 +119,26 @@ cubing暗号転置処理は方向・列・回数の三つより決定される�
 
 以下の順序で暗号化・復号を行う．
 \subsubsection{暗号化}
-\noindent
-1. 平文をブロックに分ける．\\
-2. 必要があればパディングを用意する．\\
-3. 全ての平文に対してマスク処理を行う．\\
-4. 全てのブロックに対し，エンコードを行う．\\
-5. 全てのブロックの平文以外の箇所に対してマスク処理を行う．\\
-6. ブロックごとに暗号化を行う．\\
-7. ブロックをシャッフルする．\\
+\begin{enumerate}
+\item 平文をブロックに分ける．
+\item 必要があればパディングを用意する．
+\item 全ての平文に対してマスク処理を行う．
+\item 全てのブロックに対し，エンコードを行う．
+\item 全てのブロックの平文以外の箇所に対してマスク処理を行う．
+\item ブロックごとに暗号化を行う．
+\item ブロックをシャッフルする．
+\end{enumerate}
 
 \subsubsection{復号}
-\noindent
-1. 暗号文をブロックに分ける．\\
-2. 全てのブロックに対して復号を行う．\\
-3. 暗号化の(5)で使用したマスク処理を元に戻す．\\
-4. (3)により現れるシーケンス番号を元に，ブロック間ソートを行う．\\
-5. 暗号化の(3)で使用したマスク処理を元に戻す．\\
-6. 全てのブロックに対し，デコードを行う．\\
-7. 全てのブロックを結合させ，平文を生成する．\\
+\begin{enumerate}
+\item 暗号文をブロックに分ける．
+\item 全てのブロックに対して復号を行う．
+\item 暗号化の(5)で使用したマスク処理を元に戻す．
+\item (3)により現れるシーケンス番号を元に，ブロック間ソートを行う．
+\item 暗号化の(3)で使用したマスク処理を元に戻す．
+\item 全てのブロックに対し，デコードを行う．
+\item 全てのブロックを結合させ，平文を生成する．
+\end{enumerate}
 
 \subsubsection{cubingmodeの各処理の適用範囲}
 各ブロックの内容は以下の通りである．また，mask(1)とmask(2)処理の適用範囲に関しても以下の通りである．
@@ -156,13 +159,14 @@ cubingmodeのエンコード処理内では62進数が使われる．62進数は
 \(\mathrm{rand}()\)：アルファベット又は数字から１文字を一様に選ぶ関数\\
 \(\mathrm{to62}(x)\)：0から61までの自然数xを62進数に従って文字にする関数
 
-\begin{eqnarray}
-C_{45+i} &=& \mathrm{fras}\left(\left(\left(\sum_{j=9(i-1)+1}^{9i}{\mathrm{toas}(C_j)}\right)\bmod 26\right)+97\right)\\
-C_{51} &=& \mathrm{to62}\left (\left \lfloor\frac{n}{62}\right \rfloor \right)\\
-C_{52} &=& \mathrm{to62}\left ( n \bmod 62 \right)\\
-C_{53} &=& \mathrm{rand}()\\
-C_{54} &=& \mathrm{rand}()\\
-\end{eqnarray}
+\begin{align}
+C_{45+i} &= \mathrm{fras}\left(\left(\left(\sum_{j=9(i-1)+1}^{9i}{\mathrm{toas}(C_j)}\right)\bmod 26\right)+97\right) \notag\\
+C_{51} &= \mathrm{to62}\left (\left \lfloor\frac{n}{62}\right \rfloor \right) \notag\\
+C_{52} &= \mathrm{to62}\left ( n \bmod 62 \right) \notag\\
+C_{53} &= \mathrm{rand}() \notag\\
+C_{54} &= \mathrm{rand}() \notag\\
+\end{align}
+
 とする．ただし，\(i=1,2,3,4,5\)とする．これを全てのブロックに対して行う．
 
 \subsubsection{表示可能文字}
@@ -186,9 +190,9 @@ mask(1)では各ブロックの平文45Byteにマスク処理を行う．まず�
 \(\mathrm{printable\_table}\)内の文字\(Pi\)のインデックス：\(\mathrm{Idx}(Pi)\) （※\(\mathrm{printable\_table}\)とは，上記「表示可能文字」のこと）\\
 とすると，
 
-\begin{eqnarray}
-Pi=\mathrm{printable\_table}[(\mathrm{Idx}(Pi)+Mi) \bmod 98]\\
-\end{eqnarray}
+
+\[Pi=\mathrm{printable\_table}[(\mathrm{Idx}(Pi)+Mi) \bmod 98]\\\]
+
 
 と定義する．ただし，\(i=1〜45\)とする．
 
