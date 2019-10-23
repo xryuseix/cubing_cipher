@@ -599,10 +599,10 @@ void usecubing_en(){
         fclose(fp);
     }
 
-    bool plaintext = 1;
-    bool printkey = 1;
-    bool printct = 1;
-    bool printiv = 1;
+    bool plaintext = 0;
+    bool printkey = 0;
+    bool printct = 0;
+    bool printiv = 0;
 
     if(plaintext) {
         printf("pt: ");
@@ -704,9 +704,9 @@ void usecubing_de(){
         }
     }
 
-    bool printkey = 1;
-    bool printct = 1;
-    bool printpt = 1;
+    bool printkey = 0;
+    bool printct = 0;
+    bool printpt = 0;
 
     if(printct) {
         printf("\nct: ");
@@ -753,35 +753,35 @@ void usecubing_de(){
     }
 }
 
-int main(int ac, char **av) {
+// int main(int ac, char **av) {
 
-    srand((unsigned) time(NULL));
+//     srand((unsigned) time(NULL));
 
-    printf("\n----unit_test----\n");
-    unit_test();
+//     printf("\n----unit_test----\n");
+//     unit_test();
 
-    printf("\n----en_decode_test(Cube)----\n");
-    en_decode_test();
+//     printf("\n----en_decode_test(Cube)----\n");
+//     en_decode_test();
 
-    printf("\n----encrypt_test----\n");
-    encrypt_test();
+//     printf("\n----encrypt_test----\n");
+//     encrypt_test();
 
-    printf("\n----decrypt_test----\n");
-    decrypt_test();
+//     printf("\n----decrypt_test----\n");
+//     decrypt_test();
 
-    printf("\n----encoding_test----\n");
-    encoding_test();
+//     printf("\n----encoding_test----\n");
+//     encoding_test();
 
-    printf("\n----cubingmode_ende_test----\n");
-    cubingmode_ende_test();
+//     printf("\n----cubingmode_ende_test----\n");
+//     cubingmode_ende_test();
 
-    printf("\n----encode_decode_test(cubingmode)----\n");
-    encode_decode_test();
+//     printf("\n----encode_decode_test(cubingmode)----\n");
+//     encode_decode_test();
 
-    usecubing_en();
+//     usecubing_en();
 
-    usecubing_de();
+//     usecubing_de();
 
 
-    return 0;
-}
+//     return 0;
+// }
