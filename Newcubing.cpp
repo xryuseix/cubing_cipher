@@ -483,7 +483,6 @@ void cubingmode_de(std::vector<CubeOP>& key, const std::vector<char> (&str), std
 
     int blocknum = str.size()/54;
     std::vector<std::vector<char>> BeforeShuffleText;
-    char plainblock[45];
 
     for(int i = 0; i < blocknum; i++) {
 
