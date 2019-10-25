@@ -6,7 +6,7 @@
 
 int main(){
 
-    const int N = 10;
+    const int N = 1000;
     // double sec[N];
     std::vector<double> sec(N);
     for(int calcnum = 0; calcnum < N; calcnum++) { //測定はN回行う

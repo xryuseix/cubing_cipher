@@ -701,6 +701,7 @@ void usecubing_de(){
             }
             oppos = (oppos + 1)%3;
         }
+        fclose(fp);
     }
 
     bool printkey = 0;
