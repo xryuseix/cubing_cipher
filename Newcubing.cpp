@@ -734,7 +734,6 @@ void usecubing_de(){
     std::vector<int> iv1, iv2;
     std::vector<char> pt;
     cubingmode_de(key, ct, pt);
-
     if(printpt){
         printf("\npt: ");
         for(int i = 0; i < pt.size(); i++) {

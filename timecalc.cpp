@@ -1,54 +1,56 @@
 #include <iostream>
-#include <vector> //後でけす
+#include <vector>
 #include <chrono>
-// ここで暗号化プログラムを読みこむ
 #include "Newcubing.cpp"
+
+std::vector<char> pt;
+std::vector<char> ct;
+std::vector<CubeOP> key;
+
+void file_input() {
+    char InputFileName[] = "./io/input.txt";
+    char KeyFileName[] = "./io/key.txt";
+
+    { //plain input
+        FILE *fp;
+        fp = fopen(InputFileName, "r");
+
+        char c;
+        while((c = fgetc(fp)) != EOF) {
+            pt.push_back(c);
+        }
+        fclose(fp);
+    }
+    int keysize=30;
+
+    { //key input
+        FILE *fp;
+        fp = fopen(KeyFileName, "w");
+
+        for(int i = 0; i < key.size(); i++) {
+            fprintf(fp, "%d%d%d", key[i].direction, key[i].column, key[i].times);
+        }
+        fclose(fp);
+    }
+}
 
 int main(){
 
-    const int N = 1000;
-    // double sec[N];
-    std::vector<double> sec(N);
-    for(int calcnum = 0; calcnum < N; calcnum++) { //測定はN回行う
+    std::vector<int> iv1, iv2; //暗号化用配列
+    double msec = 0.0; // 計測時間
+    file_input(); // 入力時間は計測しない
 
-        double lastsec = 0.0;
-        int times = 0;
-        double msec = 0.0;
+    std::clock_t c_start = std::clock();      // 計測スタート時刻を保存
 
-        while(1){
-            std::clock_t c_start = std::clock();      // 計測スタート時刻を保存
-            /* ここに暗号化処理 */
-            times++;
-            usecubing_en();
-            usecubing_de(); // 呼び出す関数
+    /* ここに暗号化処理 */
+    cubingmode_en(key, pt, ct, iv1, iv2);
 
-            std::clock_t c_end = std::clock();       // 計測終了時刻を保存
-            auto dur = c_end - c_start;        // 要した時間を計算
-            msec += 1000.0 * dur / CLOCKS_PER_SEC; // 要した時間をミリ秒（1/1000秒）に変換して表示
+    std::clock_t c_end = std::clock();       // 計測終了時刻を保存
+    
+    msec = (c_end - c_start) / (double)CLOCKS_PER_SEC; // 要した時間をミリ秒（1/1000秒）に変換して表示
 
-            if(msec > 3000) { // 3秒で終了
-                break;
-            }
-            lastsec = static_cast<int> (msec)/1000.0; // lastsecは秒単位
-        }
-        // 要した時間をミリ秒（1/1000秒）に変換して表示
-        std::cout << lastsec << " sec " << times - 1 << " times\n";
-        // std::cout << calcnum << " " << N << " " << times << std::endl;
-        sec[calcnum] = times;
-    }
+    // 要した時間をミリ秒（1/1000秒）に変換して表示
+    std::cout << msec << " sec " << pt.size() << " Bytes\n";
 
-    double timesum = 0;
-    for(int i = 0; i < N; i++) {
-        //平均算出
-        timesum += sec[i];
-    }
-    std::cout << timesum/N << std::endl;
-
-    // ↓読みにくいので今はコメントアウト
-    // std::cout << "Doing cubing cubingmode for 3s on N size blocks: " << times << "cubing cubingmode's in " << lastsec << "s\n";
-    /*
-    こうゆうのが出したい
-    Doing aes-128 cbc for 3s on 16 size blocks: 22208501 aes-128 cbc's in 2.81s
-    */
     return 0;
 }
