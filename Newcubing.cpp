@@ -577,8 +577,15 @@ void usecubing_en(){
         }
         fclose(fp);
     }
-
+    int keysize=30;
     std::vector<CubeOP> key;
+    CubeOP op = {1, 2, 1};
+    for(int i = 0; i < keysize; i++) {
+        op.direction = 1 + rand()%3;
+        op.column = 1 + rand()%3;
+        op.times = 1 + rand()%3;
+        key.push_back(op);
+    }
 
     { //key input
         FILE *fp;
