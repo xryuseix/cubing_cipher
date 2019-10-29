@@ -6,7 +6,7 @@
 \thispagestyle{empty}
 \begin{center}
 \vspace*{4.5cm}
-{\huge\bf cubing暗号の提案}
+{\huge\bf 新規暗号の提案及び安全性評価}
 \vspace*{3cm}
 
 {\large 20XX年X月X日}
@@ -238,7 +238,7 @@ decrypt処理ではcubing暗号のencrypt処理を元に復号処理を行う．
 鍵の長さを変えた時，転置されている割合を計算\\
 \subsubsection{数学的アプローチ}
 \LARGE
-\bf{---怪しい理論入ります---\\}
+\bf{---怪しい理論---\\}
 \normalsize
 1回の転置処理で12/54文字変化する．つまり，1回の転置処理で42/54文字は変化しない．\\
 ここで$n=$転置処理の回数とする．すると，特定の文字が変化しない確率は
@@ -249,14 +249,16 @@ decrypt処理ではcubing暗号のencrypt処理を元に復号処理を行う．
 これを満たす最小の$n$は16で，この時の左辺の値は約0.0179である．また，鍵長$=$転置回数$\times 3$なので，鍵長は$16*3=48$文字以上を推奨する．
 
 \subsubsection{機械的アプローチ}
-\LARGE
-\bf{後でやる\\}
-\normalsize
 
-\subsection{AES・RSAとの実行時間の比較}
-具体的なやり方は考えておらず，おそらくOpenSSLなるものを活用することになる
-\subsubsection{AESとの比較}
-\subsubsection{RSAとの比較}
+鍵長を$1$から$300$まで検証した．各鍵長に対して100回暗号化処理を行い，転置されていない文字がどれくらいあるのか，それぞれ平均値を計算した．\\
+なお，計算に用いたプログラムはkey\_len.cpp，計算結果はkeylen.csb，グラフの描画はkeylen\_print.pyである．\\
+\begin{center}
+  \includegraphics[width=11cm]{./tex_pic/figure.png}\\
+\end{center}
+上図より，鍵長は約50から値が変わらない，ということが読み取れる．よって鍵長は約50文字以上である必要がある．
+
+\subsection{暗号化に要する時間}
+１秒間に約18Mbyteの暗号化が可能である．これはtimecalc.cppによって計算した．
 
 \subsection{攻撃対策}
 \subsubsection{ブルートフォース攻撃}
