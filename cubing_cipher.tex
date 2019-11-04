@@ -32,12 +32,18 @@
 \clearpage
 \section{残っている作業}
 概要(もう少し書きたい)\\
-転置の仕様のルービックキューブとは違う転置の図\\
-関連研究\\
 まとめ\\
-参考文献\\
+参考文献->左揃え(?)にすべき\\
 githubとの紐付け(githubのURL乗っけたり)\\
 IVを計算によって求めたい\\
+スエとニウスのローマ皇帝伝本当かチェック\\
+参考文献\\
+・研究論文
+・暗号利用モード関連
+・RSA,AESらへん
+・replay攻撃らへん
+・選択平文攻撃・暗号化オラクルらへん
+・ルービックキューブの全探索にかかる手数
 
 -ここからコード-
 入力文字列が長いときにおこるデコード(decryptだったかも)のセグフォ
@@ -116,17 +122,10 @@ cubing暗号転置処理は方向・列・回数の三つより決定される�
 \end{center}
 
 なお，cubing暗号の転置はルービックキューブの転置とは一部違った箇所がある．それは，「ある方向のある列を転置させる際，他の列およびマスは一切転置させない」ということである．具体的には以下の図のような転置がなされる．\\
-\\
-\LARGE
-\bf{暇な自分へ\\}
-\normalsize
-「1」「2」「3」\\
-↓\\
-「2」「3」「1」\\
-みたいな図入れて\\
-
-これにより，「ルービックキューブの角は常に同じ文字が隣り合っている」といった性質がなくなり，後述の頻度分析による解読の対策となる．
-
+\begin{center}
+  \includegraphics[width=18cm]{./tex_pic/trans.png}\\
+\end{center}
+まず「cubing暗号の転置操作」で黄色のマスにっているのは鍵（縦方向１列１回）転置操作で場所が入れ替わったマスを表している．一方，一般的なルービックキューブの転置操作では同じ鍵でgubing暗号に加えてさらに転置するマスを黄色く色づいている．一見一回の操作で多くのマスを転置できるように見えるが，実際はルービックキューブの角の３マスや，側面の２マス常に隣り合った関係を持ってしまう．よって全探索や頻度分析の手掛かりになってしまうと考えた．したがって，このような転置はしないようになっている．
 
 \subsubsection{暗号文の取得}
 最後に，暗号文は以下の図の順で取り出す．
@@ -325,26 +324,16 @@ decrypt処理ではcubing暗号のencrypt処理を元に復号処理を行う．
 本研究を進めるに当たり、サイボウズ・ラボ株式会社 緑川 志穂氏からは多大な助言を賜り，また丁寧に指導して下さいました。厚く感謝を申し上げます。また暗号の解読やアルゴリズム修正等を快く協力して頂いたセキュリティ・キャンプ2019集中開発コース標準ゼミのメンターの皆さま，及び受講生の皆さまにも感謝の意を表します．
 
 \newpage 
-%% 参考文献テンプレ
-文献ですか．
-・研究論文
-・暗号利用モード関連
-・RSA,AESらへん
-・replay攻撃らへん
-・選択平文攻撃・暗号化オラクルらへん
-・ルービックキューブの全探索にかかる手数
-・その他(?)
-\LARGE
-\bf{この下のスエトニウスのやつは後でやる\\}
-\normalsize
+
 \begin{thebibliography}{}
 
-\bibitem{caesar} スエトニウス: ローマ皇帝伝 (1988). 
+\bibitem{caesar} スエトニウス : ローマ皇帝伝 (1988). 
 
-\bibitem{Mitchell} https://www.tandfonline.com/doi/pdf/10.1080/0161-119291866928?needAccess=true
-\bibitem{Trans-Composite Cipher} https://epublications.regis.edu/cgi/viewcontent.cgi?article=1511\&context=theses
+\bibitem{Mitchell} “RUBIK'S CUBE” AS A TRANSPOSITION DEVICE : https://www.tandfonline.com/doi/pdf/10.1080/0161-119291866928?needAccess=true
 
-\bibitem{Scrambling algorithm}https://pdfs.semanticscholar.org/1a63/be53b7ddc422107a9f4343eaa6cfe6732a70.pdf
+\bibitem{Trans-Composite Cipher}The Rubik's Crypto-Cube: a Trans-Composite Cipher : https://epublications.regis.edu/cgi/viewcontent.cgi?article=1511\&context=theses
+
+\bibitem{Scrambling algorithm}Scrambling algorithm for encryption of text using cube rotation artificial intelligence technique : https://pdfs.semanticscholar.org/1a63/be53b7ddc422107a9f4343eaa6cfe6732a70.pdf
 
 \end{thebibliography}
 
