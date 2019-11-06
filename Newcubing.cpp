@@ -577,22 +577,22 @@ void usecubing_en(){
         }
         fclose(fp);
     }
-    int keysize=30;
     std::vector<CubeOP> key;
-    CubeOP op = {1, 2, 1};
-    for(int i = 0; i < keysize; i++) {
-        op.direction = 1 + rand()%3;
-        op.column = 1 + rand()%3;
-        op.times = 1 + rand()%3;
-        key.push_back(op);
-    }
-
     { //key input
         FILE *fp;
-        fp = fopen(KeyFileName, "w");
+        fp = fopen(KeyFileName, "r");
 
-        for(int i = 0; i < key.size(); i++) {
-            fprintf(fp, "%d%d%d", key[i].direction, key[i].column, key[i].times);
+        char c;
+        int num = 0;
+        int tmpkey[3];
+        while((c = fgetc(fp)) != EOF) {
+            tmpkey[num] = c - '0';
+            num++;
+            if(num%3 == 0) {
+                num = 0;
+                CubeOP op = {tmpkey[0], tmpkey[1], tmpkey[2]};
+                key.push_back(op);
+            }
         }
         fclose(fp);
     }
@@ -601,6 +601,18 @@ void usecubing_en(){
     bool printkey = 0;
     bool printct = 0;
     bool printiv = 0;
+    bool generatekey = 0;
+
+    if(generatekey) {
+        int keysize = 30;
+        CubeOP op = {1, 2, 1};
+        for(int i = 0; i < keysize; i++) {
+            op.direction = 1 + rand()%3;
+            op.column = 1 + rand()%3;
+            op.times = 1 + rand()%3;
+            key.push_back(op);
+        }
+    }
 
     if(plaintext) {
         printf("pt: ");
@@ -650,7 +662,16 @@ void usecubing_en(){
         printf("(EOF)\n");
     }
 
-    { //cipher & iv input
+    { //key output
+        FILE *fp;
+        fp = fopen(KeyFileName, "w");
+
+        for(int i = 0; i < key.size(); i++) {
+            fprintf(fp, "%d%d%d", key[i].direction, key[i].column, key[i].times);
+        }
+        fclose(fp);
+    }
+    { //cipher & iv output
         FILE *fp;
         fp = fopen(OutputFileName, "w");
 
@@ -751,35 +772,35 @@ void usecubing_de(){
     }
 }
 
-// int main(int ac, char **av) {
+int main(int ac, char **av) {
 
-//     srand((unsigned) time(NULL));
+    srand((unsigned) time(NULL));
 
-//     printf("\n----unit_test----\n");
-//     unit_test();
+    printf("\n----unit_test----\n");
+    unit_test();
 
-//     printf("\n----en_decode_test(Cube)----\n");
-//     en_decode_test();
+    printf("\n----en_decode_test(Cube)----\n");
+    en_decode_test();
 
-//     printf("\n----encrypt_test----\n");
-//     encrypt_test();
+    printf("\n----encrypt_test----\n");
+    encrypt_test();
 
-//     printf("\n----decrypt_test----\n");
-//     decrypt_test();
+    printf("\n----decrypt_test----\n");
+    decrypt_test();
 
-//     printf("\n----encoding_test----\n");
-//     encoding_test();
+    printf("\n----encoding_test----\n");
+    encoding_test();
 
-//     printf("\n----cubingmode_ende_test----\n");
-//     cubingmode_ende_test();
+    printf("\n----cubingmode_ende_test----\n");
+    cubingmode_ende_test();
 
-//     printf("\n----encode_decode_test(cubingmode)----\n");
-//     encode_decode_test();
+    printf("\n----encode_decode_test(cubingmode)----\n");
+    encode_decode_test();
 
-//     usecubing_en();
+    usecubing_en();
 
-//     usecubing_de();
+    usecubing_de();
 
 
-//     return 0;
-// }
+    return 0;
+}
