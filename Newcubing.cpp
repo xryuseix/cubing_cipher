@@ -629,39 +629,55 @@ void usecubing_en(){
         }
         printf("\n");
     }
-
     std::vector<int> iv1, iv2;
+    for(int i = 0; i < pt.size()/(62*62) + 1; i++) {
+        std::vector<int> diviv1, diviv2;
+        std::vector<char> divpt;
+        std::vector<char> divct;
+        //ここで分割
+        for(int j = (62*62)*i; j < pt.size() && j < (62*62)*i + (62*62); j++) {
+            divpt.push_back(pt[j]);
+        }
+        cubingmode_en(key, divpt, divct, diviv1, diviv2);
 
-    cubingmode_en(key, pt, ct, iv1, iv2);
-
-    if(printct) {
-        printf("\nct: ");
-        for(int i = 0; i < ct.size(); i++) {
-            if(ct[i] == '\0'){
-                printf("$");
-                continue;
-            } else if(ct[i] == '\t') {
-                printf(" ");
-                continue;
+        if(printct) {
+            printf("\nct: ");
+            for(int i = 0; i < ct.size(); i++) {
+                if(ct[i] == '\0'){
+                    printf("$");
+                    continue;
+                } else if(ct[i] == '\t') {
+                    printf(" ");
+                    continue;
+                }
+                printf("%c", ct[i]);
             }
-            printf("%c", ct[i]);
+            printf("(EOF)\n");
         }
-        printf("(EOF)\n");
-    }
 
-    if(printiv) {
-        printf("\niv1: ");
-        for(int i = 0; i < iv1.size(); i++) {
-            printf("%02d ", iv1[i]);
+        if(printiv) {
+            printf("\niv1: ");
+            for(int i = 0; i < iv1.size(); i++) {
+                printf("%02d ", iv1[i]);
+            }
+            printf("(EOF)\n");
+            printf("\niv2: ");
+            for(int i = 0; i < iv2.size(); i++) {
+                printf("%02d ", iv2[i]);
+            }
+            printf("(EOF)\n");
         }
-        printf("(EOF)\n");
-        printf("\niv2: ");
-        for(int i = 0; i < iv2.size(); i++) {
-            printf("%02d ", iv2[i]);
+        // 結合処理
+        for(int j = 0; j < divct.size(); j++) {
+            ct.push_back(divct[j]);
         }
-        printf("(EOF)\n");
+        for(int j = 0; j < diviv1.size(); j++) {
+            iv1.push_back(diviv1[j]);
+        }
+        for(int j = 0; j < diviv2.size(); j++) {
+            iv2.push_back(diviv2[j]);
+        }
     }
-
     { //key output
         FILE *fp;
         fp = fopen(KeyFileName, "w");
