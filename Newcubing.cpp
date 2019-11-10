@@ -444,7 +444,7 @@ void decoding(std::vector<std::vector<char>> (&BeforeShuffleText), std::vector<c
 
     char tmp[45];
     sort(BeforeShuffleText.begin(), BeforeShuffleText.end(), sortcomp);
-    
+
     for(int i = 0; i < BeforeShuffleText.size(); i++) {
         de_masking1(BeforeShuffleText[i], tmp, iv, i);
         for(int j = 0; j < 45; j++) {
@@ -481,9 +481,8 @@ void cubingmode_de(std::vector<CubeOP>& key, const std::vector<char> (&str), std
         return;
     }
 
-    int blocknum = str.size()/54;
+    int blocknum = ct.size()/54;
     std::vector<std::vector<char>> BeforeShuffleText;
-
     for(int i = 0; i < blocknum; i++) {
 
         char cipherblock[54];
@@ -768,7 +767,6 @@ void usecubing_de(){
     std::vector<int> iv1, iv2;
     std::vector<char> pt;
     for(int i = 0; i < pt.size()/(108*62*62) + 1; i++) {
-        std::cout<<"このあとセグフォ"<<i<<std::endl;
         std::vector<int> diviv1, diviv2;
         std::vector<char> divpt;
         std::vector<char> divct;
