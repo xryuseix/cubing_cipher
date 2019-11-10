@@ -559,7 +559,7 @@ void cubingmode_ende_test() {
     assertEqual(str, pt);
 }
 
-void usecubing_en(){
+void usecubing_en() {
 
     char InputFileName[] = "./io/input.txt";
     char KeyFileName[] = "./io/key.txt";
@@ -634,7 +634,7 @@ void usecubing_en(){
         std::vector<int> diviv1, diviv2;
         std::vector<char> divpt;
         std::vector<char> divct;
-        //ここで分割
+        // 平文の分割処理
         for(int j = (62*62)*i; j < pt.size() && j < (62*62)*i + (62*62); j++) {
             divpt.push_back(pt[j]);
         }
@@ -706,7 +706,6 @@ void usecubing_de(){
     char KeyFileName[] = "./io/key.txt";
     char OutputFileName[] = "./io/plain.txt";
     std::vector<char> ct;
-
     { //cipher input
         FILE *fp;
         fp = fopen(InputFileName, "r");
@@ -766,17 +765,31 @@ void usecubing_de(){
         }
         printf("\n");
     }
-
     std::vector<int> iv1, iv2;
     std::vector<char> pt;
-    cubingmode_de(key, ct, pt);
-    if(printpt){
-        printf("\npt: ");
-        for(int i = 0; i < pt.size(); i++) {
-            printf("%c", pt[i]);
+    for(int i = 0; i < pt.size()/(108*62*62) + 1; i++) {
+        std::cout<<"このあとセグフォ"<<i<<std::endl;
+        std::vector<int> diviv1, diviv2;
+        std::vector<char> divpt;
+        std::vector<char> divct;
+
+        for(int j = (62*62*108)*i; j < ct.size() && j < (62*62*108)*i + (62*62*108); j++) {
+            divct.push_back(ct[j]);
         }
-        printf("(EOF)\n");
+        cubingmode_de(key, ct, pt);
+        if(printpt){
+            printf("\npt: ");
+            for(int i = 0; i < pt.size(); i++) {
+                printf("%c", pt[i]);
+            }
+            printf("(EOF)\n");
+        }
+        // 結合処理
+        for(int j = 0; j < divpt.size(); j++) {
+            pt.push_back(divpt[j]);
+        }
     }
+
     { //plain output
         FILE *fp;
         fp = fopen(OutputFileName, "w");
