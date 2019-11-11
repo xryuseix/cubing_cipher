@@ -444,7 +444,15 @@ void decoding(std::vector<std::vector<char>> (&BeforeShuffleText), std::vector<c
 
     char tmp[45];
     sort(BeforeShuffleText.begin(), BeforeShuffleText.end(), sortcomp);
-
+// for(int i=0;i<BeforeShuffleText.size();i++){
+//     for(int j=0;j<BeforeShuffleText[i].size();j++){
+//         printf("%c",BeforeShuffleText[i][j]);
+//     }
+//     printf("\n---------------------------------\n");
+// }
+// for(int i=0;i<iv.size();i++){
+//     printf("%d",iv[i]);
+// }
     for(int i = 0; i < BeforeShuffleText.size(); i++) {
         de_masking1(BeforeShuffleText[i], tmp, iv, i);
         for(int j = 0; j < 45; j++) {
@@ -453,6 +461,12 @@ void decoding(std::vector<std::vector<char>> (&BeforeShuffleText), std::vector<c
     }
     //パディング削除
     pt.erase(pt.begin() + static_cast<int>(std::distance(std::begin(pt), std::find(std::begin(pt), std::end(pt), '\0'))), pt.end());
+    // for(auto it = --(pt.end()); it != --(pt.begin()); it--) {
+    //     if(*it == '\0') {
+    //         pt.erase(it);
+    //         break;
+    //     }
+    // }
 }
 
 void cubingmode_de(std::vector<CubeOP>& key, const std::vector<char> (&str), std::vector<char> (&pt)) {
@@ -460,7 +474,7 @@ void cubingmode_de(std::vector<CubeOP>& key, const std::vector<char> (&str), std
     std::vector<char> ct;
     std::vector<int> iv1, tmpiv2, iv2;
 
-    for(int i = 0; i < (str.size()/158 + 1)*68; i++) { //暗号文68/158がct+iv2,残りがiv1
+    for(int i = 0; i < str.size()/158*68; i++) { //暗号文68/158がct+iv2,残りがiv1
         if(i%68 < 54) {
             ct.push_back(str[i]);
         } else {
@@ -560,12 +574,16 @@ void cubingmode_ende_test() {
 
 void usecubing_en() {
 
-    char InputFileName[] = "./io/input.txt";
-    char KeyFileName[] = "./io/key.txt";
-    char OutputFileName[] = "./io/cipher.txt";
+    char InputFileName[] = "./io/input";
+    char KeyFileName[] = "./io/key";
+    char OutputFileName[] = "./io/cipher";
     std::vector<char> pt;
     std::vector<char> ct;
-
+    { //init output file
+        FILE *fp;
+        fp = fopen(OutputFileName, "w");
+        fclose(fp);
+    }
     { //plain input
         FILE *fp;
         fp = fopen(InputFileName, "r");
@@ -629,12 +647,12 @@ void usecubing_en() {
         printf("\n");
     }
     std::vector<int> iv1, iv2;
-    for(int i = 0; i < pt.size()/(62*62) + 1; i++) {
+    for(int i = 0; i < pt.size()/(62*62*45) + 1; i++) {
         std::vector<int> diviv1, diviv2;
         std::vector<char> divpt;
         std::vector<char> divct;
         // 平文の分割処理
-        for(int j = (62*62)*i; j < pt.size() && j < (62*62)*i + (62*62); j++) {
+        for(int j = (62*62*45)*i; j < pt.size() && j < (62*62*45)*i + (62*62*45); j++) {
             divpt.push_back(pt[j]);
         }
         cubingmode_en(key, divpt, divct, diviv1, diviv2);
@@ -666,15 +684,28 @@ void usecubing_en() {
             }
             printf("(EOF)\n");
         }
-        // 結合処理
-        for(int j = 0; j < divct.size(); j++) {
-            ct.push_back(divct[j]);
-        }
-        for(int j = 0; j < diviv1.size(); j++) {
-            iv1.push_back(diviv1[j]);
-        }
-        for(int j = 0; j < diviv2.size(); j++) {
-            iv2.push_back(diviv2[j]);
+        // // 結合処理
+        // for(int j = 0; j < divct.size(); j++) {
+        //     ct.push_back(divct[j]);
+        // }
+        // for(int j = 0; j < diviv1.size(); j++) {
+        //     iv1.push_back(diviv1[j]);
+        // }
+        // for(int j = 0; j < diviv2.size(); j++) {
+        //     iv2.push_back(diviv2[j]);
+        // }
+        // printf("AAAAAAA\n");
+        { //cipher & iv output
+            FILE *fp;
+            fp = fopen(OutputFileName, "a");
+
+            for(int i = 0; i < divct.size(); i++) {
+                fprintf(fp, "%c", divct[i]);
+            }
+            for(int i = 0; i < diviv1.size(); i++) {
+                fprintf(fp, "%02d", diviv1[i]);
+            }
+            fclose(fp);
         }
     }
     { //key output
@@ -686,24 +717,13 @@ void usecubing_en() {
         }
         fclose(fp);
     }
-    { //cipher & iv output
-        FILE *fp;
-        fp = fopen(OutputFileName, "w");
-
-        for(int i = 0; i < ct.size(); i++) {
-            fprintf(fp, "%c", ct[i]);
-        }
-        for(int i = 0; i < iv1.size(); i++) {
-            fprintf(fp, "%02d", iv1[i]);
-        }
-        fclose(fp);
-    }
+    
 }
 
 void usecubing_de(){
-    char InputFileName[] = "./io/cipher.txt";
-    char KeyFileName[] = "./io/key.txt";
-    char OutputFileName[] = "./io/plain.txt";
+    char InputFileName[] = "./io/cipher";
+    char KeyFileName[] = "./io/key";
+    char OutputFileName[] = "./io/plain";
     std::vector<char> ct;
     { //cipher input
         FILE *fp;
@@ -766,19 +786,21 @@ void usecubing_de(){
     }
     std::vector<int> iv1, iv2;
     std::vector<char> pt;
-    for(int i = 0; i < pt.size()/(108*62*62) + 1; i++) {
+    printf("%d\n",(int)ct.size());
+    for(int i = 0; i < ct.size()/((45+7+90+14+2)*62*62) + 1; i++) {
         std::vector<int> diviv1, diviv2;
         std::vector<char> divpt;
         std::vector<char> divct;
 
-        for(int j = (62*62*108)*i; j < ct.size() && j < (62*62*108)*i + (62*62*108); j++) {
+        for(int j = (62*62*(45+7+90+14+2))*i; j < ct.size() && j < (62*62*(45+7+90+14+2))*i + (62*62*(45+7+90+14+2)); j++) {
             divct.push_back(ct[j]);
         }
-        cubingmode_de(key, ct, pt);
+        cubingmode_de(key, divct, divpt);
+        printf("divct:%d divpt:%d\n",(int)divct.size(),(int)divpt.size());
         if(printpt){
             printf("\npt: ");
-            for(int i = 0; i < pt.size(); i++) {
-                printf("%c", pt[i]);
+            for(int i = 0; i < divpt.size(); i++) {
+                printf("%c", divpt[i]);
             }
             printf("(EOF)\n");
         }
@@ -803,26 +825,26 @@ int main(int ac, char **av) {
 
     srand((unsigned) time(NULL));
 
-    printf("\n----unit_test----\n");
-    unit_test();
+    // printf("\n----unit_test----\n");
+    // unit_test();
 
-    printf("\n----en_decode_test(Cube)----\n");
-    en_decode_test();
+    // printf("\n----en_decode_test(Cube)----\n");
+    // en_decode_test();
 
-    printf("\n----encrypt_test----\n");
-    encrypt_test();
+    // printf("\n----encrypt_test----\n");
+    // encrypt_test();
 
-    printf("\n----decrypt_test----\n");
-    decrypt_test();
+    // printf("\n----decrypt_test----\n");
+    // decrypt_test();
 
-    printf("\n----encoding_test----\n");
-    encoding_test();
+    // printf("\n----encoding_test----\n");
+    // encoding_test();
 
-    printf("\n----cubingmode_ende_test----\n");
-    cubingmode_ende_test();
+    // printf("\n----cubingmode_ende_test----\n");
+    // cubingmode_ende_test();
 
-    printf("\n----encode_decode_test(cubingmode)----\n");
-    encode_decode_test();
+    // printf("\n----encode_decode_test(cubingmode)----\n");
+    // encode_decode_test();
 
     usecubing_en();
 
