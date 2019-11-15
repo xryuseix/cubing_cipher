@@ -33,40 +33,39 @@
 \section{残っている作業}
 概要(もう少し書きたい)\\
 まとめ\\
-参考文献->左揃え(?)にすべき\\
-githubとの紐付け(githubのURL乗っけたり)\\
+参考文献を左揃え(?)にすべき\\
 IVを計算によって求めたい\\
-スエとニウスのローマ皇帝伝本当かチェック\\
 参考文献\\
-・研究論文
-・暗号利用モード関連
-・RSA,AESらへん
-・replay攻撃らへん
-・選択平文攻撃・暗号化オラクルらへん
-・ルービックキューブの全探索にかかる手数
+・研究論文\\
+・暗号利用モード関連\\
+・replay攻撃らへん(攻撃は~~というものである)\\
+・選択平文攻撃・暗号化オラクルらへん\\
+・二段組にしたい\\
+\section{スケジュール}
+\begin{table}[hbtp]
+\begin{tabular}{|l|l|l|}
+\hline
+いつまで & 内容 & 備考\\ \hline
+11/16 & 参考文献と関連研究 & \\ \hline
+11/23 & まとめ & \\ \hline
+11/30 & \begin{tabular}[c]{@{}l@{}}二段組\\ IVの計算方法\\ 概要\\ 参考文献を左揃え\end{tabular} & \\ \hline
+12/7  & 400字の発表内容など執筆 & \begin{tabular}[c]{@{}l@{}}昨年度の記載内容：\\１）発表者情報（氏名、所属、e-mail、電話番号）\\ ２）発表タイトル\\ ３）発表概要（400字程度）\\ ４）自己アピール\\（情報セキュリティに関連した研究、開発、サービス運用、\\コミュニティ運営、インシデント対応、脆弱性発見等\\があれば記述してください。）\end{tabular} \\ \hline
+12/13 & できれば初日に提出 & 昨年度の募集開始日\\ \hline                        
+\end{tabular}
+\end{table}
 
--ここからコード-
-入力文字列が長いときにおこるデコード(decryptだったかも)のセグフォ
-鍵の入力ちゃんとできてますか？
 
 \section{はじめに}
 %暗号がここらへんで使われててそこそこ大事って言う社会的背景を語る
 
 インターネットの普及により，研究機関のみならず個人もインターネットを使うようになった．それに伴い，個人情報や社外秘情報などがインターネット上で取引され，情報の秘匿性が重要視されるようになった．それら秘匿情報を第三者に見られないようにするため，インターネット上では暗号技術というものが使われている.
-暗号技術とは特定の情報を隠蔽する技術で，古代ローマ時代には少なくとも使われていたと言われている．\cite{caesar}その代表的なもので，シーザー暗号やエニグマ暗号などがある．現在頻繁に使われる暗号としてRSA暗号やAES暗号があり，インターネット上で殆ど全ての秘匿情報を扱う際に利用されている．
+暗号技術とは特定の情報を隠蔽する技術で，その代表的なものにシーザー暗号やエニグマ暗号などがある．現在頻繁に使われる暗号としてRSA暗号やAES暗号があり，インターネット上で殆ど全ての秘匿情報を扱う際に利用されている．\\
 本論文では新しい暗号cubing暗号を提案する．\\
-
-\section{準備}
-\subsection{記号の定義}
-ここ要りますか．要らないかも．途中で喋っちゃってるからね．
-\subsection{暗号化とは}
-ここは「1.はじめに」に含んでも良さそう．
-先に下を書き，この用語の説明が必要と言ったものがあれば書く．「はじめに」の内容的にはもう少し補足しても良さそうな感じはする．暗号化・復号・暗号利用モードの話を．
-もはやこの章要らなそう
 
 \section{本論}
 \subsection{cubing暗号の概要}
-cubing暗号の概要は以下の通りである．
+cubing暗号の概要は以下の通りである．なお，本暗号に関するソースコードや素材などは全てgithubに載せられている．\cite{github}
+
 \begin{itemize}
   \item 平文ブロック長：45byte
   \item 暗号文ブロック長：108byte
@@ -244,12 +243,13 @@ decrypt処理ではcubing暗号のencrypt処理を元に復号処理を行う．
 \section{評価実験}
 ここでは主に本暗号・暗号利用モードの長所を実験結果をもとに記す．
 \subsection{推奨する鍵の長さに関して}
-鍵の長さを変えた時，転置されている割合を計算\\
+鍵の長さを変えた際，各マスが転置されている割合を計算した．\\
+
 \subsubsection{数学的アプローチ}
-1回の転置処理で12/54文字変化する．つまり，1回の転置処理で42/54文字は変化しない．\\
+1回の転置処理でfrac{12}{54}文字変化する．つまり，1回の転置処理でfrac{42}{54}文字は変化しない．\\
 ここで$n=$転置処理の回数とする．すると，特定の文字が変化しない確率は
 \[\left(\frac{42}{54}\right)^n\]
-で計算できる．ここで，全ての文字の変化する確率と変化しない確率を等しくするためには(全ての文字のエントロピーを等しくするためには??)，以下の式が成り立つ必要がある．
+で計算できる．ここで，全ての文字の変化する確率と変化しない確率を等しくするためには，以下の式が成り立つ必要がある．
 \[\left(\frac{42}{54}\right)^n \leq \frac{1}{54}\]
 
 これを満たす最小の$n$は16で，この時の左辺の値は約0.0179である．また，鍵長$=$転置回数$\times 3$なので，鍵長は$16*3=48$文字以上を推奨する．
@@ -257,7 +257,7 @@ decrypt処理ではcubing暗号のencrypt処理を元に復号処理を行う．
 \subsubsection{機械的アプローチ}
 
 鍵長を$1$から$300$まで検証した．各鍵長に対して100回暗号化処理を行い，転置されていない文字がどれくらいあるのか，それぞれ平均値を計算した．\\
-なお，計算に用いたプログラムはkey\_len.cpp，計算結果はkeylen.csb，グラフの描画はkeylen\_print.pyである．\\
+なお，計算に用いたプログラムはkey\_len.cpp，計算結果はkeylen.csv，グラフの描画はkeylen\_print.pyである．\\
 \begin{center}
   \includegraphics[width=11cm]{./tex_pic/figure.png}\\
 \end{center}
@@ -268,7 +268,6 @@ decrypt処理ではcubing暗号のencrypt処理を元に復号処理を行う．
 
 \subsection{攻撃対策}
 \subsubsection{ブルートフォース攻撃}
-
 鍵長がわからないことから，存在し得る平文は$54!$通りある．ここで，「$!$」は階乗記号を表す．\\
 ただし，encrypt処理の性質上，ルービックキューブの各面に対して各マスは以下のように分類される．
 \begin{table}[htb]
@@ -297,8 +296,8 @@ decrypt処理ではcubing暗号のencrypt処理を元に復号処理を行う．
 暗号化の最後にシャッフル処理を行う．これによりどのブロックがどこに存在するのか，秘密鍵がわからない第三者にはわからない．よってreplay攻撃は基本的に成立しない．ただし，ブロック数を$N$，すり替えたいブロック数を$M$とすると，$\dfrac{1}{N^M}$の確率でreplay攻撃が成立してしまう．しかし，Nは小さくないことを想定している為，replay攻撃は実用性に欠けると考える．
 
 \section{関連研究}
-\subsection{“RUBIK'S CUBE” AS A TRANSPOSITION DEVICE\cite{Mitchell}}
-この研究ではルービックキューブを用いた暗号について提案されている．暗号化の手順は以下の通りである．
+\subsection{“RUBIK'S CUBE” AS A TRANSPOSITION DEVICE}
+この研究ではルービックキューブを用いた暗号について提案されている．\cite{Mitchell}暗号化の手順は以下の通りである．
 \begin{enumerate}
   \item ルービックキューブの６つの面にそれぞれ１〜６まで数字を書き込む．ただし，１だけは面の左上のマスに書き込む．
   \item 面同士の入れ替えを行う．ただし，１が書かれている面に関しては入れ替えを行ってはならない．この時，並び替えの場合の総数は$5!=120$通り存在する．
@@ -312,8 +311,9 @@ decrypt処理ではcubing暗号のencrypt処理を元に復号処理を行う．
 本論文のcubing暗号はこれらの弱点に対して対策を行った．
 
 
-\subsection{Scrambling algorithm for encryption of text using cube rotation artificial intelligence technique\cite{Scrambling algorithm}}
-
+\subsection{Scrambling algorithm for encryption of text using cube rotation artificial intelligence technique}
+\cite{Scrambling algorithm}
+こちらの論文でもルービックキューブを用いた暗号が使用されている．但し，この論文ではルービックキューブの回転操作を人工知能を用いている．この論文では暗号文は平文と比べ完全にスクランブルされていると書かれている．しかし，暗号文の中に平文の文字が入った状態となってしまう他，改竄検知ができない．そこで，cubing暗号ではこれらに関して対策を行った．
 
 
 \section{まとめ}
@@ -321,20 +321,20 @@ decrypt処理ではcubing暗号のencrypt処理を元に復号処理を行う．
 \subsection{まとめ2(仮)}
 \subsection{まとめ3(仮)}
 \section{謝辞}
-本研究を進めるに当たり、サイボウズ・ラボ株式会社 緑川 志穂氏からは多大な助言を賜り，また丁寧に指導して下さいました。厚く感謝を申し上げます。また暗号の解読やアルゴリズム修正等を快く協力して頂いたセキュリティ・キャンプ2019集中開発コース標準ゼミのメンターの皆さま，及び受講生の皆さまにも感謝の意を表します．
+本研究を進めるに当たり、サイボウズ・ラボ株式会社 緑川 志穂氏からは多大な助言を賜り，また丁寧に指導して下さいました。厚く感謝を申し上げます。また暗号の解読やアルゴリズム修正等を快く協力して頂いたセキュリティ・キャンプ2019集中開発コース標準ゼミのメンターの皆さま，及び様々な助言を頂きました受講生の皆さまにも感謝の意を表します．
 
 \newpage 
-
+\begin{flushleft}
 \begin{thebibliography}{}
 
-\bibitem{caesar} スエトニウス : ローマ皇帝伝 (1988). 
+\bibitem{github} Githubレポジトリ : https://github.com/xryuseix/cubing\_cipher-SecCamp2019-
 
 \bibitem{Mitchell} “RUBIK'S CUBE” AS A TRANSPOSITION DEVICE : https://www.tandfonline.com/doi/pdf/10.1080/0161-119291866928?needAccess=true
 
-\bibitem{Trans-Composite Cipher}The Rubik's Crypto-Cube: a Trans-Composite Cipher : https://epublications.regis.edu/cgi/viewcontent.cgi?article=1511\&context=theses
+\bibitem{Trans-Composite Cipher}The Rubik's Crypto-Cube : a Trans-Composite Cipher : https://epublications.regis.edu/cgi/viewcontent.cgi?article=1511\&context=theses
 
 \bibitem{Scrambling algorithm}Scrambling algorithm for encryption of text using cube rotation artificial intelligence technique : https://pdfs.semanticscholar.org/1a63/be53b7ddc422107a9f4343eaa6cfe6732a70.pdf
 
 \end{thebibliography}
-
+\end{flushleft}
 \end{document}
