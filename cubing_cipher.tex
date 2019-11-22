@@ -1,8 +1,10 @@
-\documentclass{jsarticle}
+\documentclass[a4p]{jarticle}
+\usepackage{abstract}
 \usepackage[dvipdfmx]{graphicx}
 \usepackage{amsmath}
 
 \begin{document}
+
 \thispagestyle{empty}
 \begin{center}
 \vspace*{4.5cm}
@@ -32,15 +34,7 @@
 \clearpage
 \section{残っている作業}
 概要(もう少し書きたい)\\
-まとめ\\
-参考文献を左揃え(?)にすべき\\
 IVを計算によって求めたい\\
-参考文献\\
-・研究論文\\
-・暗号利用モード関連\\
-・replay攻撃らへん(攻撃は~~というものである)\\
-・選択平文攻撃・暗号化オラクルらへん\\
-・二段組にしたい\\
 \section{スケジュール}
 \begin{table}[hbtp]
 \begin{tabular}{|l|l|l|}
@@ -54,6 +48,7 @@ IVを計算によって求めたい\\
 \end{tabular}
 \end{table}
 
+\twocolumn
 
 \section{はじめに}
 %暗号がここらへんで使われててそこそこ大事って言う社会的背景を語る
@@ -99,9 +94,9 @@ cubing暗号の概要は以下の通りである．なお，本暗号に関す�
 \subsubsection{コンピュータ上での表現方法}
 ルービックキューブをコンピュータ上で表現する際には配列を用いる．具体的には以下のルービックキューブの展開図と配列の添字が対応する．\\
 
-\begin{center}
+%\begin{center}
   \includegraphics[width=7cm]{./tex_pic/seq.jpg}\\
-\end{center}
+%\end{center}
     
 \subsubsection{転置の仕様}
 cubing暗号転置処理は方向・列・回数の三つより決定される．方向に関しては以下の図のように三種類定義される．縦方向はルービックキューブで処理する際，以下の図のように回転させる方向のことである．なお，図には各方向に対する列が記載されている．
@@ -122,7 +117,7 @@ cubing暗号転置処理は方向・列・回数の三つより決定される�
 
 なお，cubing暗号の転置はルービックキューブの転置とは一部違った箇所がある．それは，「ある方向のある列を転置させる際，他の列およびマスは一切転置させない」ということである．具体的には以下の図のような転置がなされる．\\
 \begin{center}
-  \includegraphics[width=18cm]{./tex_pic/trans.png}\\
+  \includegraphics[width=9cm]{./tex_pic/trans.png}\\
 \end{center}
 まず「cubing暗号の転置操作」で黄色のマスにっているのは鍵（縦方向１列１回）転置操作で場所が入れ替わったマスを表している．一方，一般的なルービックキューブの転置操作では同じ鍵でgubing暗号に加えてさらに転置するマスを黄色く色づいている．一見一回の操作で多くのマスを転置できるように見えるが，実際はルービックキューブの角の３マスや，側面の２マス常に隣り合った関係を持ってしまう．よって全探索や頻度分析の手掛かりになってしまうと考えた．したがって，このような転置はしないようになっている．
 
@@ -159,7 +154,7 @@ cubing暗号転置処理は方向・列・回数の三つより決定される�
 \subsubsection{cubingmodeの各処理の適用範囲}
 各ブロックの内容は以下の通りである．また，mask(1)とmask(2)処理の適用範囲に関しても以下の通りである．
 \begin{center}
-  \includegraphics[width=12cm]{./tex_pic/block.png}\\
+  \includegraphics[width=7cm]{./tex_pic/block.png}\\
 \end{center}
 
 \subsubsection{62進数の説明}
@@ -175,6 +170,7 @@ cubingmodeのエンコード処理内では62進数が使われる．62進数は
 \(\mathrm{rand}()\)：アルファベット又は数字から１文字を一様に選ぶ関数\\
 \(\mathrm{to62}(x)\)：0から61までの自然数xを62進数に従って文字にする関数
 
+\footnotesize
 \begin{align}
 C_{45+i} &= \mathrm{fras}\left(\left(\left(\sum_{j=9(i-1)+1}^{9i}{\mathrm{toas}(C_j)}\right)\bmod 26\right)+97\right) \notag\\
 C_{51} &= \mathrm{to62}\left (\left \lfloor\frac{n}{62}\right \rfloor \right) \notag\\
@@ -182,19 +178,26 @@ C_{52} &= \mathrm{to62}\left ( n \bmod 62 \right) \notag\\
 C_{53} &= \mathrm{rand}() \notag\\
 C_{54} &= \mathrm{rand}() \notag\\
 \end{align}
+\normalsize
 
 とする．ただし，\(i=1,2,3,4,5\)とする．これを全てのブロックに対して行う．
 
 \subsubsection{表示可能文字}
 以下の配列で定義される．
 \begin{verbatim}
-printable_table[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 
-'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
-'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D',
-'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
-'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '"', '#', '$', '%', '&', '\'', '(',
-')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', 
-'\\', ']', '^', '_', '`', '{', '|', '}', '~', ' ', '\n', '\0', '\t'};
+printable_table[] = {'0', '1', '2', '3', 
+'4', '5', '6', '7', '8', '9', 'a', 'b', 
+'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 
+'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 
+'s', 't', 'u', 'v', 'w', 'x', 'y', 'z', 
+'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 
+'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 
+'Y', 'Z', '!', '"', '#', '$', '\%', '&', 
+'\'', '(', ')', '*', '+', ',', '-', '.', 
+'/', ':', ';', '<', '=', '>', '?', '@', 
+'[', '\\', ']', '^', '_', '`', '{', '|', 
+'}', '~', ' ', '\n', '\0', '\t'};
 \end{verbatim}
 
 この順序はpythonのstring.printableを元に作られた．エスケープシーケンスに関してはASCIIコードに対応している．
@@ -259,7 +262,7 @@ decrypt処理ではcubing暗号のencrypt処理を元に復号処理を行う．
 鍵長を$1$から$300$まで検証した．各鍵長に対して100回暗号化処理を行い，転置されていない文字がどれくらいあるのか，それぞれ平均値を計算した．\\
 なお，計算に用いたプログラムはkey\_len.cpp，計算結果はkeylen.csv，グラフの描画はkeylen\_print.pyである．\\
 \begin{center}
-  \includegraphics[width=11cm]{./tex_pic/figure.png}\\
+  \includegraphics[width=8cm]{./tex_pic/figure.png}\\
 \end{center}
 上図より，鍵長は約50から値が変わらない，ということが読み取れる．よって鍵長は約50文字以上である必要がある．
 
@@ -285,8 +288,8 @@ decrypt処理ではcubing暗号のencrypt処理を元に復号処理を行う．
   \item マスク処理，ソート処理など暗号化・復号にかかる全ての処理に時間がかからない
   \item 暗号文を並びかえた文字列を１秒間に$10^9$回生成できる
 \end{enumerate}
-この時，ブルートフォース攻撃にかかる最大の時間は$\dfrac{(24!)^2*6!}{10^9}$秒である．\\
-これは$277168477833598519396610641550136324390912000000000$秒であり，約$8.79*10^{42}$年である．よって現実的な時間での解読は不可能である．
+この時，ブルートフォース攻撃にかかる最大の時間は$\dfrac{(24!)^2\times6!}{10^9}$秒である．\\
+これは$2.77\times10^{50}$秒であり，約$8.79\times10^{42}$年である．よって現実的な時間での解読は不可能である．
 
 \subsubsection{頻度分析}
 暗号文の各文字はマスク処理を施されたランダムな文字またはエンコード処理のrand()計算で生成されたランダムな文字である．つまり全ての文字の出現頻度は等しくなる．よって頻度分析は不可能である．また，仮に攻撃者によってマスクが外されたと仮定する．しかし，コンピュータ上で平文と予測した文字列が正しい平文であるという判定ができない．
@@ -345,4 +348,5 @@ decrypt処理ではcubing暗号のencrypt処理を元に復号処理を行う．
 
 \end{thebibliography}
 \end{flushleft}
+\onecolumn 
 \end{document}
