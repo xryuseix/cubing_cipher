@@ -2,10 +2,10 @@
 \usepackage{abstract}
 \usepackage[dvipdfmx]{graphicx}
 \usepackage{amsmath}
+\usepackage{caption}
 
 \begin{document}
 
-\thispagestyle{empty}
 \begin{center}
 \vspace*{4.5cm}
 {\huge\bf 新規暗号の提案及び安全性評価}
@@ -19,23 +19,25 @@
 
 {\Large 石~川~~琉~聖}
 \end{center}
-\newpage 
 
-\setcounter{page}{1}
+\thispagestyle{empty}
+\clearpage
+\addtocounter{page}{-1}
+\newpage
 
 \section*{概要}
 
-本論文では，新規暗号であるcubing暗号を提案し，その安全性評価を行った．本論文の貢献は新たな安全な暗号の選択肢を増やしたことである．暗号の安全性の評価については，適切な鍵長の計算，ブルートフォース攻撃対策，頻度分析，選択平文攻撃，replay攻撃について分析した．
-分析の結果，鍵長は50文字$=50Byte$が良く，またいずれの攻撃手法においてもcubing暗号に対しては有効ではないことがわかった．
+本論文では, 新たな現代暗号かつ転置式暗号としてcubing暗号を提案する．cubing暗号はルービックキューブの転置を参考にし，任意の平文を転置する．しかし，cubing暗号は平文長が45Byteで定義されているため，45Byte以上の平文は暗号化できない．そこで，本論文では新たな暗号利用モードであるcubingmodeを提案する．cubingmodeは平文長を可変にするだけでなく，暗号文ブロックがすり替えられないようブロック間をシャッフルする機能や，頻度分析ができなくなるよう平文を乱数化する処理を行った．また，cubingmodeを利用した際のcubing暗号の安全性評価を行った．その結果，一般的な暗号の攻撃手法では解読できないことがわかった．だが，cubing暗号はアルゴリズムによって出力されるデータが大きいことや，暗号化に時間がかかるといった問題点もみられた．
 
 \newpage
 
 \tableofcontents
 \clearpage
 \section{残っている作業}
+体載は最後！！とりあえず文章をかく！！！！！\\
 概要(もう少し書きたい)\\
 IVを計算によって求めたい\\
-\section{スケジュール}
+\subsection{スケジュール}
 \begin{table}[hbtp]
 \begin{tabular}{|l|l|l|}
 \hline
@@ -48,142 +50,30 @@ IVを計算によって求めたい\\
 \end{tabular}
 \end{table}
 
+
 \twocolumn
 
 \section{はじめに}
-%暗号がここらへんで使われててそこそこ大事って言う社会的背景を語る
-
+\subsection{背景}
 インターネットの普及により，研究機関のみならず個人もインターネットを使うようになった．それに伴い，個人情報や社外秘情報などがインターネット上で取引され，情報の秘匿性が重要視されるようになった．それら秘匿情報を第三者に見られないようにするため，インターネット上では暗号技術というものが使われている.
 暗号技術とは特定の情報を隠蔽する技術で，その代表的なものにシーザー暗号やエニグマ暗号などがある．現在頻繁に使われる暗号としてRSA暗号やAES暗号があり，インターネット上で殆ど全ての秘匿情報を扱う際に利用されている．\\
-本論文では新しい暗号cubing暗号を提案する．\\
 
-\section{本論}
-\subsection{cubing暗号の概要}
-cubing暗号の概要は以下の通りである．なお，本暗号に関するソースコードや素材などは全てgithubに載せられている．\cite{github}
+\subsection{Our Contribution}
+本論文では新しい暗号cubing暗号を提案する．cubing暗号は転置式暗号でありつつ現代暗号である．cubing暗号はルービックキューブと似た方式で平文の列を転置させることによって暗号化している．また，cubing暗号は新しい暗号利用モードであるcubingmodeの利用を前提としている．これにより暗号化したい平文が，cubing暗号で定義された暗号化可能である平文長以上でも適切に暗号化できるようにした．\\
+また，cubing暗号をcubingmodeで利用した際の安全性の評価を行った．本論文では，適切な鍵長の計算，ブルートフォース攻撃対策，頻度分析，選択平文攻撃，replay攻撃について分析した．分析の結果，鍵長は50文字\(=50Byte\)が良く，またいずれの攻撃手法においてもcubing暗号に対しては有効ではないことがわかった．
 
-\begin{itemize}
-  \item 平文ブロック長：45byte
-  \item 暗号文ブロック長：108byte
-  \item 鍵長：可変
-  \item 暗号化処理の並列化：可 (※但し，Shuffle処理がボトルネックとなる)
-  \item 復号処理の並列化：可 (※但し，Sort処理がボトルネックとなる)
-  \item Random Read：不可
-\end{itemize}
-なお，cubing暗号は暗号利用モード「cubingmode(CBGモード)」の利用を前提とし，以下cubing暗号に対しcubingmodeを利用した際の手順を説明する．
-\subsection{cubing暗号の暗号化・復号手順}
+\subsection{定義}
+\subsubsection{ルービックキューブ}
+ルービックキューブとは，ハンガリーの建築学者ルビク・エルネーが考案した立体パズルである．一般的なルービックキューブは\(3\times3\times3\times=9\)個の正方形のキューブからなり，６つの各面には色がついている．これらのキューブを、各行または列ごとに自由に回転させることができる。一般的には回転操作によってシャッフルされた状態のルービックキューブを元の配置に戻すことがパズルの目的である．
 
-以下の順序で暗号化・復号を行う．
-
-\subsubsection{暗号化}
-\begin{enumerate}
-\item 平文を用意する．
-\item 必要があればパディング処理を行う．
-\item encrypt処理を行う．
-\end{enumerate}
-
-\subsubsection{復号}
-\begin{enumerate}
-\item decrypt処理を行う．
-\item パディング処理を逆に行う．つまり，暗号化の際に付属した文字を取り除く．
-\item 平文を取得する．
-\end{enumerate}
-
-\subsubsection{パディング処理}
-平文ブロックが45Byteに満たない場合，1Byte分null入れ，残りはランダムな英数列を入れる．これにより，平文を45Byteに固定することができる．
-
-\subsubsection{コンピュータ上での表現方法}
-ルービックキューブをコンピュータ上で表現する際には配列を用いる．具体的には以下のルービックキューブの展開図と配列の添字が対応する．\\
-
-%\begin{center}
-  \includegraphics[width=7cm]{./tex_pic/seq.jpg}\\
-%\end{center}
-    
-\subsubsection{転置の仕様}
-cubing暗号転置処理は方向・列・回数の三つより決定される．方向に関しては以下の図のように三種類定義される．縦方向はルービックキューブで処理する際，以下の図のように回転させる方向のことである．なお，図には各方向に対する列が記載されている．
-\begin{center}
-  \includegraphics[width=7cm]{./tex_pic/tate.jpg}\\
-\footnote{http://iamthecu.be/}
-\end{center}
-横方向に関しては以下のように定義されている．
-\begin{center}
-  \includegraphics[width=7cm]{./tex_pic/yoko.jpg}\\
-\footnotemark[1]
-\end{center}
-回転方向に関しては以下のように定義されている．
-\begin{center}
-  \includegraphics[width=7cm]{./tex_pic/kai.jpg}\\
-\footnotemark[1]
-\end{center}
-
-なお，cubing暗号の転置はルービックキューブの転置とは一部違った箇所がある．それは，「ある方向のある列を転置させる際，他の列およびマスは一切転置させない」ということである．具体的には以下の図のような転置がなされる．\\
-\begin{center}
-  \includegraphics[width=9cm]{./tex_pic/trans.png}\\
-\end{center}
-まず「cubing暗号の転置操作」で黄色のマスにっているのは鍵（縦方向１列１回）転置操作で場所が入れ替わったマスを表している．一方，一般的なルービックキューブの転置操作では同じ鍵でgubing暗号に加えてさらに転置するマスを黄色く色づいている．一見一回の操作で多くのマスを転置できるように見えるが，実際はルービックキューブの角の３マスや，側面の２マス常に隣り合った関係を持ってしまう．よって全探索や頻度分析の手掛かりになってしまうと考えた．したがって，このような転置はしないようになっている．
-
-\subsubsection{暗号文の取得}
-最後に，暗号文は以下の図の順で取り出す．
+\subsubsection{列によるルービックキューブの表現}
+ルービックキューブをコンピュータ上で表現する際には列を用いる．具体的には以下のルービックキューブの展開図とコンピュータ上で扱う列が対応する．また，列の各要素をマスと呼ぶ．\\
 \begin{center}
   \includegraphics[width=7cm]{./tex_pic/seq.jpg}\\
 \end{center}
-\subsection{cubingmodeの利用手順}
-
-以下の順序で暗号化・復号を行う．
-\subsubsection{暗号化}
-\begin{enumerate}
-\item 平文をブロックに分ける．
-\item 必要があればパディングを用意する．
-\item 全ての平文に対してマスク処理を行う．
-\item 全てのブロックに対し，エンコードを行う．
-\item 全てのブロックの平文以外の箇所に対してマスク処理を行う．
-\item ブロックごとに暗号化を行う．
-\item ブロックをシャッフルする．
-\end{enumerate}
-
-\subsubsection{復号}
-\begin{enumerate}
-\item 暗号文をブロックに分ける．
-\item 全てのブロックに対して復号を行う．
-\item 暗号化の(5)で使用したマスク処理を元に戻す．
-\item (3)により現れるシーケンス番号を元に，ブロック間ソートを行う．
-\item 暗号化の(3)で使用したマスク処理を元に戻す．
-\item 全てのブロックに対し，デコードを行う．
-\item 全てのブロックを結合させ，平文を生成する．
-\end{enumerate}
-
-\subsubsection{cubingmodeの各処理の適用範囲}
-各ブロックの内容は以下の通りである．また，mask(1)とmask(2)処理の適用範囲に関しても以下の通りである．
-\begin{center}
-  \includegraphics[width=7cm]{./tex_pic/block.png}\\
-\end{center}
-
-\subsubsection{62進数の説明}
-cubingmodeのエンコード処理内では62進数が使われる．62進数は，「AA, AB, AC, ... , AZ, Aa, Ab, Ac, ... , A0, A1, A2, ... , A9, BA, BB, ... , B9, CA, ... , 99, ...」の順で定義される．なお，本暗号利用モードではAA~99までが使用される．
-
-\subsubsection{エンコード処理}
-本節では以下の記号を用いる．
-
-\(n\)：現在操作しているブロックの番号(0,1,2,...)\\
-\(C_i\)：ブロックの\(i\) Byte目の文字\\
-\(\mathrm{toas}(C)\)：特定の文字\(C\)のASCIIコードにおける番号\\
-\(\mathrm{fras}(N)\)：特定の数字\(N\)のASCIIコードにおける文字\\
-\(\mathrm{rand}()\)：アルファベット又は数字から１文字を一様に選ぶ関数\\
-\(\mathrm{to62}(x)\)：0から61までの自然数xを62進数に従って文字にする関数
-
-\footnotesize
-\begin{align}
-C_{45+i} &= \mathrm{fras}\left(\left(\left(\sum_{j=9(i-1)+1}^{9i}{\mathrm{toas}(C_j)}\right)\bmod 26\right)+97\right) \notag\\
-C_{51} &= \mathrm{to62}\left (\left \lfloor\frac{n}{62}\right \rfloor \right) \notag\\
-C_{52} &= \mathrm{to62}\left ( n \bmod 62 \right) \notag\\
-C_{53} &= \mathrm{rand}() \notag\\
-C_{54} &= \mathrm{rand}() \notag\\
-\end{align}
-\normalsize
-
-とする．ただし，\(i=1,2,3,4,5\)とする．これを全てのブロックに対して行う．
 
 \subsubsection{表示可能文字}
-以下の配列で定義される．
+文字Xが表示可能文字であるとは，以下のリストに定義されていることと同義である．エスケープシーケンスに関してはASCIIコードに準じている．
 \begin{verbatim}
 printable_table[] = {'0', '1', '2', '3', 
 '4', '5', '6', '7', '8', '9', 'a', 'b', 
@@ -200,67 +90,180 @@ printable_table[] = {'0', '1', '2', '3',
 '}', '~', ' ', '\n', '\0', '\t'};
 \end{verbatim}
 
-この順序はpythonのstring.printableを元に作られた．エスケープシーケンスに関してはASCIIコードに対応している．
+\subsubsection{62進数}
+62進数とは，以下のリストで定義された文字のみからなる，62を底とする数字である．
+\begin{verbatim}
+base62[]={'A', 'B', 'C', 'D', 'E', 'F', 
+'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 
+'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 
+'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 
+'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 
+'m', 'n', 'o', 'p', 'q', 'r', 's', 't', 
+'u', 'v', 'w', 'x', 'y', 'z', '0', '1', 
+'2', '3', '4', '5', '6', '7', '8', '9'}
+\end{verbatim}
+例えば，10進数の0は62進数のAであり，10進数の1は62進数のBである．また，10進数の\(62^2-1\)は62進数の99である．
 
-\subsubsection{mask(1)処理}
-mask(1)では各ブロックの平文45Byteにマスク処理を行う．まず，以下を定義する．\\
-平文の\(i\)文字目：\(Pi\)\\
-\(i\)番目のマスク：\(Mi\)\\
-\(\mathrm{printable\_table}\)内の文字\(Pi\)のインデックス：\(\mathrm{Idx}(Pi)\) （※\(\mathrm{printable\_table}\)とは，上記「表示可能文字」のこと）\\
+\subsubsection{暗号利用モード}
+暗号利用モードとは，暗号化アルゴリズムで定義された平文長よりも長い平文を暗号化するためのメカニズムのことである．
+
+\subsubsection{ECBモード}
+ECBモードは暗号利用モードの一種で，全てのブロック \footnote{ブロックとは，複数の文字からなる特定の長さの列のことである．} を同じ鍵で暗号化し，最後に暗号化されたブロックを結合するアルゴリズムである．これにより，二種類の鍵(\(Ki,Kj\))と二種類の平文ブロック(\(Pi,Pj\))があり，鍵Kと平文ブロックPで生成される暗号文ブロックを\(C(K,P)\)とし，\(Ki=Kj\)かつ\(Pi=Pj\)である時，必ず\(C(Ki,Pi)=C(Kj,Pj)\)となる．
+
+\section{cubing暗号}
+\subsection{cubing暗号の概要}
+cubing暗号は平文ブロック長45Byte，暗号文ブロック長54Byte，鍵長可変の転置式暗号である．この暗号は暗号化及び復号の並列化が可能であるが，暗号化の場合は後に説明するShuffle処理，復号の場合はSort処理がボトルネックとなる．なお，本暗号に関するソースコードや素材などは全てgithubに掲載した．\cite{github}
+
+\subsection{cubing暗号の暗号化・復号手順}
+暗号化及び復号では以下の処理を利用する．
+
+\subsubsection{パディング処理}
+平文ブロックが45Byteに満たない場合，1Byte分のnull\footnote{nullは「何も示さないもの」を表す}入れ，残りはランダムな英数列を入れる．これにより，平文を45Byteに固定することができる．
+
+\subsubsection{転置の仕様}
+cubing暗号の転置は方向・列・回数の三つより決定される．方向に関しては以下の図のように三種類定義される．なお，図には各方向に対する列が記載されている．
+
+\begin{figure}[!h]
+  \includegraphics[width=5cm]{./tex_pic/tate.jpg}\\
+  \captionsetup{labelformat=empty,labelsep=none}
+  \caption{1列目を縦方向に回転させたとき (http://iamthecu.be/)}
+\end{figure}
+\begin{figure}[!h]
+  \includegraphics[width=5cm]{./tex_pic/yoko.jpg}\\
+  \captionsetup{labelformat=empty,labelsep=none}
+  \caption{1列目を横方向に回転させたとき (http://iamthecu.be/)}
+\end{figure}
+\begin{figure}[!h]
+  \includegraphics[width=5cm]{./tex_pic/kai.jpg}\\
+  \captionsetup{labelformat=empty,labelsep=none}
+  \caption{1列目を回転方向に回転させたとき (http://iamthecu.be/)}
+\end{figure}
+
+なお，cubing暗号の転置はルービックキューブの転置と比較して，「ある方向のある列を転置させる際，他の列およびマスは一切転置させない」という点において異なる．具体的には以下の図のような転置がなされる．\\
+\begin{center}
+  \includegraphics[width=7cm]{./tex_pic/trans.png}\\
+\end{center}
+まず「cubing暗号の転置操作」の黄色のマスは縦方向１列１回(以下，本節では鍵と呼ぶ)の転置操作で場所が入れ替わったマスを表している．一方，「一般的なルービックキューブの転置操作」の黄色のマスは同じ鍵で「cubing暗号の転置操作」に加えてさらに場所が入れ替わるマスである．一見一回の操作で多くの列を転置できるように見えるが，実際はルービックキューブの角の３列や，側面の２列は常に隣り合った関係を持ってしまう．よって全探索や頻度分析の手掛かりになってしまうと考えた．したがって，このような転置はしないようにした．
+
+\subsubsection{暗号文の取得}
+暗号文の取得は，「列によるルービックキューブの表現」と同じ列を利用する．\\
+
+また，以下の順序で暗号化及び復号を行う．
+\subsubsection{暗号化}
+\begin{enumerate}
+\item 平文を用意する．
+\item 必要があればパディング処理を行う．
+\item encrypt処理を行う．
+\end{enumerate}
+
+\subsubsection{復号}
+\begin{enumerate}
+\item decrypt処理を行う．
+\item パディング処理を逆に行う．つまり，暗号化の際に付属した文字を取り除く．
+\item 平文を取得する．
+\end{enumerate}
+
+\subsection{cubingmodeの利用手順}
+一般的に平文は45Byte以上である．その際，cubing暗号では暗号化ができないため，暗号利用モードが必要となる．cubing暗号は暗号利用モード「cubingmode(CBGモード)」の利用を前提とし，以下cubing暗号に対し利用するcubingmodeを説明する．
+
+\subsubsection{エンコード処理}
+本節では以下の記号を用いる．\\
+\noindent
+\(n\)：操作するブロックの番号\((0,1,2,...,62^2-1)\)\\
+\(C_i\)：ブロックの\(i\) Byte目の文字\\
+\(\mathrm{toas}(C)\)：特定の文字\(C\)のASCIIコードにおける番号\\
+\(\mathrm{fras}(N)\)：特定の数字\(N\)のASCIIコードにおける文字\\
+\(\mathrm{rand}()\)：アルファベット又は数字から１文字を一様に選ぶ関数\\
+\(\mathrm{to62}(x)\)：10進数の自然数xを62進数にする関数\\
+この時，\(C_{45}\)から\(C_{54}\)は以下のように定義する．
+\footnotesize
+\begin{align}
+C_{45+i} &= \mathrm{fras}\left(\left(\left(\sum_{j=9(i-1)+1}^{9i}{\mathrm{toas}(C_j)}\right)\bmod 26\right)+97\right) \notag\\
+C_{51} :&= \mathrm{to62}(n)の二桁目 \notag\\
+C_{52} :&= \mathrm{to62}(n)の一桁目 \notag\\
+C_{53} &= \mathrm{rand}() \notag\\
+C_{54} &= \mathrm{rand}() \notag\\
+\end{align}
+\normalsize
+
+ただし，\(i=1,2,3,4,5\)かつ\(0 \leq n < 62^2\)とする．これを全てのブロックに対して行う．また，\(C_{51}\)と\(C_{52}\)は以下，シーケンス番号と呼ぶ．
+
+\subsubsection{デコード処理}
+エンコード処理で付加した情報を全て消す．具体的には，\(i=1,2,3,4,5,6,7,8,9\)の時，\(C_{45+i}=\mathrm{null}\)とする．
+
+\subsubsection{mask処理}
+mask処理ではマスクと呼ばれる数字と，区間と文字列を決定し，その区間の文字列を別の文字列へ以下の計算式を元に変更する．\\
+平文の\(i\)番目の文字：\(Pi\)\\
+\(i\)番目のマスク：\(Mi = rand()\)\\
+\(\mathrm{printable\_table}\)内の文字\(Pi\)の列番号：\(\mathrm{Idx}(Pi)\) （※\(\mathrm{printable\_table}\)とは，上記「表示可能文字」のこと）\\
 とすると，
-
 
 \[Pi=\mathrm{printable\_table}[(\mathrm{Idx}(Pi)+Mi) \bmod 98]\\\]
 
-
-と定義する．ただし，\(i=1〜45\)とする．
-
-\subsubsection{mask(2)処理}
-mask(2)ではハッシュとシーケンス番号にマスクをかける．計算方法は上記「mask(1)」と同様．
+ここで，区間を[l, r]とすると，\(l\leq i \leq r\)である．また，区間[l, r]でmask処理を行う場合，\(mask(l, r)\)と記述する．ここで，l, rは\(1 \leq l \leq r \leq 54\)を満たす．
 
 \subsubsection{encrypt処理}
-encrypt処理ではcubing暗号の暗号化処置(転置処理)を行う．
+encrypt処理では「転置の仕様」をもとにcubing暗号の転置を行う．
 
 \subsubsection{decrypt処理}
-decrypt処理ではcubing暗号のencrypt処理を元に復号処理を行う．ルービックキューブは同じ方向・同じ列で４回回転させると元に戻る性質があるため，暗号化に回転した回数を\(n\)とおくと，復号処理では\(4-n\)回転置処理を行う．
+decrypt処理ではcubing暗号のencrypt処理を元に復号処理を行う．ルービックキューブは同じ方向・同じ列で４回回転させると元に戻る性質があるため，encrypt処理で回転した回数を\(n\)とおくと，復号処理では\(4-n\)回，転置を行う．
 
 \subsubsection{shuffle処理}
-暗号化後に全ブロックをブロックごとにシャッフルする．Fisher–Yatesのアルゴリズムを用いることによって高速に実現可能となる．
+全ブロックをブロックごとにシャッフルする．Fisher–Yatesのアルゴリズムを用いることによって高速に実現可能となる．
 
 \subsubsection{sort処理}
-各ブロックの51,52番目の文字が昇順になるようにブロックごとにソートする．
+各ブロックのシーケンス番号が昇順になるようにブロックごとにソートする．
 
-\subsubsection{送信内容}
-送信内容は以下の三つで構成され，三つが連結された状態で送信される．
+\subsubsection{暗号化}
+\begin{enumerate}
+\item 平文をブロックに分ける．
+\item 必要があればパディングを用意する．
+\item 平文に対してmask(1, 45)を行う
+\item 全てのブロックに対し，エンコード処理を行う．
+\item 平文に対してmask(46, 54)を行う．
+\item ブロックごとにencrypt処理を行う．
+\item 全てのブロックに対してshuffle処理を行う．
+\end{enumerate}
 
-1. 暗号文
-2. mask(1)
-3. mask(2)
-ただし，mask(2)に関してはどのmask(2)がどのブロックに適用されるのか判別するため，各ブロックの後ろに記述する．
-例) [block1] [mask(2)-1] [block3] [mask(2)-3] [block2] [mask(2)-2]
+\subsubsection{復号}
+\begin{enumerate}
+\item 暗号文をブロックに分ける．
+\item 全てのブロックに対してdecrypt処理を行う．
+\item mask(46, 54)を元に戻す．
+\item sort処理を行う．
+\item mask(1, 45)を元に戻す．
+\item 全てのブロックに対し，デコード処理を行う．
+\item 全てのブロックを結合させ，平文を生成する．
+\end{enumerate}
+
+\subsubsection{アルゴリズムの出力}
+アルゴリズムの出力は以下の三つで構成され，連結された状態で送信される．\\
+1. 暗号文\\
+2. mask(1, 45)で使用したマスクの列\\
+3. mask(46, 54)で使用したマスクの列\\
+ただし，mask(46, 54)で使用したマスクの列に関してはどのmask(46, 54)で使用したマスクの列がどのブロックに適用されるのか判別するため，各ブロックの後ろに記述する．\\
+例) [block1] [block1のmask(46, 54)で使用したマスクの列] 
 
 \subsubsection{ブロック数が多い時の対策}
-\(62^2\)のブロックを１つの大きなブロックとして考え，各大きなブロックをECBモードで暗号化する．
-上記「shuffle」では，\(62^2\)個の大きなブロックごとにシャッフルする．
+\(62^2\)個のブロックごとにcubingmodeで暗号化を行う．shuffle処理では\(62^2\)個のブロック単位で処理する．
 
 \section{評価実験}
 ここでは主に本暗号・暗号利用モードの長所を実験結果をもとに記す．
 \subsection{推奨する鍵の長さに関して}
-鍵の長さを変えた際，各マスが転置されている割合を計算した．\\
+転置式暗号の性質上，鍵の長さが極端に短い場合は平文と暗号文が殆ど同じ文字列になる．ここで，列番号\(i\)の文字がencrypt処理によって列番号\(j\)になる確率を\(\mathrm{P}(i,j)\)と定義する．特定の列番号\(i,a,b\)がある時，頻度分析によって解読されないためには\(\mathrm{P}(i,a)=\mathrm{P}(i,b)\)である必要がある．そこで，鍵の長さを変えた際，各マスが転置されている割合を計算した．\\
 
 \subsubsection{数学的アプローチ}
-1回の転置処理でfrac{12}{54}文字変化する．つまり，1回の転置処理でfrac{42}{54}文字は変化しない．\\
-ここで$n=$転置処理の回数とする．すると，特定の文字が変化しない確率は
+1回の転置で\(\frac{12}{54}\)文字変化する．つまり，1回の転置で\(\frac{42}{54}\)文字は変化しない．\\
+ここで転置の回数をnとすると，特定の文字が変化しない確率は
 \[\left(\frac{42}{54}\right)^n\]
 で計算できる．ここで，全ての文字の変化する確率と変化しない確率を等しくするためには，以下の式が成り立つ必要がある．
 \[\left(\frac{42}{54}\right)^n \leq \frac{1}{54}\]
 
-これを満たす最小の$n$は16で，この時の左辺の値は約0.0179である．また，鍵長$=$転置回数$\times 3$なので，鍵長は$16*3=48$文字以上を推奨する．
+これを満たす最小の\(n\)は16で，この時の左辺の値は約0.0179である．また，鍵長\(=\)転置回数\(\times 3\)なので，鍵長は\(16\times3=48\)文字以上を推奨する．
 
 \subsubsection{機械的アプローチ}
 
-鍵長を$1$から$300$まで検証した．各鍵長に対して100回暗号化処理を行い，転置されていない文字がどれくらいあるのか，それぞれ平均値を計算した．\\
-なお，計算に用いたプログラムはkey\_len.cpp，計算結果はkeylen.csv，グラフの描画はkeylen\_print.pyである．\\
+鍵長を\(1\)から\(300\)まで1ずつ増やしながら検証した．各鍵長に対して100回暗号化を行い，転置されていない文字がどれくらいあるのか，それぞれ平均値を計算した\footnote{計算に用いたプログラムはkey\_len.cpp，計算結果はkeylen.csv，グラフの描画はkeylen\_print.pyである．}．本検証では，平文の特定の文字が等しく結果に影響するべきあるため，評価は中央値ではなく平均値を採用した．\\
 \begin{center}
   \includegraphics[width=8cm]{./tex_pic/figure.png}\\
 \end{center}
@@ -269,82 +272,81 @@ decrypt処理ではcubing暗号のencrypt処理を元に復号処理を行う．
 \subsection{暗号化に要する時間}
 １秒間に約18Mbyteの暗号化が可能である．これはtimecalc.cppによって計算した．
 
-\subsection{攻撃対策}
-\subsubsection{ブルートフォース攻撃}
-鍵長がわからないことから，存在し得る平文は$54!$通りある．ここで，「$!$」は階乗記号を表す．\\
-ただし，encrypt処理の性質上，ルービックキューブの各面に対して各マスは以下のように分類される．
+\section{攻撃対策}
+\subsection{ブルートフォース攻撃}
+ブルートフォース攻撃とは，鍵やあり得る平文を全探索し，鍵または平文を特定する攻撃のことである．cubing暗号は鍵長が可変であるので，鍵を特定することはできない．よって存在し得る平文は\(54!\)通りである．ここで，「\(!\)」は階乗記号を表す．\\
+ただし，encrypt処理の性質上，転置可能なマスに1, 2, 3のラベルを以下のように貼った時, 1を転置させた先のマスは常に1となる．ここで，1のラベルを貼れるマスをS1，2のラベルを貼れるマスをS2，3のラベルを貼れるマスをS3とする．\\
 \begin{table}[htb]
   \begin{tabular}{|l|c|r|} \hline
     １ & ２ & １ \\ \hline
     ２ & ３ & ２ \\ \hline
     １ & ２ & １ \\ \hline
   \end{tabular}
-\end{table}
-これはencrypt処理をした際に転置可能なマスを集合を表している．例えば１と書かれたマスはどのような鍵を使っても１と書かれたマスにしか転置できない．これを利用するとブルートフォース攻撃をする際のパターン数が減少する．\\
-集合１に存在するマスは$4*6=24$マス，集合２に存在するマスは$4*6=24$マス，集合３に存在するマスは$1*6=6$マス，よって存在し得る平文は $24!*24!*6!$通りある．\\
-ここで，コンピュータ以下の条件を満たすとする．
+\end{table}\\
+これを利用すると暗号文に対して，ブルートフォース攻撃をする際に生成する鍵のパターン数が減少する．\\
+S1に存在する文字は\(4\times6=24\)文字，S2に存在する文字は\(4\times6=24\)文字，S3に存在する文字は\(1\times6=6\)文字，よって存在し得る平文は \(24!\times24!\times6!\)通りある．\\
+ここで，ブルートフォース攻撃を行うコンピュータが以下の条件を満たすとする．
 \begin{enumerate}
   \item 生成した平文が正当なものなのか判定するのに時間がかからない
   \item マスク処理，ソート処理など暗号化・復号にかかる全ての処理に時間がかからない
-  \item 暗号文を並びかえた文字列を１秒間に$10^9$回生成できる
+  \item 暗号文を並びかえた文字列を１秒間に\(10^9\)回生成できる
 \end{enumerate}
-この時，ブルートフォース攻撃にかかる最大の時間は$\dfrac{(24!)^2\times6!}{10^9}$秒である．\\
-これは$2.77\times10^{50}$秒であり，約$8.79\times10^{42}$年である．よって現実的な時間での解読は不可能である．
+この時，ブルートフォース攻撃にかかる最大の時間は\(\dfrac{(24!)^2\times6!}{10^9}\)秒である．\\
+これは\(2.77\times10^{50}\)秒であり，約\(8.79\times10^{42}\)年である．よって現実的な時間での解読は不可能である．
 
-\subsubsection{頻度分析}
-暗号文の各文字はマスク処理を施されたランダムな文字またはエンコード処理のrand()計算で生成されたランダムな文字である．つまり全ての文字の出現頻度は等しくなる．よって頻度分析は不可能である．また，仮に攻撃者によってマスクが外されたと仮定する．しかし，コンピュータ上で平文と予測した文字列が正しい平文であるという判定ができない．
-\subsubsection{選択平文攻撃}
+\subsection{頻度分析}
+暗号文の各文字はmask処理を施されたランダムな文字またはエンコード処理のrand()計算で生成されたランダムな文字である．つまり，rand()の出力が等確率ならば全ての文字の出現頻度は等しくなる．よって頻度分析は不可能である．また，仮に攻撃者が乱数を総当たりし, その乱数をマスク乱数と仮定して復号処理を実施したと仮定する．この時，コンピュータ上で平文と予測した文字列が正しい平文であるという判定ができないので，平文を特定することはできない．
+\subsection{選択平文攻撃}
 マスク処理で使用されるマスクは乱数である．これは暗号化する度に生成されるため，同じ平文を二度暗号化しても同じ暗号文にならない．よって選択平文攻撃は不可能である．
-\subsubsection{replay攻撃}
-暗号化の最後にシャッフル処理を行う．これによりどのブロックがどこに存在するのか，秘密鍵がわからない第三者にはわからない．よってreplay攻撃は基本的に成立しない．ただし，ブロック数を$N$，すり替えたいブロック数を$M$とすると，$\dfrac{1}{N^M}$の確率でreplay攻撃が成立してしまう．しかし，Nは小さくないことを想定している為，replay攻撃は実用性に欠けると考える．
+\subsection{replay攻撃}
+暗号化の最後にshuffle処理を行う．これによりどのブロックがどこに存在するのか，秘密鍵を知らない第三者にはわからない．よってブロック数を\(N\)，すり替えたいブロック数を\(M\)とすると，\(\dfrac{1}{N^M}\)の確率でreplay攻撃が成立してしまう．しかし， 多くの場合にはNは十分大きいと考えられるため, この攻撃は現実的には問題がないと考えられる.
 
 \section{関連研究}
-\subsection{“RUBIK'S CUBE” AS A TRANSPOSITION DEVICE}
-この研究ではルービックキューブを用いた暗号について提案されている．\cite{Mitchell}暗号化の手順は以下の通りである．
+
+本論文の先行研究として，二つほど紹介する．一つ目は“RUBIK'S CUBE” AS A TRANSPOSITION DEVICE\cite{Mitchell}という論文である．この論文ではルービックキューブを用いた暗号について提案されている．暗号化の手順は以下の通りである．
 \begin{enumerate}
   \item ルービックキューブの６つの面にそれぞれ１〜６まで数字を書き込む．ただし，１だけは面の左上のマスに書き込む．
-  \item 面同士の入れ替えを行う．ただし，１が書かれている面に関しては入れ替えを行ってはならない．この時，並び替えの場合の総数は$5!=120$通り存在する．
+  \item 面同士の入れ替えを行う．ただし，１が書かれている面に関しては入れ替えを行ってはならない．この時，並び替えの場合の総数は\(5!=120\)通り存在する．
   \item 各面に平文を８文字ずつ，数字が書かれていないマスに書き込む．
   \item ルービックキューブを回転させる．ただし，左上にある１の数字だけは回転させてはならない．
   \item スペースはランダム性のため，好きな数nullに置き換えても良い．
   \item 出来たルービックキューブの各面に書かれている数字の順に文字を取り出す．この時の文字が暗号文になる．
 \end{enumerate}
 
-この暗号はThe Rubik's Crypto-Cube: a Trans-Composite Cipher\cite{Trans-Composite Cipher}によって解読されている．Mitchell Cryptsystemsの弱点は主に二つある．一つはルービックキューブの角にある３マスは常に同じ位置関係にあること，二つ目は暗号文が平文の中にあることである．
-本論文のcubing暗号はこれらの弱点に対して対策を行った．
+この暗号はThe Rubik's Crypto-Cube: a Trans-Composite Cipher\cite{Trans-Composite Cipher}によって解読されている．Mitchell Cryptsystemsの弱点は主に二つある．一つ目はルービックキューブの角にある３マスは常に同じ位置関係にあること，二つ目は暗号文に使用される文字が平文の中にあることである．\\
+本論文のcubing暗号はこれらの弱点に対して対策を行った．\\\\
 
-
-\subsection{Scrambling algorithm for encryption of text using cube rotation artificial intelligence technique}
-
-こちらの論文\cite{Scrambling algorithm}でもルービックキューブを用いた暗号が使用されている．但し，この論文ではルービックキューブの回転操作を人工知能を用いている．この論文では暗号文は平文と比べ完全にスクランブルされていると書かれている．しかし，暗号文の中に平文の文字が入った状態となってしまう他，改竄検知ができない．そこで，cubing暗号ではこれらに関して対策を行った．
+二つ目はScrambling algorithm for encryption of text using cube rotation artificial intelligence technique\cite{Scrambling algorithm}という論文である．こちらの論文でもルービックキューブを用いた暗号が使用されている．但し，この論文ではルービックキューブの転置に対して人工知能を用いている．これにより暗号文は平文と比べ完全にスクランブルされると書かれている．しかし，暗号文の中に平文の文字が入った状態となってしまう他，改竄検知ができない．そこで，cubing暗号ではこれらに関して対策を行った．
 
 
 \section{まとめ}
 
 \subsection{本論文の内容}
-本論文では自作の暗号cubing暗号についての定義とその安全性について述べた．ルービックキューブを用いた転置暗号は既に開発されていたが，私はそれらの暗号を弱点を踏まえて解かれにくい暗号の作成を行った．解かれにくい暗号というのは，安全性が保証された条件下で様々な攻撃に対して無効である暗号である．
+本論文では自作の暗号cubing暗号についての定義とその安全性について述べた．ルービックキューブを用いた転置式暗号は既に開発されていたが，私はそれらの暗号を弱点を踏まえて解かれにくい暗号の作成を行った．解かれにくい暗号というのは，安全性が保証された条件下で様々な攻撃に対して無効である暗号である．
 
 \subsection{推奨される鍵長に関して}
-暗号の安全性が保証される鍵長に関しての検証も行った．検証は平文に転置処理を施して元の平文との転置率を機械的に求める方法と数学的に求める方法で二度行った．その結果，どちらも鍵長は50文字以上が好ましいとわかった．
+暗号の安全性が保証される鍵長に関しての検証も行った．検証は平文を転置した暗号文と元の平文との転置率を機械的に求める方法と数学的計算によって求める方法で二度行った．その結果，どちらも鍵長は50文字以上が好ましいとわかった．
 
 \subsection{攻撃対策に関して}
-本論文では主要な攻撃手法であるブルートフォース攻撃・頻度分析・選択平文攻撃・replay攻撃に関して，暗号の安全性の検証を行った．その結果，ブルートフォース攻撃に対しては計算量が指数時間になるため，実用的ではないと判断し，頻度分析に対しては暗号文がマスクされている上，たとえマスクが外されてもコンピュータ上で平文と予測した文字列が正しい平文であるという判定ができない．よって頻度分析も有用ではない．そして，選択平文攻撃に対してはマスク処理が施されており，マスクによって暗号文の各文字はランダムな値になる．最後に，replay攻撃に対しては，暗号文ブロックはシャッフルされるので，replay攻撃が成立する確率はブロック数を$N$，すり替えたいブロック数を$M$とすると，$\dfrac{1}{N^M}$である．これは実用的ではない．\\\\
-以上の結果から本暗号は以前から存在するルービックキューブによる転置暗号の脆弱性を対策し，より安全な暗号の制作に成功した．
+本論文では主要な攻撃手法であるブルートフォース攻撃・頻度分析・選択平文攻撃・replay攻撃に関して，暗号の安全性の検証を行った．その結果，ブルートフォース攻撃に対しては最悪時間計算量が指数時間になるため，実用的ではないと判断し，頻度分析に対しては暗号文がマスクされている上，たとえマスクが外されてもコンピュータ上で平文と予測した文字列が正しい平文であるという判定ができない．よって頻度分析も有用ではない．そして，選択平文攻撃に対してはマスク処理が施されており，マスクによって暗号文の各文字はランダムな値になる．最後に，replay攻撃に対しては，暗号文ブロックはシャッフルされるので，replay攻撃が成立する確率はブロック数を\(N\)，すり替えたいブロック数を\(M\)とすると，\(\dfrac{1}{N^M}\)である．これは実用的ではない．\\
+以上の結果から本暗号は以前から存在するルービックキューブによる転置式暗号の脆弱性を対策し，より安全な暗号の制作に成功した．
+
+\subsection{問題点}
+cubing暗号は平文長が45Byteで暗号文長が54Byteである．cubing暗号を\(n\) (\(0 < n \leq 62^2\))ブロック暗号化すると，暗号文長は\(54n\)Byteになる．ここでcubingmodeを使用すると，mask処理によって１ブロック当たり52Byteのマスクが付与される．よって\(n\)ブロックの暗号化で出力されるデータ量は\(54n+52n=106n\)Byteである．これは平文長と比較して非常に多い．そこで，今後マスクは乱数であるシード値だけを暗号文に付加し，シード値から全てのマスクを生成できる多項式を選定し，cubingmodeのアルゴリズムに導入しようと考えている．
 
 \section{謝辞}
 本研究を進めるに当たり、サイボウズ・ラボ株式会社 緑川 志穂氏からは多大な助言を賜り，また丁寧に指導して下さいました。厚く感謝を申し上げます。また暗号の解読やアルゴリズム修正等を快く協力して頂いたセキュリティ・キャンプ2019集中開発コース標準ゼミのメンターの皆さま，及び様々な助言を頂きました受講生の皆さまにも感謝の意を表します．
 
-\newpage
 \begin{flushleft}
 \begin{thebibliography}{}
 
 \bibitem{github} Githubレポジトリ : https://github.com/xryuseix/cubing\_cipher-SecCamp2019-
 
-\bibitem{Mitchell} “RUBIK'S CUBE” AS A TRANSPOSITION DEVICE : https://www.tandfonline.com/doi/pdf/10.1080/0161-119291866928?needAccess=true
+\bibitem{Mitchell} “RUBIK'S CUBE” AS A TRANSPOSITION DEVICE : https://www.tandfonline.com/doi/pdf/10.10\\80/0161-119291866928?needAccess=true
 
-\bibitem{Trans-Composite Cipher}The Rubik's Crypto-Cube : a Trans-Composite Cipher : https://epublications.regis.edu/cgi/viewcontent.cgi?article=1511\&context=theses
+\bibitem{Trans-Composite Cipher}The Rubik's Crypto-Cube : a Trans-Composite Cipher : https://epublications.regis.edu/cgi/viewconte\\nt.cgi?article=1511\&context=theses
 
-\bibitem{Scrambling algorithm}Scrambling algorithm for encryption of text using cube rotation artificial intelligence technique : https://pdfs.semanticscholar.org/1a63/be53b7ddc422107a9f4343eaa6cfe6732a70.pdf
+\bibitem{Scrambling algorithm}Scrambling algorithm for encryption of text using cube rotation artificial intelligence technique : https://pdfs.semanticscholar.org/1a63/be53b7\\ddc422107a9f4343eaa6cfe6732a70.pdf
 
 \end{thebibliography}
 \end{flushleft}
