@@ -2,6 +2,7 @@
 \usepackage{abstract}
 \usepackage[dvipdfmx]{graphicx}
 \usepackage{amsmath}
+\usepackage{ascmac}
 \usepackage{caption}
 \usepackage{url}
 
@@ -35,7 +36,7 @@
 
 \begin{figure}
   \centering
-  \includegraphics[width=5cm]{./tex_pic/rubik-cube.jpg}\\
+  \includegraphics[width=10cm]{./tex_pic/rubik-cube.jpg}\\
   \caption{ルービックキューブ\\(https://ja.wikipedia.org)}
 \end{figure}
 
@@ -125,7 +126,7 @@ cubing暗号は暗号利用モード「cubingmode」の利用を前提とし，�
 この時，\(C_{45}\)から\(C_{54}\)は以下のように定義する．
 \footnotesize
 \begin{align}
-C_{45+i} &= \mathrm{fras}\left(\left(\left(\sum_{j=9(i-1)+1}^{9i}{\mathrm{toas}(C_j)}\right)\bmod 26\right)+97\right) \notag\\
+C_{45 + i} &= \mathrm{fras} \left( \left( \left( \sum_{j = 1}^9 \mathrm{toas}(C_{9 \left( i - 1 \right) + j} )\right)\bmod 26 \right) + 97 \right) \notag\\
 C_{51} :&= \mathrm{to62}(n)の右から二桁目 \notag\\
 C_{52} :&= \mathrm{to62}(n)の右から一桁目 \notag\\
 C_{53} &= \mathrm{rand}() \notag\\
@@ -188,8 +189,6 @@ decrypt処理ではcubing暗号のencrypt処理を元に復号処理を行う．
 1. 暗号文\\
 2. mask(1, 45)で使用したマスクの列\\
 3. mask(46, 54)で使用したマスクの列\\
-ただし，mask(46, 54)で使用したマスクの列に関してはどのmask(46, 54)で使用したマスクの列がどのブロックに適用されるのか判別するため，各ブロックの後ろに記述する．\\
-例) [block1] [block1のmask(46, 54)で使用したマスクの列] 
 
 \subsubsection{ブロック数が多い時の対策}
 \(62^2\)個のブロックごとにcubingmodeで暗号化を行う．shuffle処理では\(62^2\)個のブロック単位で処理する．
@@ -214,14 +213,6 @@ decrypt処理ではcubing暗号のencrypt処理を元に復号処理を行う．
   \includegraphics[width=8cm]{./tex_pic/figure.png}\\
 \end{center}
 上図より，鍵長は約50から値が変わらない，ということが読み取れる．よって鍵長は50文字以上である必要がある．また，上記「数学的アプローチ」と結果が近しいことから，実験の正確であることが証明できる．
-
-
-\section{課題}
-- 鍵長
-- 実行速度
-
-\subsection{暗号化に要する時間}
-１秒間に約18MByteの暗号化が可能である．これはtimecalc.cppによって計算した．
 
 \section{攻撃対策}
 \subsection{ブルートフォース攻撃}
@@ -252,8 +243,35 @@ S1に存在する文字は\(4\times6=24\)文字，S2に存在する文字は\(4\
 \subsection{replay攻撃}
 暗号化の最後にshuffle処理を行う．これによりどのブロックがどこに存在するのか，秘密鍵を知らない第三者にはわからない．よってブロック数を\(N\)，すり替えたいブロック数を\(M\)とすると，\(\dfrac{1}{N^M}\)の確率でreplay攻撃が成立してしまう．しかし， 多くの場合には\(N\)は十分大きいと考えられるため, この攻撃は現実的には問題がないと考えられる.
 
-\section{関連研究}
+\section{課題}
+\subsection{暗号文長}
+cubing暗号は平文長が45Byteで暗号文長が54Byteである．cubing暗号を\(n\) (\(0 < n \leq 62^2\))ブロック暗号化すると，暗号文長は\(54n\)Byteになる．ここでcubingmodeを使用すると，mask処理によって１ブロック当たり52Byteのマスクが付与される．よって\(n\)ブロックの暗号化で出力されるデータ量は\(54n+52n=106n\)Byteである．これは平文長と比較して非常に多い．そこで，今後マスクは乱数であるシード値だけを暗号文に付加し，シード値から全てのマスクを生成できる多項式を選定し，cubingmodeのアルゴリズムに導入しようと考えている．
 
+\subsection{暗号化に要する時間}
+cubing暗号の暗号化に要する時間を測定した．測定には\url{https://github.com/xryuseix/cubing_cipher/tree/master/evalution/timecalc.cpp}を用いた．その結果，１秒間に約18MByteの暗号化が可能であることがわかった．しかし，同環境でOpenSSLによるAES(1024bit)の暗号化を行うと，１秒間に130MByteの暗号化ができた．今後の展開として，実装を少し工夫し，高速で暗号化を行えるようにしようと考えている．
+
+\subsection{暗号文の順序}
+ソースコードのアルゴリズムの出力は以下のようになっている．\\
+\begin{screen}
+  \begin{enumerate}
+    \item block1とmask(1, 45)で使用したマスクの列
+    \item block1のmask(46, 54)で使用したマスクの列
+    \item block2とmask(1, 45)で使用したマスクの列
+    \item block2のmask(46, 54)で使用したマスクの列 ...
+  \end{enumerate}
+\end{screen}
+だが，以下のように出力した方が直感的である．\\
+\begin{screen}
+  \begin{enumerate}
+    \item block1とmask(0, 45)で使用したマスクの列
+    \item block2とmask(0, 45)で使用したマスクの列
+    \item block1のmask(46, 54)で使用したマスクの列
+    \item block2のmask(46, 54)で使用したマスクの列 ...
+  \end{enumerate}
+\end{screen}
+これは，mask(46, 54)で使用したマスクの列に関してはどのmask(46, 54)で使用したマスクの列がどのブロックに適用されるのか判別できないと考えたからである．しかし，暗号文長をnとすると，先頭から\(\frac{54}{106}*n\)文字は暗号文ブロックである，という性質を利用すると正しく復号が可能である．ソースコードは今後は修正しようと考えている．
+
+\section{関連研究}
 本論文の先行研究として，二つほど紹介する．一つ目は“RUBIK'S CUBE” AS A TRANSPOSITION DEVICE\cite{Mitchell}という論文である．この論文ではルービックキューブを用いた暗号について提案されている．暗号化の手順は以下の通りである．
 \begin{enumerate}
   \item ルービックキューブの６つの面にそれぞれ１〜６まで数字を書き込む．ただし，１だけは面の左上のマスに書き込む．
@@ -264,11 +282,8 @@ S1に存在する文字は\(4\times6=24\)文字，S2に存在する文字は\(4\
   \item 出来たルービックキューブの各面に書かれている数字の順に文字を取り出す．この時の文字が暗号文になる．
 \end{enumerate}
 
-この暗号はThe Rubik's Crypto-Cube: a Trans-Composite Cipher\cite{Trans-Composite Cipher}によって解読されている．Mitchell Cryptsystemsの弱点は主に二つある．一つ目はルービックキューブの角にある３マスは常に同じ位置関係にあること，二つ目は暗号文に使用される文字が平文の中にあることである．\\
-本論文のcubing暗号はこれらの弱点に対して対策を行った．\\\\
-
+この暗号はThe Rubik's Crypto-Cube: a Trans-Composite Cipher\cite{Trans-Composite Cipher}によって解読されている．Mitchell Cryptsystemsの弱点は主に二つある．一つ目はルービックキューブの角にある３マスは常に同じ位置関係にあること，二つ目は暗号文に使用される文字が平文の中にあることである．本論文のcubing暗号はこれらの弱点に対して対策を行った．\\
 二つ目はScrambling algorithm for encryption of text using cube rotation artificial intelligence technique\cite{Scrambling algorithm}という論文である．こちらの論文でもルービックキューブを用いた暗号が使用されている．但し，この論文ではルービックキューブの転置に対して人工知能を用いている．これにより暗号文は平文と比べ完全にスクランブルされると書かれている．しかし，暗号文の中に平文の文字が入った状態となってしまう他，改竄検知ができない．そこで，cubing暗号ではこれらに関して対策を行った．
-
 
 \section{まとめ}
 
@@ -281,9 +296,6 @@ S1に存在する文字は\(4\times6=24\)文字，S2に存在する文字は\(4\
 \subsection{攻撃対策に関して}
 本論文では主要な攻撃手法であるブルートフォース攻撃・頻度分析・選択平文攻撃・replay攻撃に関して，暗号の安全性の検証を行った．その結果，ブルートフォース攻撃に対しては最悪時間計算量が指数時間になるため，実用的ではないと判断できる．頻度分析に対しては暗号文がマスクされている上，たとえマスクが外されてもコンピュータ上で平文と予測した文字列が正しい平文であるという判定ができない．よって頻度分析も有用ではない．そして，選択平文攻撃に対してはマスク処理が施されており，マスクによって暗号文の各文字はランダムな値になる．最後に，replay攻撃に対しては，暗号文ブロックはシャッフルされるので，replay攻撃が成立する確率はブロック数を\(N\)，すり替えたいブロック数を\(M\)とすると，\(\dfrac{1}{N^M}\)である．これは実用的ではない．\\
 以上の結果から本暗号は以前から存在するルービックキューブによる転置式暗号の脆弱性を対策し，より安全な暗号の作成に成功した．
-
-\subsection{問題点}
-cubing暗号は平文長が45Byteで暗号文長が54Byteである．cubing暗号を\(n\) (\(0 < n \leq 62^2\))ブロック暗号化すると，暗号文長は\(54n\)Byteになる．ここでcubingmodeを使用すると，mask処理によって１ブロック当たり52Byteのマスクが付与される．よって\(n\)ブロックの暗号化で出力されるデータ量は\(54n+52n=106n\)Byteである．これは平文長と比較して非常に多い．そこで，今後マスクは乱数であるシード値だけを暗号文に付加し，シード値から全てのマスクを生成できる多項式を選定し，cubingmodeのアルゴリズムに導入しようと考えている．
 
 \section{謝辞}
 本研究を進めるに当たり、サイボウズ・ラボ株式会社 緑川 志穂氏からは多大な助言を賜り，また丁寧に指導して下さいました。厚く感謝を申し上げます。また暗号の解読やアルゴリズム修正等を快く協力して頂いたセキュリティ・キャンプ2019集中開発コース標準ゼミのメンターの皆さま，及び様々な助言を頂きました受講生の皆さまにも感謝の意を表します．
