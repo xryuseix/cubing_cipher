@@ -12,5 +12,7 @@ plt.ylim(0, 100)
 
 # 表示
 plt.plot(train_x,train_y,'o')
+plt.xlabel('Key length [characters]')
+plt.ylabel('Transposition rate [%]')
 # plt.show()
 plt.savefig('figure.png')
