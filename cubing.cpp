@@ -791,35 +791,3 @@ void usecubing_de(){
     }
 }
 
-// int main(int ac, char **av) {
-
-//     srand((unsigned) time(NULL));
-
-//     printf("\n----unit_test----\n");
-//     unit_test();
-
-//     printf("\n----en_decode_test(Cube)----\n");
-//     en_decode_test();
-
-//     printf("\n----encrypt_test----\n");
-//     encrypt_test();
-
-//     printf("\n----decrypt_test----\n");
-//     decrypt_test();
-
-//     printf("\n----encoding_test----\n");
-//     encoding_test();
-
-//     printf("\n----cubingmode_ende_test----\n");
-//     cubingmode_ende_test();
-
-//     printf("\n----encode_decode_test(cubingmode)----\n");
-//     encode_decode_test();
-
-//     usecubing_en();
-
-//     usecubing_de();
-
-
-//     return 0;
-// }
