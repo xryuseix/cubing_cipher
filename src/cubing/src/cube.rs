@@ -19,8 +19,25 @@ impl Cube {
         let mut tmp: u8;
         let col = (key.column - 1) as usize;
         match key.direction {
-            1 => Ok(()),
-            2 => {
+            0 => {
+                for _k in 0..key.times * 3 {
+                    tmp = self.cubing[0 + col];
+                    self.cubing[0 + col] = self.cubing[3 + col];
+                    self.cubing[3 + col] = self.cubing[6 + col];
+                    self.cubing[6 + col] = self.cubing[12 + col];
+                    self.cubing[12 + col] = self.cubing[24 + col];
+                    self.cubing[24 + col] = self.cubing[36 + col];
+                    self.cubing[36 + col] = self.cubing[45 + col];
+                    self.cubing[45 + col] = self.cubing[48 + col];
+                    self.cubing[48 + col] = self.cubing[51 + col];
+                    self.cubing[51 + col] = self.cubing[44 - col];
+                    self.cubing[44 - col] = self.cubing[32 - col];
+                    self.cubing[32 - col] = self.cubing[20 - col];
+                    self.cubing[20 - col] = tmp;
+                }
+                Ok(())
+            }
+            1 => {
                 for _k in 0..key.times * 3 {
                     tmp = self.cubing[9 + 12 * col];
                     for m in 0..11 {
@@ -30,8 +47,25 @@ impl Cube {
                 }
                 Ok(())
             }
-            3 => Ok(()),
-            _ => bail!("[ERROR] invalid operation.")
+            2 => {
+                for _k in 0..key.times * 3 {
+                    tmp = self.cubing[6 - 3 * col];
+                    self.cubing[6 - 3 * col] = self.cubing[7 - 3 * col];
+                    self.cubing[7 - 3 * col] = self.cubing[8 - 3 * col];
+                    self.cubing[8 - 3 * col] = self.cubing[15 + col];
+                    self.cubing[15 + col] = self.cubing[27 + col];
+                    self.cubing[27 + col] = self.cubing[39 + col];
+                    self.cubing[39 + col] = self.cubing[47 + 3 * col];
+                    self.cubing[47 + 3 * col] = self.cubing[46 + 3 * col];
+                    self.cubing[46 + 3 * col] = self.cubing[45 + 3 * col];
+                    self.cubing[45 + 3 * col] = self.cubing[35 - col];
+                    self.cubing[35 - col] = self.cubing[23 - col];
+                    self.cubing[23 - col] = self.cubing[11 - col];
+                    self.cubing[11 - col] = tmp;
+                }
+                Ok(())
+            }
+            _ => bail!("[ERROR] invalid operation."),
         }
     }
 
@@ -40,78 +74,65 @@ impl Cube {
     }
 }
 
-// struct Cube {
-//     char cubing[54];
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-//     Cube (const char (&str)[54]) {
-//         for(int i = 0; i < 54; i++) {
-//             cubing[i] = str[i];
-//         }
-//     }
+    fn get_test_arr() -> [u8; 54] {
+        let arr: [u8; 54] = [
+            97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114,
+            115, 116, 117, 118, 119, 120, 121, 122, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76,
+            77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 33, 63,
+        ];
+        return arr;
+    }
 
-//     void rotate(const CubeOP &key) {
-//         char letter;
-//         int col = key.column - 1;
-//         if(key.direction == 1) { // 方向 // 縦方向
-//             for(int k = 0; k < key.times*3; k++) { // 回数
-
-//                 letter = cubing[0 + col]; // colは転値対象列(0~2)
-//                 cubing[0 + col] = cubing[3 + col];
-//                 cubing[3 + col] = cubing[6 + col];
-//                 cubing[6 + col] = cubing[12 + col];
-//                 cubing[12 + col] = cubing[24 + col];
-//                 cubing[24 + col] = cubing[36 + col];
-//                 cubing[36 + col] = cubing[45 + col];
-//                 cubing[45 + col] = cubing[48 + col];
-//                 cubing[48 + col] = cubing[51 + col];
-//                 cubing[51 + col] = cubing[44 - col];
-//                 cubing[44 - col] = cubing[32 - col];
-//                 cubing[32 - col] = cubing[20 - col];
-//                 cubing[20 - col] = letter;
-
-//             }
-//         } else if(key.direction == 2){ // 横方向
-//             for(int k = 0; k < key.times*3; k++) { // 回数
-//                 letter = cubing[9 + 12*col];
-//                 for(int m = 0; m < 11; m++) {
-//                     cubing[9 + 12*col + m] = cubing[10 + 12*col + m];
-//                 }
-//                 cubing[20 + 12*col] = letter;
-//             }
-//         } else if(key.direction == 3) { // 回転方向
-//             for(int k = 0; k < key.times*3; k++) { // 回数
-//                 letter = cubing[6 - 3*col];
-//                 cubing[6 - 3*col] = cubing[7 - 3*col];
-//                 cubing[7 - 3*col] = cubing[8 - 3*col];
-//                 cubing[8 - 3*col] = cubing[15 + col];
-//                 cubing[15 + col] = cubing[27 + col];
-//                 cubing[27 + col] = cubing[39 + col];
-//                 cubing[39 + col] = cubing[47 + 3*col];
-//                 cubing[47 + 3*col] = cubing[46 + 3*col];
-//                 cubing[46 + 3*col] = cubing[45 + 3*col];
-//                 cubing[45 + 3*col] = cubing[35 - col];
-//                 cubing[35 - col] = cubing[23 - col];
-//                 cubing[23 - col] = cubing[11 - col];
-//                 cubing[11 - col] = letter;
-//             }
-//         }
-//     }
-
-//     bool equals (const Cube& a) const {
-//         bool equal = true;
-//         for(int i = 0; i < 54; i++) {
-//             if(cubing[i] != a.cubing[i]) {
-//                 equal = false;
-//                 break;
-//             }
-//         }
-//         return equal;
-//     }
-
-//     void print() const {
-//         for(int i = 0; i < 54; i++) {
-//             printf("%c", cubing[i]);
-//         }
-//         printf("\n");
-//     }
-// };
+    #[test]
+    fn rotate_tate_test() {
+        let expect: [u8; 54] = [
+            97, 110, 99, 100, 122, 102, 103, 76, 105, 106, 107, 108, 109, 85, 111, 112, 113, 114,
+            115, 104, 117, 118, 119, 120, 121, 88, 65, 66, 67, 68, 69, 101, 71, 72, 73, 74, 75, 33,
+            77, 78, 79, 80, 81, 98, 83, 84, 82, 86, 87, 70, 89, 90, 116, 63,
+        ];
+        let mut cube = Cube::new(get_test_arr());
+        let key = CubeOP {
+            direction: 0,
+            column: 2,
+            times: 1,
+        };
+        cube.rotate(key).unwrap();
+        assert_eq!(cube.cubing, expect);
+    }
+    #[test]
+    fn rotate_yoko_test() {
+        let expect: [u8; 54] = [
+            97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114,
+            115, 116, 117, 121, 122, 65, 66, 67, 68, 69, 70, 71, 118, 119, 120, 72, 73, 74, 75, 76,
+            77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 33, 63,
+        ];
+        let mut cube = Cube::new(get_test_arr());
+        let key = CubeOP {
+            direction: 1,
+            column: 2,
+            times: 1,
+        };
+        cube.rotate(key).unwrap();
+        assert_eq!(cube.cubing, expect);
+    }
+    #[test]
+    fn rotate_soto_test() {
+        let expect: [u8; 54] = [
+            97, 98, 99, 113, 67, 79, 103, 104, 105, 106, 102, 108, 109, 110, 111, 112, 89, 114,
+            115, 116, 117, 118, 101, 120, 121, 122, 65, 66, 88, 68, 69, 70, 71, 72, 100, 74, 75,
+            76, 77, 78, 87, 80, 81, 82, 83, 84, 85, 86, 107, 119, 73, 90, 33, 63,
+        ];
+        let mut cube = Cube::new(get_test_arr());
+        let key = CubeOP {
+            direction: 2,
+            column: 2,
+            times: 1,
+        };
+        cube.rotate(key).unwrap();
+        assert_eq!(cube.cubing, expect);
+    }
+}
