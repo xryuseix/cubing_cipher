@@ -1,18 +1,16 @@
-use cubing::decrypt;
-use cubing::encode;
-use cubing::encrypt;
+use cubing::cube;
+// use cubing::decrypt;
+// use cubing::encode;
+// use cubing::encrypt;
 // use cubing::utils;
 
 fn main() {
-    println!(
-        "{}",
-        encode::binary_to_str(&vec![
-            vec![0, 1, 0, 0, 0, 0, 0, 1],
-            vec![0, 1, 0, 0, 0, 0, 1, 0],
-            vec![0, 1, 0, 0, 0, 0, 1, 1]
-        ])
-        .unwrap()
-    );
+    let mut arr: [u8; 54] = [0; 54];
+    for i in 0..54 {
+        arr[i] = i as u8;
+    }
+    let cube = cube::Cube::new(arr);
+    cube.print_cube();
 }
 
 #[cfg(test)]
