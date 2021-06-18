@@ -1,5 +1,6 @@
 use anyhow::{bail, Result};
 
+#[derive(Clone, Debug)]
 pub struct CubeOP {
     pub direction: u8,
     pub column: u8,
@@ -20,6 +21,7 @@ impl Cube {
         let col = key.column as usize;
         match key.direction {
             0 => {
+                // 置換は位置を一つスライドするだけなので3回やる
                 for _k in 0..key.times * 3 {
                     tmp = self.cubing[0 + col];
                     self.cubing[0 + col] = self.cubing[3 + col];
