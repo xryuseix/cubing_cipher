@@ -53,6 +53,16 @@ pub fn binary_to_str(bin: &Vec<Vec<u8>>) -> Result<String, anyhow::Error> {
     Ok(s)
 }
 
+/* 文字列を配列へ変換する */
+pub fn str_to_arr(s: String) -> [u8; 54] {
+    let mut arr: [u8; 54] = [0; 54];
+    let tmp: Vec<u8> = s.into_bytes();
+    for i in 0..tmp.len() {
+        arr[i] = tmp[i];
+    }
+    return arr;
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -102,5 +112,15 @@ mod tests {
             binary_to_str(&str_to_binary("ABC").unwrap()).unwrap(),
             "ABC".to_string()
         );
+    }
+
+    #[test]
+    fn str_to_arr_test() {
+        let s = "ABC".to_string();
+        let mut expected: [u8; 54] = [0; 54];
+        expected[0] = 65;
+        expected[1] = 66;
+        expected[2] = 67;
+        assert_eq!(str_to_arr(s), expected);
     }
 }
