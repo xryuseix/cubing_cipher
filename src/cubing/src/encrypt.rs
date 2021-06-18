@@ -32,7 +32,11 @@ mod tests {
         assert_eq!(encrypt(plain_arr, &key), cipher_arr);
     }
 
-    fn encrypt_str_test_func(plain_text: String, cipher_text: String, key: [cube::CubeOP; 1]) -> bool {
+    fn encrypt_str_test_func(
+        plain_text: String,
+        cipher_text: String,
+        key: [cube::CubeOP; 1],
+    ) -> bool {
         let mut plain_arr: [u8; 54] = [0; 54];
         let mut cipher_arr: [u8; 54] = [0; 54];
         let tmp: Vec<u8> = plain_text.into_bytes();
@@ -65,73 +69,73 @@ mod tests {
         }];
         assert!(encrypt_str_test_func(plain_text2, cipher_text2, key2));
     }
-    // #[test]
-    // fn encrypt_test() {
-    //     let plain_text = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!?".to_string();
-    //     let cipher_text = "abVqzIghp?fujWQmYcMdrvwxyXEBCDAeGHnJKLsNtPoRSTUlkFOZ!i".to_string();
-    //     // TODO: ここどうにかならないのかな
-    //     let key: [cube::CubeOP; 10] = [
-    //         cube::CubeOP {
-    //             direction: 1,
-    //             column: 1,
-    //             times: 2,
-    //         },
-    //         cube::CubeOP {
-    //             direction: 2,
-    //             column: 1,
-    //             times: 2,
-    //         },
-    //         cube::CubeOP {
-    //             direction: 0,
-    //             column: 2,
-    //             times: 2,
-    //         },
-    //         cube::CubeOP {
-    //             direction: 1,
-    //             column: 0,
-    //             times: 2,
-    //         },
-    //         cube::CubeOP {
-    //             direction: 0,
-    //             column: 2,
-    //             times: 0,
-    //         },
-    //         cube::CubeOP {
-    //             direction: 2,
-    //             column: 1,
-    //             times: 1,
-    //         },
-    //         cube::CubeOP {
-    //             direction: 1,
-    //             column: 1,
-    //             times: 0,
-    //         },
-    //         cube::CubeOP {
-    //             direction: 1,
-    //             column: 0,
-    //             times: 2,
-    //         },
-    //         cube::CubeOP {
-    //             direction: 1,
-    //             column: 0,
-    //             times: 0,
-    //         },
-    //         cube::CubeOP {
-    //             direction: 0,
-    //             column: 2,
-    //             times: 1,
-    //         },
-    //     ];
-    //     let mut plain_arr: [u8; 54] = [0; 54];
-    //     let mut cipher_arr: [u8; 54] = [0; 54];
-    //     let tmp: Vec<u8> = plain_text.into_bytes();
-    //     for i in 0..54 {
-    //         plain_arr[i] = tmp[i];
-    //     }
-    //     let tmp: Vec<u8> = cipher_text.into_bytes();
-    //     for i in 0..54 {
-    //         cipher_arr[i] = tmp[i];
-    //     }
-    //     assert_eq!(encrypt(plain_arr, &key), cipher_arr);
-    // }
+    #[test]
+    fn encrypt_test() {
+        let plain_text = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!?".to_string();
+        let cipher_text = "abVqzIghp?fujWQmYcMdrvwxyXEBCDAeGHnJKLsNtPoRSTUlkFOZ!i".to_string();
+        // TODO: ここどうにかならないのかな
+        let key: [cube::CubeOP; 10] = [
+            cube::CubeOP {
+                direction: 1,
+                column: 1,
+                times: 3,
+            },
+            cube::CubeOP {
+                direction: 2,
+                column: 1,
+                times: 3,
+            },
+            cube::CubeOP {
+                direction: 0,
+                column: 2,
+                times: 3,
+            },
+            cube::CubeOP {
+                direction: 1,
+                column: 0,
+                times: 3,
+            },
+            cube::CubeOP {
+                direction: 0,
+                column: 2,
+                times: 1,
+            },
+            cube::CubeOP {
+                direction: 2,
+                column: 1,
+                times: 2,
+            },
+            cube::CubeOP {
+                direction: 1,
+                column: 1,
+                times: 1,
+            },
+            cube::CubeOP {
+                direction: 1,
+                column: 0,
+                times: 3,
+            },
+            cube::CubeOP {
+                direction: 1,
+                column: 0,
+                times: 1,
+            },
+            cube::CubeOP {
+                direction: 0,
+                column: 2,
+                times: 2,
+            },
+        ];
+        let mut plain_arr: [u8; 54] = [0; 54];
+        let mut cipher_arr: [u8; 54] = [0; 54];
+        let tmp: Vec<u8> = plain_text.into_bytes();
+        for i in 0..54 {
+            plain_arr[i] = tmp[i];
+        }
+        let tmp: Vec<u8> = cipher_text.into_bytes();
+        for i in 0..54 {
+            cipher_arr[i] = tmp[i];
+        }
+        assert_eq!(encrypt(plain_arr, &key), cipher_arr);
+    }
 }
