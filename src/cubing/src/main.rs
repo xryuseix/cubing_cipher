@@ -55,11 +55,11 @@ mod tests {
             times: 1,
         }];
         assert_eq!(
-            decrypt::decrypt(
+            encode::arr_to_str(decrypt::decrypt(
                 encrypt::encrypt(encode::str_to_arr(plain_text.clone()), &key),
                 &key
-            ),
-            encode::str_to_arr(plain_text.clone())
+            )),
+            plain_text.clone()
         );
     }
 }

@@ -63,6 +63,16 @@ pub fn str_to_arr(s: String) -> [u8; 54] {
     return arr;
 }
 
+/* 配列を文字列へ変換する */
+pub fn arr_to_str(arr: [u8; 54]) -> String {
+    let mut s = "".to_string();
+    for d in arr.iter() {
+        // s += &((d as char).to_string());
+        s += std::str::from_utf8(&[*d]).unwrap();
+    }
+    return s;
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -122,5 +132,26 @@ mod tests {
         expected[1] = 66;
         expected[2] = 67;
         assert_eq!(str_to_arr(s), expected);
+    }
+
+    #[test]
+    fn arr_to_str_test() {
+        let mut arr: [u8; 54] = [0; 54];
+        arr[0] = 65;
+        arr[1] = 66;
+        arr[2] = 67;
+        let expected = "ABC".to_string();
+        assert_eq!(&arr_to_str(arr)[..3], expected);
+    }
+
+    #[test]
+    fn convert_arr_and_str_test() {
+        let s = "ABC".to_string();
+        let mut arr: [u8; 54] = [0; 54];
+        arr[0] = 65;
+        arr[1] = 66;
+        arr[2] = 67;
+        let expected = "ABC".to_string();
+        assert_eq!(&arr_to_str(str_to_arr(s))[..3], expected);
     }
 }
