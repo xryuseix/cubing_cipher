@@ -13,6 +13,7 @@ pub fn decrypt(plain_text: [u8; 54], key: &[cube::CubeOP]) -> [u8; 54] {
 #[cfg(test)]
 mod tests {
     use super::*;
+    pub use crate::encode;
 
     #[test]
     fn decrypt_once_test() {
@@ -34,23 +35,6 @@ mod tests {
         assert_eq!(decrypt(cipher_arr, &key), plain_arr);
     }
 
-    fn decrypt_str_test_func(
-        plain_text: String,
-        cipher_text: String,
-        key: [cube::CubeOP; 1],
-    ) -> bool {
-        let mut plain_arr: [u8; 54] = [0; 54];
-        let mut cipher_arr: [u8; 54] = [0; 54];
-        let tmp: Vec<u8> = plain_text.into_bytes();
-        for i in 0..54 {
-            plain_arr[i] = tmp[i];
-        }
-        let tmp: Vec<u8> = cipher_text.into_bytes();
-        for i in 0..54 {
-            cipher_arr[i] = tmp[i];
-        }
-        return decrypt(cipher_arr, &key) == plain_arr;
-    }
     #[test]
     fn encrypt_str_once_test() {
         let plain_text1 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!?".to_string();
@@ -60,7 +44,10 @@ mod tests {
             column: 1,
             times: 1,
         }];
-        assert!(decrypt_str_test_func(plain_text1, cipher_text1, key1));
+        assert_eq!(
+            decrypt(encode::str_to_arr(cipher_text1), &key1),
+            encode::str_to_arr(plain_text1)
+        );
 
         let plain_text2 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!?".to_string();
         let cipher_text2 = "abcdefghistujklmnopqrvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!?".to_string();
@@ -69,7 +56,10 @@ mod tests {
             column: 0,
             times: 3,
         }];
-        assert!(decrypt_str_test_func(plain_text2, cipher_text2, key2));
+        assert_eq!(
+            decrypt(encode::str_to_arr(cipher_text2), &key2),
+            encode::str_to_arr(plain_text2)
+        );
     }
 
     #[test]
@@ -129,16 +119,9 @@ mod tests {
                 times: 2,
             },
         ];
-        let mut plain_arr: [u8; 54] = [0; 54];
-        let mut cipher_arr: [u8; 54] = [0; 54];
-        let tmp: Vec<u8> = plain_text.into_bytes();
-        for i in 0..54 {
-            plain_arr[i] = tmp[i];
-        }
-        let tmp: Vec<u8> = cipher_text.into_bytes();
-        for i in 0..54 {
-            cipher_arr[i] = tmp[i];
-        }
-        assert_eq!(decrypt(cipher_arr, &key), plain_arr);
+        assert_eq!(
+            decrypt(encode::str_to_arr(cipher_text), &key),
+            encode::str_to_arr(plain_text)
+        );
     }
 }
