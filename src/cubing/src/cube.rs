@@ -1,13 +1,13 @@
 use anyhow::{bail, Result};
 
 pub struct CubeOP {
-    direction: u8,
-    column: u8,
-    times: u8,
+    pub direction: u8,
+    pub column: u8,
+    pub times: u8,
 }
 
 pub struct Cube {
-    cubing: [u8; 54],
+    pub cubing: [u8; 54],
 }
 
 impl Cube {
@@ -15,9 +15,9 @@ impl Cube {
         Cube { cubing: cubing }
     }
 
-    pub fn rotate(&mut self, key: CubeOP) -> Result<(), anyhow::Error> {
+    pub fn rotate(&mut self, key: &CubeOP) -> Result<(), anyhow::Error> {
         let mut tmp: u8;
-        let col = (key.column - 1) as usize;
+        let col = key.column as usize;
         match key.direction {
             0 => {
                 for _k in 0..key.times * 3 {
@@ -97,10 +97,10 @@ mod tests {
         let mut cube = Cube::new(get_test_arr());
         let key = CubeOP {
             direction: 0,
-            column: 2,
+            column: 1,
             times: 1,
         };
-        cube.rotate(key).unwrap();
+        cube.rotate(&key).unwrap();
         assert_eq!(cube.cubing, expect);
     }
     #[test]
@@ -113,10 +113,10 @@ mod tests {
         let mut cube = Cube::new(get_test_arr());
         let key = CubeOP {
             direction: 1,
-            column: 2,
+            column: 1,
             times: 1,
         };
-        cube.rotate(key).unwrap();
+        cube.rotate(&key).unwrap();
         assert_eq!(cube.cubing, expect);
     }
     #[test]
@@ -129,10 +129,10 @@ mod tests {
         let mut cube = Cube::new(get_test_arr());
         let key = CubeOP {
             direction: 2,
-            column: 2,
+            column: 1,
             times: 1,
         };
-        cube.rotate(key).unwrap();
+        cube.rotate(&key).unwrap();
         assert_eq!(cube.cubing, expect);
     }
 }

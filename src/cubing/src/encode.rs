@@ -5,8 +5,8 @@ pub fn get_typename<T>(_: T) -> &'static str {
     return std::any::type_name::<T>();
 }
 
-/* 多分使わん */
-pub fn char_to_binary(c: char) -> Result<i32, anyhow::Error> {
+/* charをintへ変換 */
+pub fn char_to_int(c: char) -> Result<i32, anyhow::Error> {
     let res = c as i32 - '0' as i32;
     match 0 <= res && res < 10 {
         true => Ok(res),
@@ -58,12 +58,12 @@ mod tests {
     use super::*;
 
     #[test]
-    fn char_to_binary_test() {
-        assert_eq!(char_to_binary('0').unwrap(), 0);
-        assert_eq!(char_to_binary('1').unwrap(), 1);
-        assert_ne!(char_to_binary('1').unwrap(), 0);
+    fn char_to_int_test() {
+        assert_eq!(char_to_int('0').unwrap(), 0);
+        assert_eq!(char_to_int('1').unwrap(), 1);
+        assert_ne!(char_to_int('1').unwrap(), 0);
         assert_eq!(
-            get_typename(char_to_binary('-')),
+            get_typename(char_to_int('-')),
             "core::result::Result<i32, anyhow::Error>"
         );
     }
