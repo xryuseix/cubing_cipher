@@ -3,15 +3,12 @@
 // use cubing::encrypt;
 // use cubing::encode;
 // use cubing::utils;
+use cubing::key;
+
+
 
 fn main() {
-    let plain_text = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!?";
-    let b: Vec<u8> = plain_text.to_string().into_bytes();
-    let mut c: [u8; 54] = [0; 54];
-    for i in 0..54 {
-        c[i] = b[i];
-    }
-    println!("{:?}", b);
+    println!("{:?}", key::generate(10));
 }
 
 #[cfg(test)]
