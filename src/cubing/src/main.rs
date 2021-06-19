@@ -3,12 +3,12 @@
 // use cubing::encrypt;
 // use cubing::encode;
 // use cubing::utils;
-use cubing::key;
+// use cubing::key;
 
 
 
 fn main() {
-    println!("{:?}", key::generate(10));
+    // println!("{:?}", key::generate(10));
 }
 
 #[cfg(test)]
@@ -25,7 +25,7 @@ mod tests {
             115, 116, 117, 118, 119, 120, 121, 122, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76,
             77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 33, 63,
         ];
-        let key: [cube::CubeOP; 2] = [
+        let key: Vec<cube::CubeOP> = vec![
             cube::CubeOP {
                 direction: 0,
                 column: 1,
@@ -46,7 +46,7 @@ mod tests {
     #[test]
     fn encrypt_decrypt_test() {
         let plain_text = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!?".to_string();
-        let key: [cube::CubeOP; 1] = [cube::CubeOP {
+        let key: Vec<cube::CubeOP> = vec![cube::CubeOP {
             direction: 0,
             column: 1,
             times: 1,

@@ -1,6 +1,6 @@
 pub use crate::cube;
 
-pub fn encrypt(plain_text: [u8; 54], key: &[cube::CubeOP]) -> [u8; 54] {
+pub fn encrypt(plain_text: [u8; 54], key: &Vec<cube::CubeOP>) -> [u8; 54] {
     let mut cube = cube::Cube::new(plain_text);
     for k in key {
         cube.rotate(k).unwrap();
@@ -25,7 +25,7 @@ mod tests {
             115, 104, 117, 118, 119, 120, 121, 88, 65, 66, 67, 68, 69, 101, 71, 72, 73, 74, 75, 33,
             77, 78, 79, 80, 81, 98, 83, 84, 82, 86, 87, 70, 89, 90, 116, 63,
         ];
-        let key: [cube::CubeOP; 1] = [cube::CubeOP {
+        let key: Vec<cube::CubeOP> = vec![cube::CubeOP {
             direction: 0,
             column: 1,
             times: 1,
@@ -47,7 +47,7 @@ mod tests {
             77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 33, 63,
         ];
 
-        let key: [cube::CubeOP; 1] = [cube::CubeOP {
+        let key: Vec<cube::CubeOP> = vec![cube::CubeOP {
             direction: 0,
             column: 1,
             times: 4,
@@ -68,14 +68,14 @@ mod tests {
             115, 116, 117, 118, 119, 120, 121, 122, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76,
             77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 33, 63,
         ];
-        let key1: [cube::CubeOP; 1] = [cube::CubeOP {
+        let key1: Vec<cube::CubeOP> = vec![cube::CubeOP {
             direction: 0,
             column: 1,
             times: 1,
         }];
         let encrypted_arr: [u8; 54] = encrypt(plain_arr, &key1);
 
-        let key2: [cube::CubeOP; 1] = [cube::CubeOP {
+        let key2: Vec<cube::CubeOP> = vec![cube::CubeOP {
             direction: 0,
             column: 1,
             times: 3,
@@ -87,7 +87,7 @@ mod tests {
     fn encrypt_str_once_test() {
         let plain_text1 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!?".to_string();
         let cipher_text1 = "ancdzfgLijklmUopqrshuvwxyXABCDEeGHIJK!MNOPQbSTRVWFYZt?".to_string();
-        let key1: [cube::CubeOP; 1] = [cube::CubeOP {
+        let key1: Vec<cube::CubeOP> = vec![cube::CubeOP {
             direction: 0,
             column: 1,
             times: 1,
@@ -99,7 +99,7 @@ mod tests {
 
         let plain_text2 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!?".to_string();
         let cipher_text2 = "abcdefghistujklmnopqrvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!?".to_string();
-        let key2: [cube::CubeOP; 1] = [cube::CubeOP {
+        let key2: Vec<cube::CubeOP> = vec![cube::CubeOP {
             direction: 1,
             column: 0,
             times: 3,
@@ -114,7 +114,7 @@ mod tests {
         let plain_text = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!?".to_string();
         let cipher_text = "abVqzIghp?fujWQmYcMdrvwxyXEBCDAeGHnJKLsNtPoRSTUlkFOZ!i".to_string();
         // TODO: ここどうにかならないのかな
-        let key: [cube::CubeOP; 10] = [
+        let key: Vec<cube::CubeOP> = vec![
             cube::CubeOP {
                 direction: 1,
                 column: 1,
