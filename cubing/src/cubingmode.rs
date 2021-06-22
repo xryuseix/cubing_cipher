@@ -7,9 +7,7 @@ use rand::Rng;
 */
 pub fn padding(mut text: Vec<u8>) -> Vec<u8> {
     if text.len() % 45 != 0 {
-        for _ in 0..8 {
-            text.push(0);
-        }
+        text.push(0);
     }
     let mut rng = rand::thread_rng();
     while text.len() % 45 != 0 {
@@ -21,7 +19,7 @@ pub fn padding(mut text: Vec<u8>) -> Vec<u8> {
 /*
   * 固定長の平文をブロック単位で分割する
   * @param text 平文
-  * @return 45 Byte単位のブロック列
+  * @return 45 Byte単位の平文ブロック
 */
 pub fn block_unit_division(mut text: Vec<u8>) -> Vec<Vec<u8>> {
     let mut blocks: Vec<Vec<u8>> = Vec::new();
@@ -32,20 +30,30 @@ pub fn block_unit_division(mut text: Vec<u8>) -> Vec<Vec<u8>> {
     blocks
 }
 
+/*
+  * 1回目のmaskをかける
+  * 乱数とのXORをとる
+  * @param text 平文ブロック
+  * @return maskをかけた平文ブロック
+*/
+// pub fn mask_1(mut text: Vec<u8>) -> Vec<u8> {
+    
+// }
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn padding_test() {
-        let text = vec![0; 20];
-        let mut expected = vec![0; 20];
-        let zero = vec![0; 8];
-        let pad = vec![0; 17];
-        expected.extend(&zero);
+        let text = vec![1; 20];
+        let mut expected = vec![1; 20];
+        expected.push(0);
+        let pad = vec![0; 24];
         expected.extend(&pad);
         assert_eq!(padding(text.clone()).len(), 45);
-        assert_eq!(&padding(text.clone())[0..28], &expected[0..28]);
+        assert_eq!(&padding(text.clone())[0..21], &expected[0..21]);
     }
 
     #[test]
