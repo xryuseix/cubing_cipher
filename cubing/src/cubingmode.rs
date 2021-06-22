@@ -1,7 +1,7 @@
 use rand::Rng;
 
 /*
-  任意長の平文にパディングを付与して固定長にする
+  * 任意長の平文にパディングを付与して固定長にする
   * @param text 任意長の平文
   * @return 45の倍数長のパディング付与された平文
 */
@@ -19,7 +19,7 @@ pub fn padding(mut text: Vec<u8>) -> Vec<u8> {
 }
 
 /*
-  固定長の平文をブロック単位で分割する
+  * 固定長の平文をブロック単位で分割する
   * @param text 平文
   * @return 45 Byte単位のブロック列
 */
@@ -56,9 +56,9 @@ mod tests {
         }
         let mut expected = Vec::new();
         for i in 0..3 {
-            let mut block= Vec::new();
+            let mut block = Vec::new();
             for j in 0..45 {
-                block.push(i*45+j);
+                block.push(i * 45 + j);
             }
             expected.push(block);
         }

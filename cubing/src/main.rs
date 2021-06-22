@@ -76,7 +76,7 @@ mod tests {
     fn encrypt_decrypt_random_test() {
         for _ in 0..100 {
             let plain_text = gen_ascii_chars(54);
-            let key: Vec<cube::CubeOP> = key::generate(20);
+            let key: Vec<cube::CubeOP> = key::key_generate(20);
             assert_eq!(
                 encode::arr_to_str(decrypt::decrypt(
                     encrypt::encrypt(encode::str_to_arr(plain_text.clone()), &key),
