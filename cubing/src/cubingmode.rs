@@ -1,8 +1,8 @@
-use rand::Rng;
+pub use crate::key;
 use rand::rngs::ThreadRng;
+use rand::Rng;
 
-const CHARSET: &[u8] = b"
-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&()*+-./:;<=>?@[\\]^_`{|}~\n\0\t";
+const CHARSET: &[u8;98] = b"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ \n\0\t";
 
 /*
  * ランダム文字を生成する
@@ -12,6 +12,15 @@ const CHARSET: &[u8] = b"
 fn get_random_char(mut rng: ThreadRng) -> u8 {
     let idx = rng.gen_range(0..CHARSET.len());
     CHARSET[idx] as u8
+}
+
+/*
+ * CHARSETから指定した文字のインデックスを取得する
+ * @param インデックスを取得したい文字
+ * @return インデックス
+*/
+fn get_charset_index(c: char) -> u8 {
+    CHARSET.iter().position(|&r| r == c as u8).unwrap() as u8
 }
 
 /*
@@ -45,14 +54,18 @@ pub fn block_unit_division(mut text: Vec<u8>) -> Vec<Vec<u8>> {
 }
 
 /*
- * 1回目のmaskをかける
- * 乱数とのXORをとる
+ * maskをかける
  * @param text 平文ブロック
  * @return maskをかけた平文ブロック
 */
-// pub fn mask_1(mut text: Vec<u8>) -> Vec<u8> {
-
-// }
+pub fn to_masked(text: Vec<u8>, size: usize) -> Vec<u8> {
+    let mut masked_text = Vec::new();
+    let mask = key::mask_generate(size);
+    for i in 0..text.len() {
+        masked_text.push((get_charset_index(text[i] as char) + mask[i]) % CHARSET.len() as u8);
+    }
+    masked_text
+}
 
 #[cfg(test)]
 mod tests {
@@ -84,5 +97,12 @@ mod tests {
             expected.push(block);
         }
         assert_eq!(block_unit_division(text), expected);
+    }
+
+    #[test]
+    fn get_charset_index_test() {
+        assert_eq!(get_charset_index('0'), 0 as u8);
+        assert_eq!(get_charset_index('a'), 10 as u8);
+        assert_eq!(get_charset_index('!'), 62 as u8);
     }
 }
