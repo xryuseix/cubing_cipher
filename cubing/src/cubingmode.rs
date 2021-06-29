@@ -67,6 +67,31 @@ pub fn to_masked(text: Vec<u8>, size: usize) -> Vec<u8> {
     masked_text
 }
 
+/*
+ * エンコード処理
+ * ブロックの末尾に色々つける
+ * @param text maskをかけた平文ブロック
+ * @return エンコードした平文ブロック
+*/
+pub fn to_encoded(text: Vec<u8>, block_num: u8) -> Vec<u8> {
+    let mut encoded_text = text;
+    for i in 0..5 {
+        let mut sequence = 0;
+        for j in 9 * i..9 * i + 9 {
+            sequence += encoded_text[j] as u8;
+            sequence %= 26;
+        }
+        sequence = sequence % 26 + 97;
+        encoded_text.push(sequence);
+    }
+    encoded_text.push(CHARSET[(block_num / 62) as usize]);
+    encoded_text.push(CHARSET[(block_num % 62) as usize]);
+    let rng = rand::thread_rng();
+    encoded_text.push(get_random_char(rng.clone()));
+    encoded_text.push(get_random_char(rng.clone()));
+    encoded_text
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -104,5 +129,22 @@ mod tests {
         assert_eq!(get_charset_index('0'), 0 as u8);
         assert_eq!(get_charset_index('a'), 10 as u8);
         assert_eq!(get_charset_index('!'), 62 as u8);
+    }
+
+    #[test]
+    fn to_encoded_test() {
+        let mut v = Vec::new();
+        for i in 0..45 {
+            v.push(i as u8);
+        }
+        let mut expected = v.clone();
+        expected.push(107);
+        expected.push(110);
+        expected.push(113);
+        expected.push(116);
+        expected.push(119);
+        expected.push('1' as u8);
+        expected.push('3' as u8);
+        assert_eq!(&to_encoded(v, 65)[0..52], &expected[0..52]);
     }
 }

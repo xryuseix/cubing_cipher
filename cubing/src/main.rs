@@ -4,10 +4,9 @@
 // use cubing::encode;
 // use cubing::utils;
 // use cubing::key;
+// use cubing::cubingmode;
 
-fn main() {
-    // println!("{:?}", key::generate(10));
-}
+fn main() {}
 
 #[cfg(test)]
 mod tests {
