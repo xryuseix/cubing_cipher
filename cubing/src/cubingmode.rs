@@ -92,6 +92,23 @@ pub fn to_encoded(text: Vec<u8>, block_num: u8) -> Vec<u8> {
     encoded_text
 }
 
+/*
+ * 平文ブロックをシャッフルする
+ * @param blocks 複数の平文ブロック
+ * @return シャッフルした平文ブロック
+*/
+pub fn shuffle_blocks(mut blocks: Vec<Vec<u8>>) -> Vec<Vec<u8>> {
+    let mut rng = rand::thread_rng();
+    let mut t = Vec::default();
+    for i in (0..blocks.len()).rev() {
+        let idx = rng.gen_range(0..i + 1);
+        std::mem::swap(&mut blocks[idx], &mut t);
+        std::mem::swap(&mut blocks[i], &mut t);
+        std::mem::swap(&mut blocks[idx], &mut t);
+    }
+    blocks
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
