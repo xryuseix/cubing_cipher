@@ -4,30 +4,30 @@ use rand::Rng;
 
 const CHARSET: &[u8;98] = b"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ \n\0\t";
 
-/*
+/**
  * ランダム文字を生成する
  * @param rng 乱数発生器
  * @return ランダム文字
-*/
+ */
 fn get_random_char(mut rng: ThreadRng) -> u8 {
     let idx = rng.gen_range(0..CHARSET.len());
     CHARSET[idx] as u8
 }
 
-/*
+/**
  * CHARSETから指定した文字のインデックスを取得する
  * @param インデックスを取得したい文字
  * @return インデックス
-*/
+ */
 fn get_charset_index(c: char) -> u8 {
     CHARSET.iter().position(|&r| r == c as u8).unwrap() as u8
 }
 
-/*
+/**
  * 任意長の平文にパディングを付与して固定長にする
  * @param text 任意長の平文
  * @return 45の倍数長のパディング付与された平文
-*/
+ */
 pub fn padding(mut text: Vec<u8>) -> Vec<u8> {
     if text.len() % 45 != 0 {
         text.push(0);
@@ -39,11 +39,11 @@ pub fn padding(mut text: Vec<u8>) -> Vec<u8> {
     text
 }
 
-/*
+/**
  * 固定長の平文をブロック単位で分割する
  * @param text 平文
  * @return 45 Byte単位の平文ブロック
-*/
+ */
 pub fn block_unit_division(mut text: Vec<u8>) -> Vec<Vec<u8>> {
     let mut blocks: Vec<Vec<u8>> = Vec::new();
     for i in (0..text.len() / 45).rev() {
@@ -53,32 +53,32 @@ pub fn block_unit_division(mut text: Vec<u8>) -> Vec<Vec<u8>> {
     blocks
 }
 
-/*
+/**
  * maskをかける
  * @param text 平文ブロック
  * @return maskをかけた平文ブロック
-*/
-pub fn to_masked(text: Vec<u8>, size: usize) -> Vec<u8> {
+ */
+pub fn mask(text: Vec<u8>) -> Vec<u8> {
     let mut masked_text = Vec::new();
-    let mask = key::mask_generate(size);
+    let mask = key::mask_generate(text.len());
     for i in 0..text.len() {
         masked_text.push((get_charset_index(text[i] as char) + mask[i]) % CHARSET.len() as u8);
     }
     masked_text
 }
 
-/*
+/**
  * エンコード処理
  * ブロックの末尾に色々つける
  * @param text maskをかけた平文ブロック
  * @return エンコードした平文ブロック
-*/
-pub fn to_encoded(text: Vec<u8>, block_num: u8) -> Vec<u8> {
-    let mut encoded_text = text;
+ */
+pub fn encode(text: Vec<u8>, block_num: u8) -> Vec<u8> {
+    let mut encoded_text = Vec::default();
     for i in 0..5 {
         let mut sequence = 0;
         for j in 9 * i..9 * i + 9 {
-            sequence += encoded_text[j] as u8;
+            sequence += text[j] as u8;
             sequence %= 26;
         }
         sequence = sequence % 26 + 97;
@@ -92,11 +92,11 @@ pub fn to_encoded(text: Vec<u8>, block_num: u8) -> Vec<u8> {
     encoded_text
 }
 
-/*
+/**
  * 平文ブロックをシャッフルする
  * @param blocks 複数の平文ブロック
  * @return シャッフルした平文ブロック
-*/
+ */
 pub fn shuffle_blocks(mut blocks: Vec<Vec<u8>>) -> Vec<Vec<u8>> {
     let mut rng = rand::thread_rng();
     let mut t = Vec::default();
@@ -107,6 +107,23 @@ pub fn shuffle_blocks(mut blocks: Vec<Vec<u8>>) -> Vec<Vec<u8>> {
         std::mem::swap(&mut blocks[idx], &mut t);
     }
     blocks
+}
+
+/**
+ * 暗号化
+ * @param plain_text 平文
+ */
+fn encrypt(plain_text: Vec<u8>) -> Vec<Vec<u8>> {
+    let padded_text = padding(plain_text);
+    let masked_text = mask(padded_text);
+    let plain_blocks = block_unit_division(masked_text);
+    let mut encoded_blocks = Vec::default();
+    for (i, block) in plain_blocks.iter().enumerate() {
+        let mut encoded_block = block.to_vec();
+        encoded_block.append(&mut encode(block.to_vec(), i as u8));
+        encoded_blocks.push(encoded_block);
+    }
+    return shuffle_blocks(encoded_blocks);
 }
 
 #[cfg(test)]
@@ -149,19 +166,12 @@ mod tests {
     }
 
     #[test]
-    fn to_encoded_test() {
+    fn encode_test() {
         let mut v = Vec::new();
         for i in 0..45 {
             v.push(i as u8);
         }
-        let mut expected = v.clone();
-        expected.push(107);
-        expected.push(110);
-        expected.push(113);
-        expected.push(116);
-        expected.push(119);
-        expected.push('1' as u8);
-        expected.push('3' as u8);
-        assert_eq!(&to_encoded(v, 65)[0..52], &expected[0..52]);
+        let expected = vec![107, 110, 113, 116, 119, '1' as u8, '3' as u8];
+        assert_eq!(encode(v, 65)[0..7], expected[0..7]);
     }
 }
