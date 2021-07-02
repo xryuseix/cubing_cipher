@@ -1,3 +1,4 @@
+pub use crate::encrypt;
 pub use crate::key;
 use rand::rngs::ThreadRng;
 use rand::Rng;
@@ -73,14 +74,13 @@ pub fn masking(text: Vec<u8>) -> (Vec<u8>, Vec<u8>) {
  * @param text 平文ブロック
  * @return maskをかけた平文ブロック
  */
-pub fn unmask(text: Vec<u8>) -> Vec<u8> {
-    let mut masked_text = Vec::new();
-    let mask = key::mask_generate(text.len());
-    for i in 0..text.len() {
-        masked_text.push((get_charset_index(text[i] as char) + mask[i]) % CHARSET.len() as u8);
-    }
-    masked_text
-}
+// pub fn unmask(masked_text: Vec<u8>, mask: Vec<u8>) -> Vec<u8> {
+//     let mut text = masked_text;
+//     for i in 0..text.len() {
+//         masked_text.push((get_charset_index(text[i] as char) + mask[i]) % CHARSET.len() as u8);
+//     }
+//     masked_text
+// }
 
 /**
  * エンコード処理
@@ -128,20 +128,28 @@ pub fn shuffle_blocks(mut blocks: Vec<Vec<u8>>) -> Vec<Vec<u8>> {
  * 暗号化
  * @param plain_text 平文
  */
-pub fn encrypt(plain_text: Vec<u8>) -> (Vec<Vec<u8>>, Vec<u8>, Vec<u8>) {
+pub fn encrypt(
+    plain_text: Vec<u8>,
+    key: &Vec<key::cube::CubeOP>,
+) -> (Vec<Vec<u8>>, Vec<Vec<u8>>, Vec<Vec<u8>>) {
     let padded_text = padding(plain_text);
-    let (masked_text, mask1) = masking(padded_text);
-    let plain_blocks = block_unit_division(masked_text);
-    let mut encoded_blocks = Vec::default();
-    let mut mask2 = Vec::default();
+
+    let plain_blocks = block_unit_division(padded_text);
+    let mut encoded_blocks: Vec<Vec<u8>> = Vec::default();
+    let mut mask_blocks1: Vec<Vec<u8>> = Vec::default();
+    let mut mask_blocks2: Vec<Vec<u8>> = Vec::default();
+
     for (i, block) in plain_blocks.iter().enumerate() {
-        let mut encoded_block = block.to_vec();
-        let (mut masked_text, mask) = masking(encode(block.to_vec(), i as u8));
-        encoded_block.append(&mut masked_text);
-        encoded_blocks.push(encoded_block);
-        mask2 = mask;
+        let (mut masked_block, mask1) = masking(block.to_vec());
+        let encoded_tail = encode(masked_block.clone(), i as u8);
+        let (mut masked_tail, mask2) = masking(encoded_tail);
+        masked_block.append(&mut masked_tail);
+        encoded_blocks.push(encrypt::encrypt(masked_block, key));
+
+        mask_blocks1.push(mask1);
+        mask_blocks2.push(mask2);
     }
-    return (shuffle_blocks(encoded_blocks), mask1, mask2);
+    return (shuffle_blocks(encoded_blocks), mask_blocks1, mask_blocks2);
 }
 
 #[cfg(test)]

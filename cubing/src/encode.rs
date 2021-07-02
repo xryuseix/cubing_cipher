@@ -54,8 +54,8 @@ pub fn binary_to_str(bin: &Vec<Vec<u8>>) -> Result<String, anyhow::Error> {
 }
 
 /* 文字列を配列へ変換する */
-pub fn str_to_arr(s: String) -> [u8; 54] {
-    let mut arr: [u8; 54] = [0; 54];
+pub fn str_to_arr(s: String) -> Vec<u8> {
+    let mut arr = vec![0; 54];
     let tmp: Vec<u8> = s.into_bytes();
     for i in 0..tmp.len() {
         arr[i] = tmp[i];
@@ -64,7 +64,7 @@ pub fn str_to_arr(s: String) -> [u8; 54] {
 }
 
 /* 配列を文字列へ変換する */
-pub fn arr_to_str(arr: [u8; 54]) -> String {
+pub fn arr_to_str(arr: Vec<u8>) -> String {
     let mut s = "".to_string();
     for d in arr.iter() {
         // s += &((d as char).to_string());
@@ -136,22 +136,22 @@ mod tests {
 
     #[test]
     fn arr_to_str_test() {
-        let mut arr: [u8; 54] = [0; 54];
+        let mut arr: Vec<u8> = vec![0; 54];
         arr[0] = 65;
         arr[1] = 66;
         arr[2] = 67;
         let expected = "ABC".to_string();
-        assert_eq!(&arr_to_str(arr)[..3], expected);
+        assert_eq!(arr_to_str(arr)[0..3], expected);
     }
 
     #[test]
     fn convert_arr_and_str_test() {
         let s = "ABC".to_string();
-        let mut arr: [u8; 54] = [0; 54];
+        let mut arr: Vec<u8> = vec![0; 54];
         arr[0] = 65;
         arr[1] = 66;
         arr[2] = 67;
         let expected = "ABC".to_string();
-        assert_eq!(&arr_to_str(str_to_arr(s))[..3], expected);
+        assert_eq!(arr_to_str(str_to_arr(s))[0..3], expected);
     }
 }
