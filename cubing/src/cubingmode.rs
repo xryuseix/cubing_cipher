@@ -57,8 +57,23 @@ pub fn block_unit_division(mut text: Vec<u8>) -> Vec<Vec<u8>> {
  * maskをかける
  * @param text 平文ブロック
  * @return maskをかけた平文ブロック
+ * @return mask
  */
-pub fn mask(text: Vec<u8>) -> Vec<u8> {
+pub fn masking(text: Vec<u8>) -> (Vec<u8>, Vec<u8>) {
+    let mut masked_text = Vec::new();
+    let mask = key::mask_generate(text.len());
+    for i in 0..text.len() {
+        masked_text.push((get_charset_index(text[i] as char) + mask[i]) % CHARSET.len() as u8);
+    }
+    (masked_text, mask)
+}
+
+/**
+ * maskをかける
+ * @param text 平文ブロック
+ * @return maskをかけた平文ブロック
+ */
+pub fn unmask(text: Vec<u8>) -> Vec<u8> {
     let mut masked_text = Vec::new();
     let mask = key::mask_generate(text.len());
     for i in 0..text.len() {
@@ -113,17 +128,20 @@ pub fn shuffle_blocks(mut blocks: Vec<Vec<u8>>) -> Vec<Vec<u8>> {
  * 暗号化
  * @param plain_text 平文
  */
-fn encrypt(plain_text: Vec<u8>) -> Vec<Vec<u8>> {
+pub fn encrypt(plain_text: Vec<u8>) -> (Vec<Vec<u8>>, Vec<u8>, Vec<u8>) {
     let padded_text = padding(plain_text);
-    let masked_text = mask(padded_text);
+    let (masked_text, mask1) = masking(padded_text);
     let plain_blocks = block_unit_division(masked_text);
     let mut encoded_blocks = Vec::default();
+    let mut mask2 = Vec::default();
     for (i, block) in plain_blocks.iter().enumerate() {
         let mut encoded_block = block.to_vec();
-        encoded_block.append(&mut encode(block.to_vec(), i as u8));
+        let (mut masked_text, mask) = masking(encode(block.to_vec(), i as u8));
+        encoded_block.append(&mut masked_text);
         encoded_blocks.push(encoded_block);
+        mask2 = mask;
     }
-    return shuffle_blocks(encoded_blocks);
+    return (shuffle_blocks(encoded_blocks), mask1, mask2);
 }
 
 #[cfg(test)]
