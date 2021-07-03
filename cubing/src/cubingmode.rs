@@ -10,7 +10,7 @@ const CHARSET: &[u8;98] = b"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOP
  * @param rng 乱数発生器
  * @return ランダム文字
  */
-fn get_random_char(mut rng: ThreadRng) -> u8 {
+pub fn get_random_char(mut rng: ThreadRng) -> u8 {
     let idx = rng.gen_range(0..CHARSET.len());
     CHARSET[idx] as u8
 }
@@ -20,8 +20,17 @@ fn get_random_char(mut rng: ThreadRng) -> u8 {
  * @param インデックスを取得したい文字
  * @return インデックス
  */
-fn get_charset_index(c: char) -> u8 {
-    CHARSET.iter().position(|&r| r == c as u8).unwrap() as u8
+fn get_charset_index(c: u8) -> u8 {
+    CHARSET.iter().position(|&r| r == c).unwrap() as u8
+}
+
+/**
+ * CHARSETから指定したインデックスの文字を取得する
+ * @param インデックス
+ * @return インデックスに対応する文字
+ */
+fn get_index_charset(idx: u8) -> u8 {
+    CHARSET[idx as usize] as u8
 }
 
 /**
@@ -64,23 +73,29 @@ pub fn masking(text: Vec<u8>) -> (Vec<u8>, Vec<u8>) {
     let mut masked_text = Vec::new();
     let mask = key::mask_generate(text.len());
     for i in 0..text.len() {
-        masked_text.push((get_charset_index(text[i] as char) + mask[i]) % CHARSET.len() as u8);
+        masked_text.push(get_index_charset(
+            ((get_charset_index(text[i]) as i32 + mask[i] as i32) % CHARSET.len() as i32) as u8,
+        ));
     }
     (masked_text, mask)
 }
 
 /**
- * maskをかける
- * @param text 平文ブロック
- * @return maskをかけた平文ブロック
+ * maskを元に戻す
+ * @param masked_text maskをかけた平文ブロック
+ * @param mask mask
+ * @return 平文ブロック
  */
-// pub fn unmask(masked_text: Vec<u8>, mask: Vec<u8>) -> Vec<u8> {
-//     let mut text = masked_text;
-//     for i in 0..text.len() {
-//         masked_text.push((get_charset_index(text[i] as char) + mask[i]) % CHARSET.len() as u8);
-//     }
-//     masked_text
-// }
+pub fn unmasking(masked_text: Vec<u8>, mask: Vec<u8>) -> Vec<u8> {
+    let mut text = Vec::new();
+    for i in 0..masked_text.len() {
+        text.push(get_index_charset(
+            ((get_charset_index(masked_text[i]) as i32 - mask[i] as i32 + CHARSET.len() as i32)
+                % CHARSET.len() as i32) as u8,
+        ));
+    }
+    text
+}
 
 /**
  * エンコード処理
@@ -127,6 +142,8 @@ pub fn shuffle_blocks(mut blocks: Vec<Vec<u8>>) -> Vec<Vec<u8>> {
 /**
  * 暗号化
  * @param plain_text 平文
+ * @param key 鍵
+ * @return 暗号文, mask1, mask2
  */
 pub fn encrypt(
     plain_text: Vec<u8>,
@@ -135,17 +152,17 @@ pub fn encrypt(
     let padded_text = padding(plain_text);
 
     let plain_blocks = block_unit_division(padded_text);
-    let mut encoded_blocks: Vec<Vec<u8>> = Vec::default();
-    let mut mask_blocks1: Vec<Vec<u8>> = Vec::default();
-    let mut mask_blocks2: Vec<Vec<u8>> = Vec::default();
+    let mut encoded_blocks: Vec<Vec<u8>> = Vec::new();
+    let mut mask_blocks1: Vec<Vec<u8>> = Vec::new();
+    let mut mask_blocks2: Vec<Vec<u8>> = Vec::new();
 
     for (i, block) in plain_blocks.iter().enumerate() {
         let (mut masked_block, mask1) = masking(block.to_vec());
         let encoded_tail = encode(masked_block.clone(), i as u8);
         let (mut masked_tail, mask2) = masking(encoded_tail);
         masked_block.append(&mut masked_tail);
-        encoded_blocks.push(encrypt::encrypt(masked_block, key));
 
+        encoded_blocks.push(encrypt::encrypt(masked_block, key));
         mask_blocks1.push(mask1);
         mask_blocks2.push(mask2);
     }
@@ -186,9 +203,9 @@ mod tests {
 
     #[test]
     fn get_charset_index_test() {
-        assert_eq!(get_charset_index('0'), 0 as u8);
-        assert_eq!(get_charset_index('a'), 10 as u8);
-        assert_eq!(get_charset_index('!'), 62 as u8);
+        assert_eq!(get_charset_index('0' as u8), 0 as u8);
+        assert_eq!(get_charset_index('a' as u8), 10 as u8);
+        assert_eq!(get_charset_index('!' as u8), 62 as u8);
     }
 
     #[test]
@@ -199,5 +216,18 @@ mod tests {
         }
         let expected = vec![107, 110, 113, 116, 119, '1' as u8, '3' as u8];
         assert_eq!(encode(v, 65)[0..7], expected[0..7]);
+    }
+
+    #[test]
+    fn mask_unmask_test() {
+        let mut text = Vec::new();
+        let rng = rand::thread_rng();
+        for _ in 0..54 {
+            text.push(get_random_char(rng.clone()));
+            // text.push('0' as u8);
+        }
+        let (masked_text, mask) = masking(text.clone());
+        let unmasked_text = unmasking(masked_text, mask);
+        assert_eq!(text, unmasked_text);
     }
 }
