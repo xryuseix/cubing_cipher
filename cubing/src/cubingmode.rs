@@ -106,13 +106,13 @@ pub fn unmasking(masked_text: Vec<u8>, mask: Vec<u8>) -> Vec<u8> {
 pub fn encode(text: Vec<u8>, block_num: u8) -> Vec<u8> {
     let mut encoded_text = Vec::default();
     for i in 0..5 {
-        let mut sequence = 0;
+        let mut hash = 0;
         for j in 9 * i..9 * i + 9 {
-            sequence += text[j] as u8;
-            sequence %= 26;
+            hash += text[j] as u8;
+            hash %= 26;
         }
-        sequence = sequence % 26 + 97;
-        encoded_text.push(sequence);
+        hash = hash % 26 + 97;
+        encoded_text.push(hash);
     }
     encoded_text.push(CHARSET[(block_num / 62) as usize]);
     encoded_text.push(CHARSET[(block_num % 62) as usize]);
@@ -136,6 +136,30 @@ pub fn shuffle_blocks(mut blocks: Vec<Vec<u8>>) -> Vec<Vec<u8>> {
         std::mem::swap(&mut blocks[i], &mut t);
         std::mem::swap(&mut blocks[idx], &mut t);
     }
+    blocks
+}
+
+/**
+ * シーケンシャル番号をデコードする
+ * @param place_50 ブロック50番目=十の位
+ * @param place_51 ブロック50番目=一の位
+ * @return シーケンシャル番号
+ */
+fn decode_sequence(place_50: u8, place_51: u8) -> u8 {
+    return place_50 * 62 + place_51;
+}
+
+/**
+ * シャッフルされた平文ブロックをソートする
+ * @param blocks シャッフルされた複数の平文ブロック
+ * @return ソートされた平文ブロック
+ */
+pub fn sort_blocks(mut blocks: Vec<Vec<u8>>) -> Vec<Vec<u8>> {
+    blocks.sort_by(|x, y| {
+        decode_sequence(x[50], x[51])
+            .partial_cmp(&decode_sequence(y[50], y[51]))
+            .unwrap()
+    });
     blocks
 }
 
@@ -229,5 +253,30 @@ mod tests {
         let (masked_text, mask) = masking(text.clone());
         let unmasked_text = unmasking(masked_text, mask);
         assert_eq!(text, unmasked_text);
+    }
+
+    #[test]
+    fn sort_blocks_test() {
+        let vec = vec![0; 54];
+        let mut block1 = vec.clone();
+        block1[50] = 0;
+        block1[51] = 0;
+        let mut block2 = vec.clone();
+        block2[50] = 1;
+        block2[51] = 3;
+        let mut block3 = vec.clone();
+        block3[50] = 2;
+        block3[51] = 2;
+        
+        let random_blocks1 = vec![block3.clone(), block2.clone(), block1.clone()];
+        let random_blocks2 = vec![block2.clone(), block1.clone(), block3.clone()];
+        let random_blocks3 = vec![block1.clone(), block3.clone(), block2.clone()];
+        let random_blocks4 = vec![block1.clone(), block2.clone(), block3.clone()];
+        let expected = vec![block1.clone(), block2.clone(), block3.clone()];
+        
+        assert_eq!(sort_blocks(random_blocks1), expected);
+        assert_eq!(sort_blocks(random_blocks2), expected);
+        assert_eq!(sort_blocks(random_blocks3), expected);
+        assert_eq!(sort_blocks(random_blocks4), expected);
     }
 }
