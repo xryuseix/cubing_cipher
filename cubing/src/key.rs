@@ -1,5 +1,8 @@
 pub use crate::cube;
+pub use crate::encode;
 use rand::Rng;
+
+pub const CHARSET: &[u8;98] = b"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ \n\0\t";
 
 pub fn key_generate(k: usize) -> Vec<cube::CubeOP> {
     let mut rng = rand::thread_rng();
@@ -18,7 +21,7 @@ pub fn mask_generate(k: usize) -> Vec<u8> {
     let mut rng = rand::thread_rng();
     let mut mask = Vec::new();
     for _ in 0..k {
-        mask.push(rng.gen_range(0..2) as u8);
+        mask.push(CHARSET[rng.gen_range(0..CHARSET.len())]);
     }
     mask
 }
