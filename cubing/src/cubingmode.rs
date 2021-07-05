@@ -10,7 +10,7 @@ const CHARSET: &[u8;98] = b"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOP
  * @param rng 乱数発生器
  * @return ランダム文字
  */
-pub fn get_random_char(mut rng: ThreadRng) -> u8 {
+fn get_random_char(mut rng: ThreadRng) -> u8 {
     let idx = rng.gen_range(0..CHARSET.len());
     CHARSET[idx] as u8
 }
@@ -38,7 +38,7 @@ fn get_index_charset(idx: u8) -> u8 {
  * @param text 任意長の平文
  * @return 45の倍数長のパディング付与された平文
  */
-pub fn padding(mut text: Vec<u8>) -> Vec<u8> {
+fn padding(mut text: Vec<u8>) -> Vec<u8> {
     if text.len() % 45 != 0 {
         text.push(0);
     }
@@ -54,7 +54,7 @@ pub fn padding(mut text: Vec<u8>) -> Vec<u8> {
  * @param text 平文
  * @return 45 Byte単位の平文ブロック
  */
-pub fn block_unit_division(mut text: Vec<u8>) -> Vec<Vec<u8>> {
+fn block_unit_division(mut text: Vec<u8>) -> Vec<Vec<u8>> {
     let mut blocks: Vec<Vec<u8>> = Vec::new();
     for i in (0..text.len() / 45).rev() {
         blocks.push(text.split_off(i * 45));
@@ -69,7 +69,7 @@ pub fn block_unit_division(mut text: Vec<u8>) -> Vec<Vec<u8>> {
  * @return maskをかけた平文ブロック
  * @return mask
  */
-pub fn masking(text: Vec<u8>) -> (Vec<u8>, Vec<u8>) {
+fn masking(text: Vec<u8>) -> (Vec<u8>, Vec<u8>) {
     let mut masked_text = Vec::new();
     let mask = key::mask_generate(text.len());
     for i in 0..text.len() {
@@ -86,7 +86,7 @@ pub fn masking(text: Vec<u8>) -> (Vec<u8>, Vec<u8>) {
  * @param mask mask
  * @return 平文ブロック
  */
-pub fn unmasking(masked_text: Vec<u8>, mask: Vec<u8>) -> Vec<u8> {
+fn unmasking(masked_text: Vec<u8>, mask: Vec<u8>) -> Vec<u8> {
     let mut text = Vec::new();
     for i in 0..masked_text.len() {
         text.push(get_index_charset(
@@ -103,7 +103,7 @@ pub fn unmasking(masked_text: Vec<u8>, mask: Vec<u8>) -> Vec<u8> {
  * @param text maskをかけた平文ブロック
  * @return エンコードした平文ブロック
  */
-pub fn encode(text: Vec<u8>, block_num: u8) -> Vec<u8> {
+fn encode(text: Vec<u8>, block_num: u8) -> Vec<u8> {
     let mut encoded_text = Vec::default();
     for i in 0..5 {
         let mut hash = 0;
@@ -123,11 +123,21 @@ pub fn encode(text: Vec<u8>, block_num: u8) -> Vec<u8> {
 }
 
 /**
+ * デコード処理
+ * エンコード処理でブロックの末尾についた文字を削除する
+ * @param encoded_text エンコードされた平文ブロック
+ * @return デコードした平文ブロック
+ */
+fn decode(encoded_text: Vec<u8>) -> Vec<u8> {
+    (&encoded_text[0..45]).to_vec()
+}
+
+/**
  * 平文ブロックをシャッフルする
  * @param blocks 複数の平文ブロック
  * @return シャッフルした平文ブロック
  */
-pub fn shuffle_blocks(mut blocks: Vec<Vec<u8>>) -> Vec<Vec<u8>> {
+fn shuffle_blocks(mut blocks: Vec<Vec<u8>>) -> Vec<Vec<u8>> {
     let mut rng = rand::thread_rng();
     let mut t = Vec::default();
     for i in (0..blocks.len()).rev() {
@@ -154,7 +164,7 @@ fn decode_sequence(place_50: u8, place_51: u8) -> u8 {
  * @param blocks シャッフルされた複数の平文ブロック
  * @return ソートされた平文ブロック
  */
-pub fn sort_blocks(mut blocks: Vec<Vec<u8>>) -> Vec<Vec<u8>> {
+fn sort_blocks(mut blocks: Vec<Vec<u8>>) -> Vec<Vec<u8>> {
     blocks.sort_by(|x, y| {
         decode_sequence(x[50], x[51])
             .partial_cmp(&decode_sequence(y[50], y[51]))
