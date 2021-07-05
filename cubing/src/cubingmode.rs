@@ -95,7 +95,7 @@ pub fn unmasking(masked_text: Vec<u8>, mask: Vec<u8>) -> Vec<u8> {
         let mut char_index = get_charset_index(masked_text[i]) as i32 - mask[i] as i32;
         let charset_len = key::CHARSET.len() as i32;
         // char_indexが負数の時は正に持ち上げる
-        char_index = (char_index % charset_len + charset_len ) % charset_len;
+        char_index = (char_index % charset_len + charset_len) % charset_len;
         text.push(get_index_charset(char_index as u8));
     }
     assert_eq!(masked_text.len(), text.len());
@@ -339,12 +339,12 @@ mod tests {
         assert_eq!(sort_blocks(random_blocks4), expected);
     }
 
-    // #[test]
-    // fn encrypt_decrypt_test() {
-    //     let text = "ABC".to_string();
-    //     let key = key::key_generate(10);
-    //     let (cipher_text, mask1, mask2) = encrypt(encode::str_to_arr(text.clone()), &key);
-    //     let plain_text = decrypt(cipher_text, mask1, mask2, &key);
-    //     assert_eq!(text, plain_text);
-    // }
+    #[test]
+    fn encrypt_decrypt_test() {
+        let text = "ABC".to_string();
+        let key = key::key_generate(10);
+        let (cipher_text, mask1, mask2) = encrypt(encode::str_to_arr(text.clone()), &key);
+        let plain_text = decrypt(cipher_text, mask1, mask2, &key);
+        assert_eq!(text, plain_text);
+    }
 }
