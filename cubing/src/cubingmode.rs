@@ -135,8 +135,10 @@ fn encode(text: Vec<u8>, block_num: u8) -> Vec<u8> {
  */
 fn decode(encoded_text: Vec<u8>) -> Vec<u8> {
     // TODO: ハッシュのチェックする
-    // TODO: パディング削除
-    (&encoded_text[0..45]).to_vec()
+    match encoded_text.iter().position(|&r| r == 0) {
+        Some(idx) => return (&encoded_text[0..idx]).to_vec(),
+        _ => return (&encoded_text[0..45]).to_vec(),
+    }
 }
 
 /**
@@ -343,6 +345,6 @@ mod tests {
         let key = key::key_generate(10);
         let (cipher_text, mask1, mask2) = encrypt(encode::str_to_arr(text.clone()), &key);
         let plain_text = decrypt(cipher_text, mask1, mask2, &key);
-        assert_eq!(text, plain_text[0..3]);
+        assert_eq!(text, plain_text);
     }
 }
