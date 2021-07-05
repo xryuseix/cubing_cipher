@@ -127,7 +127,7 @@ mod tests {
     #[test]
     fn str_to_arr_test() {
         let s = "ABC".to_string();
-        let expected= vec![65, 66, 67];
+        let expected = vec![65, 66, 67];
         assert_eq!(str_to_arr(s), expected);
     }
 
@@ -141,11 +141,7 @@ mod tests {
     #[test]
     fn convert_arr_and_str_test() {
         let s = "ABC".to_string();
-        let mut arr: Vec<u8> = vec![0; 54];
-        arr[0] = 65;
-        arr[1] = 66;
-        arr[2] = 67;
         let expected = "ABC".to_string();
-        assert_eq!(arr_to_str(str_to_arr(s))[0..3], expected);
+        assert_eq!(arr_to_str(str_to_arr(s)), expected);
     }
 }

@@ -1,7 +1,7 @@
 pub use crate::cube;
 
-pub fn decrypt(plain_text: Vec<u8>, key: &Vec<cube::CubeOP>) -> Vec<u8> {
-    let mut cube = cube::Cube::new(plain_text);
+pub fn decrypt(cipher_text: Vec<u8>, key: &Vec<cube::CubeOP>) -> Vec<u8> {
+    let mut cube = cube::Cube::new(cipher_text);
     for k in key.iter().rev() {
         let mut d_key: cube::CubeOP = (*k).clone();
         d_key.times = 4 - d_key.times;

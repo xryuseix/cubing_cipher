@@ -1,9 +1,9 @@
 // use cubing::cube;
 // use cubing::decrypt;
 // use cubing::encrypt;
+// use cubing::cubingmode;
 // use cubing::encode;
 // use cubing::key;
-// use cubing::cubingmode;
 
 fn main() {}
 

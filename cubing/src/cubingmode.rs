@@ -1,3 +1,5 @@
+pub use crate::decrypt;
+pub use crate::encode;
 pub use crate::encrypt;
 pub use crate::key;
 use rand::rngs::ThreadRng;
@@ -77,6 +79,7 @@ fn masking(text: Vec<u8>) -> (Vec<u8>, Vec<u8>) {
             ((get_charset_index(text[i]) as i32 + mask[i] as i32) % CHARSET.len() as i32) as u8,
         ));
     }
+    assert_eq!(masked_text.len(), mask.len());
     (masked_text, mask)
 }
 
@@ -87,6 +90,7 @@ fn masking(text: Vec<u8>) -> (Vec<u8>, Vec<u8>) {
  * @return 平文ブロック
  */
 fn unmasking(masked_text: Vec<u8>, mask: Vec<u8>) -> Vec<u8> {
+    assert_eq!(masked_text.len(), mask.len());
     let mut text = Vec::new();
     for i in 0..masked_text.len() {
         text.push(get_index_charset(
@@ -94,6 +98,7 @@ fn unmasking(masked_text: Vec<u8>, mask: Vec<u8>) -> Vec<u8> {
                 % CHARSET.len() as i32) as u8,
         ));
     }
+    assert_eq!(masked_text.len(), text.len());
     text
 }
 
@@ -129,6 +134,8 @@ fn encode(text: Vec<u8>, block_num: u8) -> Vec<u8> {
  * @return デコードした平文ブロック
  */
 fn decode(encoded_text: Vec<u8>) -> Vec<u8> {
+    // TODO: ハッシュのチェックする
+    // TODO: パディング削除
     (&encoded_text[0..45]).to_vec()
 }
 
@@ -140,7 +147,7 @@ fn decode(encoded_text: Vec<u8>) -> Vec<u8> {
 fn shuffle_blocks(mut blocks: Vec<Vec<u8>>) -> Vec<Vec<u8>> {
     let mut rng = rand::thread_rng();
     let mut t = Vec::default();
-    for i in (0..blocks.len()).rev() {
+    for i in (1..blocks.len()).rev() {
         let idx = rng.gen_range(0..i + 1);
         std::mem::swap(&mut blocks[idx], &mut t);
         std::mem::swap(&mut blocks[i], &mut t);
@@ -183,9 +190,9 @@ pub fn encrypt(
     plain_text: Vec<u8>,
     key: &Vec<key::cube::CubeOP>,
 ) -> (Vec<Vec<u8>>, Vec<Vec<u8>>, Vec<Vec<u8>>) {
-    let padded_text = padding(plain_text);
+    let padded_text = padding(plain_text.clone());
 
-    let plain_blocks = block_unit_division(padded_text);
+    let plain_blocks = block_unit_division(padded_text.clone());
     let mut encoded_blocks: Vec<Vec<u8>> = Vec::new();
     let mut mask_blocks1: Vec<Vec<u8>> = Vec::new();
     let mut mask_blocks2: Vec<Vec<u8>> = Vec::new();
@@ -197,10 +204,51 @@ pub fn encrypt(
         masked_block.append(&mut masked_tail);
 
         encoded_blocks.push(encrypt::encrypt(masked_block, key));
+
+        assert_eq!(mask1.len(), 45);
+        assert_eq!(mask2.len(), 9);
         mask_blocks1.push(mask1);
         mask_blocks2.push(mask2);
     }
+
+    assert_eq!(encoded_blocks.len(), plain_blocks.len());
+    assert_eq!(mask_blocks1.len(), plain_blocks.len());
+    assert_eq!(mask_blocks2.len(), plain_blocks.len());
     return (shuffle_blocks(encoded_blocks), mask_blocks1, mask_blocks2);
+}
+
+/**
+ * 復号
+ * @param cipher_text 平文
+ * @param mask1 mask1
+ * @param mask2 mask2
+ * @param key 鍵
+ * @return 平文
+ */
+pub fn decrypt(
+    cipher_text: Vec<Vec<u8>>,
+    mask1: Vec<Vec<u8>>,
+    mask2: Vec<Vec<u8>>,
+    key: &Vec<key::cube::CubeOP>,
+) -> String {
+    let mut decrypted_blocks: Vec<Vec<u8>> = Vec::new();
+    for (block, mask) in cipher_text.iter().zip(mask2.iter()) {
+        let decrypted_block = decrypt::decrypt((*block).clone(), key);
+        let mut unmasked2_block = (&decrypted_block[0..45]).to_vec();
+        unmasked2_block.append(&mut unmasking(
+            (&decrypted_block[45..54]).to_vec(),
+            (*mask).clone(),
+        ));
+        decrypted_blocks.push(unmasked2_block);
+    }
+    decrypted_blocks = sort_blocks(decrypted_blocks);
+    let mut cipher_text = String::new();
+    for (block, mask) in decrypted_blocks.iter().zip(mask1.iter()) {
+        let unmasked1_block = unmasking((&block[0..45]).to_vec(), (*mask).clone());
+        let decoded_block = decode(unmasked1_block);
+        cipher_text += &encode::arr_to_str(decoded_block);
+    }
+    return cipher_text;
 }
 
 #[cfg(test)]
@@ -258,7 +306,6 @@ mod tests {
         let rng = rand::thread_rng();
         for _ in 0..54 {
             text.push(get_random_char(rng.clone()));
-            // text.push('0' as u8);
         }
         let (masked_text, mask) = masking(text.clone());
         let unmasked_text = unmasking(masked_text, mask);
@@ -277,16 +324,25 @@ mod tests {
         let mut block3 = vec.clone();
         block3[50] = 2;
         block3[51] = 2;
-        
+
         let random_blocks1 = vec![block3.clone(), block2.clone(), block1.clone()];
         let random_blocks2 = vec![block2.clone(), block1.clone(), block3.clone()];
         let random_blocks3 = vec![block1.clone(), block3.clone(), block2.clone()];
         let random_blocks4 = vec![block1.clone(), block2.clone(), block3.clone()];
         let expected = vec![block1.clone(), block2.clone(), block3.clone()];
-        
+
         assert_eq!(sort_blocks(random_blocks1), expected);
         assert_eq!(sort_blocks(random_blocks2), expected);
         assert_eq!(sort_blocks(random_blocks3), expected);
         assert_eq!(sort_blocks(random_blocks4), expected);
+    }
+
+    #[test]
+    fn encrypt_decrypt_test() {
+        let text = "ABC".to_string();
+        let key = key::key_generate(10);
+        let (cipher_text, mask1, mask2) = encrypt(encode::str_to_arr(text.clone()), &key);
+        let plain_text = decrypt(cipher_text, mask1, mask2, &key);
+        assert_eq!(text, plain_text[0..3]);
     }
 }
