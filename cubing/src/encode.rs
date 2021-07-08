@@ -39,7 +39,6 @@ pub fn str_to_binary(s: &str) -> Result<Vec<Vec<u8>>, anyhow::Error> {
     for c in *a {
         bin.push(u8_to_binary(*c).unwrap());
     }
-    println!("{:?}", bin);
     Ok(bin)
 }
 
@@ -49,7 +48,6 @@ pub fn binary_to_str(bin: &Vec<Vec<u8>>) -> Result<String, anyhow::Error> {
     for d in bin {
         s += &((binary_to_u8(d).unwrap() as char).to_string());
     }
-    println!("{:?}", s);
     Ok(s)
 }
 
