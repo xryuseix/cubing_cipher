@@ -130,7 +130,8 @@ fn calc_hash(text: Vec<u8>) -> Vec<u8> {
  * @param text maskをかけた平文ブロック
  * @return エンコードした平文ブロック
  */
-fn encode(text: Vec<u8>, block_num: u8) -> Vec<u8> {
+fn encode(masked_text: Vec<u8>,text: Vec<u8>, block_num: u8) -> Vec<u8> {
+    assert_eq!(masked_text.len(), 45);
     assert_eq!(text.len(), 45);
     let mut encoded_text = calc_hash((&text[0..45]).to_vec());
     encoded_text.push(key::CHARSET[(block_num / 62) as usize]);
@@ -150,8 +151,8 @@ fn encode(text: Vec<u8>, block_num: u8) -> Vec<u8> {
 fn decode(encoded_text: Vec<u8>, received_hashs: Vec<u8>) -> Vec<u8> {
     assert_eq!(received_hashs.len(), 5);
     assert_eq!(encoded_text.len(), 45);
-    let _expected_hashs = calc_hash((&encoded_text[0..45]).to_vec());
-    // assert_eq!(received_hashs, expected_hashs);
+    let expected_hashs = calc_hash((&encoded_text[0..45]).to_vec());
+    assert_eq!(received_hashs, expected_hashs);
     match encoded_text.iter().position(|&r| r == 0) {
         Some(idx) => return (&encoded_text[0..idx]).to_vec(),
         _ => return (&encoded_text[0..45]).to_vec(),
@@ -178,10 +179,10 @@ fn shuffle_blocks(mut blocks: Vec<Vec<u8>>) -> Vec<Vec<u8>> {
 /**
  * シーケンシャル番号をデコードする
  * @param place_50 ブロック50番目=十の位
- * @param place_51 ブロック50番目=一の位
+ * @param place_51 ブロック51番目=一の位
  * @return シーケンシャル番号
  */
-fn decode_sequence(place_50: u8, place_51: u8) ->  i32 {
+fn decode_sequence(place_50: u8, place_51: u8) -> i32 {
     return get_charset_index(place_50) as i32 * 62 + get_charset_index(place_51) as i32;
 }
 
@@ -217,7 +218,7 @@ pub fn encrypt(
 
     for (i, block) in plain_blocks.iter().enumerate() {
         let (mut masked_block, mask1) = masking(block.to_vec());
-        let encoded_tail = encode(masked_block.clone(), i as u8);
+        let encoded_tail = encode(masked_block.clone(),block.to_vec(), i as u8);
         let (mut masked_tail, mask2) = masking((&encoded_tail[0..5]).to_vec());
         masked_block.append(&mut masked_tail);
         masked_block.append(&mut (&encoded_tail[5..9]).to_vec());
@@ -316,7 +317,7 @@ mod tests {
             v.push(i as u8);
         }
         let expected = vec![107, 110, 113, 116, 119, '1' as u8, '3' as u8];
-        assert_eq!(encode(v, 65)[0..7], expected[0..7]);
+        assert_eq!(encode(v.clone(), v.clone(), 65)[0..7], expected[0..7]);
     }
 
     #[test]
