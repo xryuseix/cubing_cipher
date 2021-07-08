@@ -4,8 +4,35 @@
 // use cubing::cubingmode;
 // use cubing::encode;
 // use cubing::key;
+use std::env;
+use clap::Clap;
+use std::path::PathBuf;
 
-fn main() {}
+#[derive(Clap, Debug)]
+#[clap(
+    name = env!("CARGO_PKG_NAME"),
+    version = env!("CARGO_PKG_VERSION"),
+    author = env!("CARGO_PKG_AUTHORS"),
+    about= env!("CARGO_PKG_DESCRIPTION")
+)]
+struct Opts {
+    /// encrypt
+    #[clap(short, long)]
+    encrypt: bool,
+
+    /// decrypt
+    #[clap(short, long)]
+    decrypt: bool,
+
+    /// generate key
+    #[clap(short, long)]
+    gen_key: bool,
+
+    /// 変換対象ファイル
+    #[clap(name = "FILE")]
+    plain_file: Option<PathBuf>,
+}
+fn main() {Opts::parse();}
 
 #[cfg(test)]
 mod tests {
