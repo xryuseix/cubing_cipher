@@ -83,12 +83,8 @@ struct Cube {
     }
 };
 
-const static char base62_table[62] = {
-    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-    'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+const std::string base62_table[62] =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 const static char printable_table[] = {
     '0', '1',  '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b',  'c',  'd',
     'e', 'f',  'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',  'q',  'r',
@@ -130,23 +126,24 @@ void assertEqual(const T& a, const T& b) {
 
 void unit_test() {
     {  //縦方向テスト
-        char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
-                        'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-                        'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G',
-                        'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
-                        'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
-        char ExpectedStr[54] = {'a', 'n', 'c', 'd', 'z', 'f', 'g', 'L', 'i',
-                                'j', 'k', 'l', 'm', 'U', 'o', 'p', 'q', 'r',
-                                's', 'h', 'u', 'v', 'w', 'x', 'y', 'X', 'A',
-                                'B', 'C', 'D', 'E', 'e', 'G', 'H', 'I', 'J',
-                                'K', '!', 'M', 'N', 'O', 'P', 'Q', 'b', 'S',
-                                'T', 'R', 'V', 'W', 'F', 'Y', 'Z', 't', '?'};
+        char str[54];
+        {
+            const std::string _str =
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!?";
+            _str.copy(str, 54);
+        }
+        char expected_str[54];
+        {
+            const std::string _expected_str =
+                "ancdzfgLijklmUopqrshuvwxyXABCDEeGHIJK!MNOPQbSTRVWFYZt?";
+            _expected_str.copy(expected_str, 54);
+        }
 
         Cube cube(str);
-        Cube expected(ExpectedStr);
+        const Cube expected(expected_str);
 
         std::vector<CubeOP> key;
-        CubeOP op = {1, 2, 1};
+        const CubeOP op = {1, 2, 1};
         key.push_back(op);
 
         cube.rotate(key[0]);
@@ -154,23 +151,23 @@ void unit_test() {
     }
 
     {  //横方向テスト
-        char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
-                        'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-                        'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G',
-                        'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
-                        'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
-        char ExpectedStr[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
-                                'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
-                                's', 't', 'u', 'y', 'z', 'A', 'B', 'C', 'D',
-                                'E', 'F', 'G', 'v', 'w', 'x', 'H', 'I', 'J',
-                                'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
-                                'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
-
+        char str[54];
+        {
+            const std::string _str =
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!?";
+            _str.copy(str, 54);
+        }
+        char expected_str[54];
+        {
+            const std::string _expected_str =
+                "abcdefghijklmnopqrstuyzABCDEFGvwxHIJKLMNOPQRSTUVWXYZ!?";
+            _expected_str.copy(expected_str, 54);
+        }
         Cube cube(str);
-        Cube expected(ExpectedStr);
+        const Cube expected(expected_str);
 
         std::vector<CubeOP> key;
-        CubeOP op = {2, 2, 1};
+        const CubeOP op = {2, 2, 1};
         key.push_back(op);
 
         cube.rotate(key[0]);
@@ -178,23 +175,23 @@ void unit_test() {
     }
 
     {  //回転方向テスト
-        char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
-                        'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-                        'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G',
-                        'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
-                        'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
-        char ExpectedStr[54] = {'a', 'b', 'c', 'q', 'C', 'O', 'g', 'h', 'i',
-                                'j', 'f', 'l', 'm', 'n', 'o', 'p', 'Y', 'r',
-                                's', 't', 'u', 'v', 'e', 'x', 'y', 'z', 'A',
-                                'B', 'X', 'D', 'E', 'F', 'G', 'H', 'd', 'J',
-                                'K', 'L', 'M', 'N', 'W', 'P', 'Q', 'R', 'S',
-                                'T', 'U', 'V', 'k', 'w', 'I', 'Z', '!', '?'};
-
+        char str[54];
+        {
+            const std::string _str =
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!?";
+            _str.copy(str, 54);
+        }
+        char expected_str[54];
+        {
+            const std::string _expected_str =
+                "abcqCOghijflmnopYrstuvexyzABXDEFGHdJKLMNWPQRSTUVkwIZ!?";
+            _expected_str.copy(expected_str, 54);
+        }
         Cube cube(str);
-        Cube expected(ExpectedStr);
+        const Cube expected(expected_str);
 
         std::vector<CubeOP> key;
-        CubeOP op = {3, 2, 1};
+        const CubeOP op = {3, 2, 1};
         key.push_back(op);
 
         cube.rotate(key[0]);
@@ -217,41 +214,42 @@ void cube2str(Cube cube, char (&str)[54]) {
 
 void en_decode_test() {
     {
-        char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
-                        'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-                        'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G',
-                        'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
-                        'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
-        char ExpectedStr[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
-                                'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
-                                's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A',
-                                'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
-                                'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
-                                'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
-
+        char str[54];
+        {
+            const std::string _str =
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!?";
+            _str.copy(str, 54);
+        }
+        char expected_str[54];
+        {
+            const std::string _expected_str =
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!?";
+            _expected_str.copy(expected_str, 54);
+        }
         Cube cube = str2cube(str);
 
-        assertEqual(cube.cubing, ExpectedStr);
+        assertEqual(cube.cubing, expected_str);
     }
 
     {
-        char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
-                        'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-                        'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G',
-                        'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
-                        'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
-        char ExpectedStr[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
-                                'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
-                                's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A',
-                                'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
-                                'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
-                                'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
+        char str[54];
+        {
+            const std::string _str =
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!?";
+            _str.copy(str, 54);
+        }
+        char expected_str[54];
+        {
+            const std::string _expected_str =
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!?";
+            _expected_str.copy(expected_str, 54);
+        }
         char buf[54];
 
         Cube cube(str);
         cube2str(cube, buf);
 
-        assertEqual(buf, ExpectedStr);
+        assertEqual(buf, expected_str);
     }
 
     return;
@@ -269,26 +267,26 @@ void encrypt(const std::vector<CubeOP>& key, const char (&str)[54],
 }
 
 void encrypt_test() {
-    char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
-                    'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-                    'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G',
-                    'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
-                    'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
-    char ExpectedStr[54] = {
-        'a', 'n', 'c', 'd', 'z', 'f', 'g', 'L', 'i', 'j', 'k', 'l', 'm', 'U',
-        'o', 'p', 'q', 'r', 's', 'h', 'u', 'v', 'w', 'x', 'y', 'X', 'A', 'B',
-        'C', 'D', 'E', 'e', 'G', 'H', 'I', 'J', 'K', '!', 'M', 'N', 'O', 'P',
-        'Q', 'b', 'S', 'T', 'R', 'V', 'W', 'F', 'Y', 'Z', 't', '?'};
+    char str[54];
+    {
+        const std::string _str =
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!?";
+        _str.copy(str, 54);
+    }
+    char expected_str[54];
+    {
+        const std::string _expected_str =
+            "ancdzfgLijklmUopqrshuvwxyXABCDEeGHIJK!MNOPQbSTRVWFYZt?";
+        _expected_str.copy(expected_str, 54);
+    }
     char ct[54];
 
     std::vector<CubeOP> key;
-    CubeOP op = {1, 2, 1};
+    const CubeOP op = {1, 2, 1};
     key.push_back(op);
 
     encrypt(key, str, ct);
-    assertEqual(ct, ExpectedStr);
-
-    return;
+    assertEqual(ct, expected_str);
 }
 
 void decrypt(std::vector<CubeOP>& key, const char (&str)[54], char (&pt)[54]) {
@@ -300,31 +298,29 @@ void decrypt(std::vector<CubeOP>& key, const char (&str)[54], char (&pt)[54]) {
         key[i].times = beforetimes;
     }
     cube2str(cube, pt);
-
-    return;
 }
 
 void decrypt_test() {
-    char str[54] = {'a', 'n', 'c', 'd', 'z', 'f', 'g', 'L', 'i', 'j', 'k',
-                    'l', 'm', 'U', 'o', 'p', 'q', 'r', 's', 'h', 'u', 'v',
-                    'w', 'x', 'y', 'X', 'A', 'B', 'C', 'D', 'E', 'e', 'G',
-                    'H', 'I', 'J', 'K', '!', 'M', 'N', 'O', 'P', 'Q', 'b',
-                    'S', 'T', 'R', 'V', 'W', 'F', 'Y', 'Z', 't', '?'};
-    char ExpectedStr[54] = {
-        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-        'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B',
-        'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
-        'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
+    char str[54];
+    {
+        const std::string _str =
+            "ancdzfgLijklmUopqrshuvwxyXABCDEeGHIJK!MNOPQbSTRVWFYZt?";
+        _str.copy(str, 54);
+    }
+    char expected_str[54];
+    {
+        const std::string _expected_str =
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!?";
+        _expected_str.copy(expected_str, 54);
+    }
     char pt[54];
 
     std::vector<CubeOP> key;
-    CubeOP op = {1, 2, 1};
+    const CubeOP op = {1, 2, 1};
     key.push_back(op);
 
     decrypt(key, str, pt);
-    assertEqual(ExpectedStr, pt);
-
-    return;
+    assertEqual(expected_str, pt);
 }
 
 void encoding(const char (&plainblock)[45], char (&encoded_block)[54],
@@ -342,35 +338,35 @@ void encoding(const char (&plainblock)[45], char (&encoded_block)[54],
     encoded_block[50] = base62_table[blocknum / 62];
     encoded_block[51] = base62_table[blocknum % 62];
 
-    int chartype1 = rand() % 62;
-    int chartype2 = rand() % 62;
+    const int chartype1 = rand() % 62;
+    const int chartype2 = rand() % 62;
 
     encoded_block[52] = base62_table[chartype1];
     encoded_block[53] = base62_table[chartype2];
-
-    return;
 }
 
 void encoding_test() {
-    const char plainblock[45] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
-                                 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
-                                 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A',
-                                 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
-                                 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S'};
     char encoded_block[54];
-
+    char plainblock[45];
+    {
+        std::string _plainblock =
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRS";
+        ;
+        _plainblock.copy(plainblock, 45);
+    }
     encoding(plainblock, encoded_block, 0);
 
     char BeforeRandBlock[52];
     for (int i = 0; i < 52; i++) {  //後ろのrand以外をコピー
         BeforeRandBlock[i] = encoded_block[i];
     }
-    char Expectedblock_1[52] = {
-        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-        'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-        'N', 'O', 'P', 'Q', 'R', 'S', 'z', 'c', 'z', 'g', 'j', 'A', 'A'};
-    assertEqual(BeforeRandBlock, Expectedblock_1);
+    char expectedblock[52];
+    {
+        std::string _expectedblock =
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSzczgjAA";
+        _expectedblock.copy(expectedblock, 52);
+    }
+    assertEqual(BeforeRandBlock, expectedblock);
 }
 
 void en_masking1(const char (&plain)[45], char (&masked)[45],
@@ -594,10 +590,11 @@ void cubingmode_de(std::vector<CubeOP>& key, const std::vector<char>(&str),
 }
 
 void encode_decode_test() {
-    char str[45] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
-                    'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
-                    'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
-                    'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S'};
+    char str[45];
+    {
+        std::string _str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRS";
+        _str.copy(str, 54);
+    }
     char chencoded[54], chdecoded[45];
     std::vector<char> vcdecoded, vcencoded;
     std::vector<std::vector<char>> todecode;
@@ -621,25 +618,13 @@ void encode_decode_test() {
 }
 
 void cubingmode_ende_test() {
-    std::vector<char> str{
-        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-        'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B',
-        'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
-        'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?', 'a', 'b',
-        'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
-        'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D',
-        'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
-        'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?', 'a', 'b', 'c', 'd',
-        'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
-        's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F',
-        'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-        'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?', 'a', 'b', 'c', 'd', 'e', 'f',
-        'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
-        'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
-        'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
-        'W', 'X', 'Y', 'Z', '!'};
-    std::vector<char> ct;
-    std::vector<char> pt;
+    std::vector<char> str, ct, pt;
+    std::string _str =
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!?"
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!?"
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!?"
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!";
+    std::copy(_str.begin(), _str.end(), std::back_inserter(str));
 
     std::vector<CubeOP> key;
     CubeOP op = {1, 2, 1};
@@ -901,19 +886,11 @@ void usecubing_de() {
 }
 
 int main() {
-    char str[54] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
-                    'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-                    'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G',
-                    'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
-                    'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?'};
-    char ct[54];
-
-    std::vector<CubeOP> key{{2, 2, 3}, {3, 2, 3}, {1, 3, 3}, {2, 1, 3},
-                            {1, 3, 1}, {3, 2, 2}, {2, 2, 1}, {2, 1, 3},
-                            {2, 1, 1}, {1, 3, 2}};
-    // std::vector<CubeOP> key{{2, 1, 3}};
-
-    encrypt(key, str, ct);
-    printf("%s\n", str);
-    printf("%s\n", ct);
+    unit_test();
+    en_decode_test();
+    encrypt_test();
+    decrypt_test();
+    encoding_test();
+    encode_decode_test();
+    cubingmode_ende_test();
 }
