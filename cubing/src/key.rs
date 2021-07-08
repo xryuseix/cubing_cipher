@@ -26,6 +26,30 @@ pub fn mask_generate(k: usize) -> Vec<u8> {
     mask
 }
 
+/**
+ * String型の鍵をCubeOP型に変換する
+ * @param key_text String型の鍵
+ * @return CubeOP型の鍵
+ */
+pub fn key_convert(key_text: String) -> Vec<cube::CubeOP> {
+    let mut key = Vec::new();
+    for i in 0..key_text.len() {
+        if i % 3 != 0 {
+            continue;
+        }
+        let dir = encode::char_to_int(key_text.chars().nth(i).unwrap()).unwrap() as u8;
+        let col = encode::char_to_int(key_text.chars().nth(i + 1).unwrap()).unwrap() as u8;
+        let time = encode::char_to_int(key_text.chars().nth(i + 2).unwrap()).unwrap() as u8;
+        assert!(dir <= 2 && col <= 2 && time <= 2);
+        key.push(cube::CubeOP {
+            direction: dir,
+            column: col,
+            times: time,
+        })
+    }
+    key
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

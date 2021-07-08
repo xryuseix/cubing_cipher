@@ -7,7 +7,7 @@ pub fn get_typename<T>(_: T) -> &'static str {
 }
 
 /* charをintへ変換 */
-fn _char_to_int(c: char) -> Result<i32, anyhow::Error> {
+pub fn char_to_int(c: char) -> Result<i32, anyhow::Error> {
     let res = c as i32 - '0' as i32;
     match 0 <= res && res < 10 {
         true => Ok(res),

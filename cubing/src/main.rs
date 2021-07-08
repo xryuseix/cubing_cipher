@@ -1,12 +1,11 @@
-// use cubing::cube;
-// use cubing::decrypt;
-// use cubing::encrypt;
-// use cubing::cubingmode;
-// use cubing::encode;
-// use cubing::key;
-use std::env;
+use anyhow::Result;
 use clap::Clap;
+use cubing::cubingmode;
+use cubing::encode;
+use cubing::key;
+use std::env;
 use std::path::PathBuf;
+use std::{cmp, fs, io};
 
 #[derive(Clap, Debug)]
 #[clap(
@@ -31,8 +30,70 @@ struct Opts {
     /// 変換対象ファイル
     #[clap(name = "FILE")]
     plain_file: Option<PathBuf>,
+
+    /// 鍵ファイル
+    #[clap(name = "KEY_FILE")]
+    key_file: Option<PathBuf>,
 }
-fn main() {Opts::parse();}
+fn main() -> Result<()> {
+    let opts = Opts::parse();
+    if opts.encrypt {
+        let plain_text = match opts.plain_file {
+            Some(file) => read_file(file, Some("plain_text".to_string())),
+            _ => stdin(Some("plain_text".to_string())),
+        }?;
+        let key = match opts.key_file {
+            Some(file) => key::key_convert(read_file(file, Some("key_text".to_string())).unwrap()),
+            _ => key::key_generate(100),
+        };
+        let (cipher_text, mask1, mask2) = cubingmode::encrypt(encode::str_to_arr(plain_text), &key);
+        println!(
+            "cipher_text: {}",
+            encode::arr_to_str(encode::flatten(cipher_text))
+        );
+        println!("mask1: {}", encode::arr_to_str(encode::flatten(mask1)));
+        println!("mask2: {}", encode::arr_to_str(encode::flatten(mask2)));
+    }
+    Ok(())
+}
+
+/**
+ * 標準入力読み込み
+ * @param desc 入力内容の説明
+ * @return 異常終了: エラー
+ *         正常終了: 受け取ったの文字列
+ */
+fn stdin(description: Option<String>) -> Result<String, anyhow::Error> {
+    match description {
+        Some(desc) => println!("{}: ", desc),
+        _ => {}
+    }
+    let mut input = String::new();
+    io::stdin()
+        .read_line(&mut input)
+        .expect("Failed to read line.");
+    input.pop();
+    Ok(input)
+}
+
+/**
+ * ファイルの読み込み
+ * @param path ファイルへの絶対パス
+ * @return 異常終了: エラー
+ *         正常終了: 実行結果の文字列
+ */
+fn read_file(path: PathBuf, description: Option<String>) -> Result<String, anyhow::Error> {
+    let file_content = fs::read_to_string(path)?;
+    match description {
+        Some(desc) => println!(
+            "{}: \n{}",
+            desc,
+            &file_content[0..cmp::min(100, file_content.len())]
+        ),
+        _ => {}
+    }
+    Ok(file_content)
+}
 
 #[cfg(test)]
 mod tests {
