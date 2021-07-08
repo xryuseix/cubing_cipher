@@ -7,7 +7,7 @@ pub fn get_typename<T>(_: T) -> &'static str {
 }
 
 /* charをintへ変換 */
-pub fn char_to_int(c: char) -> Result<i32, anyhow::Error> {
+fn _char_to_int(c: char) -> Result<i32, anyhow::Error> {
     let res = c as i32 - '0' as i32;
     match 0 <= res && res < 10 {
         true => Ok(res),
@@ -16,7 +16,7 @@ pub fn char_to_int(c: char) -> Result<i32, anyhow::Error> {
 }
 
 /* 数値をバイナリ配列に変換する */
-pub fn u8_to_binary(d: u8) -> Result<Vec<u8>, anyhow::Error> {
+fn _u8_to_binary(d: u8) -> Result<Vec<u8>, anyhow::Error> {
     let mut bin = Vec::new();
     for i in (0..8).rev() {
         bin.push((d & (1 << i)) / (1 << i));
@@ -25,7 +25,7 @@ pub fn u8_to_binary(d: u8) -> Result<Vec<u8>, anyhow::Error> {
 }
 
 /* バイナリ配列を数値に変換する */
-pub fn binary_to_u8(bin: &Vec<u8>) -> Result<u8, anyhow::Error> {
+fn _binary_to_u8(bin: &Vec<u8>) -> Result<u8, anyhow::Error> {
     let mut d = 0;
     for i in 0..8 {
         d += bin[i] * (1 << (7 - i));
@@ -34,20 +34,20 @@ pub fn binary_to_u8(bin: &Vec<u8>) -> Result<u8, anyhow::Error> {
 }
 
 /* 文字列をバイナリ配列の配列に変換する */
-pub fn str_to_binary(s: &str) -> Result<Vec<Vec<u8>>, anyhow::Error> {
+fn _str_to_binary(s: &str) -> Result<Vec<Vec<u8>>, anyhow::Error> {
     let mut bin = Vec::new();
     let a = &s.as_bytes();
     for c in *a {
-        bin.push(u8_to_binary(*c).unwrap());
+        bin.push(_u8_to_binary(*c).unwrap());
     }
     Ok(bin)
 }
 
 /* バイナリ配列の配列を文字列に変換する */
-pub fn binary_to_str(bin: &Vec<Vec<u8>>) -> Result<String, anyhow::Error> {
+fn _binary_to_str(bin: &Vec<Vec<u8>>) -> Result<String, anyhow::Error> {
     let mut s = "".to_string();
     for d in bin {
-        s += &((binary_to_u8(d).unwrap() as char).to_string());
+        s += &((_binary_to_u8(d).unwrap() as char).to_string());
     }
     Ok(s)
 }
@@ -86,44 +86,52 @@ pub fn gen_ascii_chars(size: usize) -> String {
     .unwrap()
 }
 
+/* 二次元のベクトルを一次元に変換する */
+pub fn flatten<T>(nested: Vec<Vec<T>>) -> Vec<T> {
+    nested.into_iter().flatten().collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn char_to_int_test() {
-        assert_eq!(char_to_int('0').unwrap(), 0);
-        assert_eq!(char_to_int('1').unwrap(), 1);
-        assert_ne!(char_to_int('1').unwrap(), 0);
+        assert_eq!(_char_to_int('0').unwrap(), 0);
+        assert_eq!(_char_to_int('1').unwrap(), 1);
+        assert_ne!(_char_to_int('1').unwrap(), 0);
         assert_eq!(
-            get_typename(char_to_int('-')),
+            get_typename(_char_to_int('-')),
             "core::result::Result<i32, anyhow::Error>"
         );
     }
 
     #[test]
     fn convert_binary_and_str_test() {
-        assert_eq!(u8_to_binary(1 as u8).unwrap(), vec![0, 0, 0, 0, 0, 0, 0, 1]);
         assert_eq!(
-            u8_to_binary('A' as u8).unwrap(),
+            _u8_to_binary(1 as u8).unwrap(),
+            vec![0, 0, 0, 0, 0, 0, 0, 1]
+        );
+        assert_eq!(
+            _u8_to_binary('A' as u8).unwrap(),
             vec![0, 1, 0, 0, 0, 0, 0, 1]
         );
         assert_eq!(
-            str_to_binary("ABC").unwrap(),
+            _str_to_binary("ABC").unwrap(),
             vec![
                 vec![0, 1, 0, 0, 0, 0, 0, 1],
                 vec![0, 1, 0, 0, 0, 0, 1, 0],
                 vec![0, 1, 0, 0, 0, 0, 1, 1]
             ]
         );
-        assert_eq!(binary_to_u8(&vec![0, 1, 0, 0, 0, 0, 0, 1]).unwrap(), 65);
-        assert_eq!(binary_to_u8(&u8_to_binary(65).unwrap()).unwrap(), 65);
+        assert_eq!(_binary_to_u8(&vec![0, 1, 0, 0, 0, 0, 0, 1]).unwrap(), 65);
+        assert_eq!(_binary_to_u8(&_u8_to_binary(65).unwrap()).unwrap(), 65);
         assert_eq!(
-            binary_to_u8(&u8_to_binary('A' as u8).unwrap()).unwrap(),
+            _binary_to_u8(&_u8_to_binary('A' as u8).unwrap()).unwrap(),
             'A' as u8
         );
         assert_eq!(
-            binary_to_str(&vec![
+            _binary_to_str(&vec![
                 vec![0, 1, 0, 0, 0, 0, 0, 1],
                 vec![0, 1, 0, 0, 0, 0, 1, 0],
                 vec![0, 1, 0, 0, 0, 0, 1, 1]
@@ -132,7 +140,7 @@ mod tests {
             "ABC".to_string()
         );
         assert_eq!(
-            binary_to_str(&str_to_binary("ABC").unwrap()).unwrap(),
+            _binary_to_str(&_str_to_binary("ABC").unwrap()).unwrap(),
             "ABC".to_string()
         );
     }
