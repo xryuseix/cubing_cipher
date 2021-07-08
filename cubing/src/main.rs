@@ -14,7 +14,6 @@ mod tests {
     use cubing::encode;
     use cubing::encrypt;
     use cubing::key;
-    use rand::seq::SliceRandom;
 
     #[test]
     fn encrypt_arr_test() {
@@ -58,22 +57,10 @@ mod tests {
         );
     }
 
-    fn gen_ascii_chars(size: usize) -> String {
-        let mut rng = &mut rand::thread_rng();
-        const BASE_STR: &str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        String::from_utf8(
-            BASE_STR
-                .as_bytes()
-                .choose_multiple(&mut rng, size)
-                .cloned()
-                .collect(),
-        )
-        .unwrap()
-    }
     #[test]
     fn encrypt_decrypt_random_test() {
         for _ in 0..100 {
-            let plain_text = gen_ascii_chars(54);
+            let plain_text = encode::gen_ascii_chars(54);
             let key: Vec<cube::CubeOP> = key::key_generate(20);
             assert_eq!(
                 encode::arr_to_str(decrypt::decrypt(

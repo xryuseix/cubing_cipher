@@ -1,4 +1,5 @@
 use anyhow::{bail, Result};
+use rand::seq::SliceRandom;
 
 /* 型を取得する */
 pub fn get_typename<T>(_: T) -> &'static str {
@@ -69,6 +70,20 @@ pub fn arr_to_str(arr: Vec<u8>) -> String {
         s += std::str::from_utf8(&[*d]).unwrap();
     }
     return s;
+}
+
+/* ランダム文字列を生成する */
+pub fn gen_ascii_chars(size: usize) -> String {
+    let mut rng = &mut rand::thread_rng();
+    const BASE_STR: &str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    String::from_utf8(
+        BASE_STR
+            .as_bytes()
+            .choose_multiple(&mut rng, size)
+            .cloned()
+            .collect(),
+    )
+    .unwrap()
 }
 
 #[cfg(test)]
