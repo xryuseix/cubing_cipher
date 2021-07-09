@@ -32,6 +32,7 @@ pub fn mask_generate(k: usize) -> Vec<u8> {
  * @return CubeOP型の鍵
  */
 pub fn key_convert(key_text: String) -> Vec<cube::CubeOP> {
+    assert!(key_text.len() % 3 == 0);
     let mut key = Vec::new();
     for i in 0..key_text.len() {
         if i % 3 != 0 {
@@ -48,6 +49,21 @@ pub fn key_convert(key_text: String) -> Vec<cube::CubeOP> {
         })
     }
     key
+}
+
+/**
+ * CubeOP型の鍵をString型に変換する
+ * @param key CubeOP型の鍵
+ * @return String型の鍵
+ */
+pub fn key_deconvert(key: Vec<cube::CubeOP>) -> String {
+    let mut key_text = Vec::new();
+    for k in key {
+        key_text.push(encode::int_to_char(k.direction) as u8);
+        key_text.push(encode::int_to_char(k.column) as u8);
+        key_text.push(encode::int_to_char(k.times) as u8);
+    }
+    encode::arr_to_str(key_text)
 }
 
 #[cfg(test)]
@@ -73,5 +89,11 @@ mod tests {
             let k = rng.gen_range(0..10000);
             assert_eq!(mask_generate(k).len(), k);
         }
+    }
+
+    #[test]
+    fn key_convert_deconvert_test() {
+        let s = "012012".to_string();
+        assert_eq!(key_deconvert(key_convert(s.clone())), s.clone());
     }
 }
