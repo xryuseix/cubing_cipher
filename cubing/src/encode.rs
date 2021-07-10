@@ -15,6 +15,13 @@ pub fn char_to_int(c: char) -> Result<i32, anyhow::Error> {
     }
 }
 
+/* intをcharへ変換 */
+pub fn int_to_char(d: u8) -> char {
+    let c = (d as u8 + '0' as u8) as char;
+    assert!('0' <= c && c <= '9');
+    c
+}
+
 /* 数値をバイナリ配列に変換する */
 fn _u8_to_binary(d: u8) -> Result<Vec<u8>, anyhow::Error> {
     let mut bin = Vec::new();
@@ -66,7 +73,6 @@ pub fn str_to_arr(s: String) -> Vec<u8> {
 pub fn arr_to_str(arr: Vec<u8>) -> String {
     let mut s = "".to_string();
     for d in arr.iter() {
-        // s += &((d as char).to_string());
         s += std::str::from_utf8(&[*d]).unwrap();
     }
     return s;
@@ -97,11 +103,11 @@ mod tests {
 
     #[test]
     fn char_to_int_test() {
-        assert_eq!(_char_to_int('0').unwrap(), 0);
-        assert_eq!(_char_to_int('1').unwrap(), 1);
-        assert_ne!(_char_to_int('1').unwrap(), 0);
+        assert_eq!(char_to_int('0').unwrap(), 0);
+        assert_eq!(char_to_int('1').unwrap(), 1);
+        assert_ne!(char_to_int('1').unwrap(), 0);
         assert_eq!(
-            get_typename(_char_to_int('-')),
+            get_typename(char_to_int('-')),
             "core::result::Result<i32, anyhow::Error>"
         );
     }

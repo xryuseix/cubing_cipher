@@ -252,14 +252,11 @@ pub fn decrypt(
     mask2: Vec<Vec<u8>>,
     key: &Vec<key::cube::CubeOP>,
 ) -> String {
-    println!("mask1_len: {}", mask1.len());
-    println!("mask2_len: {}", mask2.len());
     let mut decrypted_blocks: Vec<Vec<u8>> = Vec::new();
     for block in cipher_text {
         let decrypted_block = decrypt::decrypt(block, key);
         let mut unmasked2_block = (&decrypted_block[0..45]).to_vec();
         let sequence = decode_sequence(decrypted_block[50], decrypted_block[51]);
-        println!("sequence: {}", sequence);
         unmasked2_block.append(&mut unmasking(
             (&decrypted_block[45..50]).to_vec(),
             mask2[sequence as usize].clone(),

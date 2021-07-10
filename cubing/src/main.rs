@@ -3,9 +3,10 @@ use clap::Clap;
 use cubing::cubingmode;
 use cubing::encode;
 use cubing::key;
-use std::env;
+use std::fs::{self, File};
+use std::io::Write;
 use std::path::PathBuf;
-use std::{cmp, fs, io};
+use std::{cmp, env, io};
 
 #[derive(Clap, Debug)]
 #[clap(
@@ -29,30 +30,67 @@ struct Opts {
 
     /// 変換対象ファイル
     #[clap(name = "FILE")]
-    plain_file: Option<PathBuf>,
+    file: Option<PathBuf>,
 
     /// 鍵ファイル
     #[clap(name = "KEY_FILE")]
     key_file: Option<PathBuf>,
+
+    /// mask1ファイル(復号の場合のみ)
+    #[clap(name = "MASK1_FILE")]
+    mask1_file: Option<PathBuf>,
+
+    /// mask2ファイル(復号の場合のみ)
+    #[clap(name = "MASK2_FILE")]
+    mask2_file: Option<PathBuf>,
 }
 fn main() -> Result<()> {
     let opts = Opts::parse();
     if opts.encrypt {
-        let plain_text = match opts.plain_file {
+        let plain_text = match opts.file.clone() {
             Some(file) => read_file(file, Some("plain_text".to_string())),
             _ => stdin(Some("plain_text".to_string())),
         }?;
-        let key = match opts.key_file {
-            Some(file) => key::key_convert(read_file(file, Some("key_text".to_string())).unwrap()),
+        let key = match opts.key_file.clone() {
+            Some(key_file) => {
+                key::key_convert(read_file(key_file, Some("key_text".to_string())).unwrap())
+            }
             _ => key::key_generate(100),
         };
         let (cipher_text, mask1, mask2) = cubingmode::encrypt(encode::str_to_arr(plain_text), &key);
-        println!(
-            "cipher_text: {}",
-            encode::arr_to_str(encode::flatten(cipher_text))
+        write_file(
+            encode::arr_to_str(encode::flatten(cipher_text)),
+            "cipher_text.txt",
+        )?;
+        write_file(key::key_deconvert(key), "enc_key.key")?;
+        write_file(encode::arr_to_str(encode::flatten(mask1)), "mask1.key")?;
+        write_file(encode::arr_to_str(encode::flatten(mask2)), "mask2.key")?;
+    }
+    if opts.decrypt {
+        let cipher_text = match opts.file.clone() {
+            Some(file) => read_file(file.clone(), Some("cipher_text".to_string())),
+            _ => stdin(Some("cipher_text".to_string())),
+        }?;
+        let key = match opts.key_file.clone() {
+            Some(file) => key::key_convert(read_file(file, Some("key_text".to_string())).unwrap()),
+            _ => key::key_generate(100),
+        };
+        let mask1 = match opts.mask1_file {
+            Some(file) => read_file(file, Some("mask1".to_string())),
+            _ => stdin(Some("mask1".to_string())),
+        }?;
+        let mask2 = match opts.mask2_file {
+            Some(file) => read_file(file, Some("mask2".to_string())),
+            _ => stdin(Some("mask2".to_string())),
+        }?;
+        let plain_text = cubingmode::decrypt(
+            cubingmode::block_unit_division(encode::str_to_arr(cipher_text), 54),
+            cubingmode::block_unit_division(encode::str_to_arr(mask1), 45),
+            cubingmode::block_unit_division(encode::str_to_arr(mask2), 5),
+            &key,
         );
-        println!("mask1: {}", encode::arr_to_str(encode::flatten(mask1)));
-        println!("mask2: {}", encode::arr_to_str(encode::flatten(mask2)));
+        write_file(plain_text.clone(), "plain_text.txt")?;
+        println!("decrypted: \n{}", (&plain_text[0..cmp::min(100, plain_text.len())]).to_string());
     }
     Ok(())
 }
@@ -93,6 +131,23 @@ fn read_file(path: PathBuf, description: Option<String>) -> Result<String, anyho
         _ => {}
     }
     Ok(file_content)
+}
+
+/**
+ * 暗号化の計算結果を出力する
+ * @param text 出力する文字列
+ * @param file_name ファイル名
+ * @return 正常終了の有無
+ */
+fn write_file(text: String, file_name: &str) -> Result<()> {
+    match fs::create_dir("out") {
+        Err(_) => {}
+        Ok(_) => {}
+    }
+    let mut file = File::create("out/".to_string() + file_name)?;
+    write!(file, "{}", &text)?;
+    file.flush()?;
+    Ok(())
 }
 
 #[cfg(test)]
