@@ -54,10 +54,10 @@ fn padding(mut text: Vec<u8>) -> Vec<u8> {
  * @param text 平文
  * @return 45 Byte単位の平文ブロック
  */
-fn block_unit_division(mut text: Vec<u8>) -> Vec<Vec<u8>> {
+pub fn block_unit_division(mut text: Vec<u8>, size: i32) -> Vec<Vec<u8>> {
     let mut blocks: Vec<Vec<u8>> = Vec::new();
-    for i in (0..text.len() / 45).rev() {
-        blocks.push(text.split_off(i * 45));
+    for i in (0..text.len() / size as usize).rev() {
+        blocks.push(text.split_off(i * size as usize));
     }
     blocks.reverse();
     blocks
@@ -213,7 +213,7 @@ pub fn encrypt(
     key: &Vec<key::cube::CubeOP>,
 ) -> (Vec<Vec<u8>>, Vec<Vec<u8>>, Vec<Vec<u8>>) {
     let padded_text = padding(plain_text.clone());
-    let plain_blocks = block_unit_division(padded_text.clone());
+    let plain_blocks = block_unit_division(padded_text.clone(), 45);
     let mut encoded_blocks: Vec<Vec<u8>> = Vec::new();
     let mut mask_blocks1: Vec<Vec<u8>> = Vec::new();
     let mut mask_blocks2: Vec<Vec<u8>> = Vec::new();
@@ -252,11 +252,14 @@ pub fn decrypt(
     mask2: Vec<Vec<u8>>,
     key: &Vec<key::cube::CubeOP>,
 ) -> String {
+    println!("mask1_len: {}", mask1.len());
+    println!("mask2_len: {}", mask2.len());
     let mut decrypted_blocks: Vec<Vec<u8>> = Vec::new();
     for block in cipher_text {
         let decrypted_block = decrypt::decrypt(block, key);
         let mut unmasked2_block = (&decrypted_block[0..45]).to_vec();
         let sequence = decode_sequence(decrypted_block[50], decrypted_block[51]);
+        println!("sequence: {}", sequence);
         unmasked2_block.append(&mut unmasking(
             (&decrypted_block[45..50]).to_vec(),
             mask2[sequence as usize].clone(),
@@ -303,7 +306,7 @@ mod tests {
             }
             expected.push(block);
         }
-        assert_eq!(block_unit_division(text), expected);
+        assert_eq!(block_unit_division(text, 45), expected);
     }
 
     #[test]
@@ -363,7 +366,8 @@ mod tests {
     #[test]
     fn encrypt_decrypt_test() {
         for _ in 0..30 {
-            let text = encode::gen_ascii_chars(500);
+            let mut rng = rand::thread_rng();
+            let text = encode::gen_ascii_chars(rng.gen_range(0..1000));
             let key = key::key_generate(100);
             let (cipher_text, mask1, mask2) = encrypt(encode::str_to_arr(text.clone()), &key);
             let plain_text = decrypt(cipher_text, mask1, mask2, &key);
