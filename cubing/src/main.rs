@@ -55,7 +55,12 @@ fn main() -> Result<()> {
             Some(key_file) => {
                 key::key_convert(read_file(key_file, Some("key_text".to_string())).unwrap())
             }
-            _ => key::key_generate(100),
+            _ => key::key_generate(
+                stdin(Some("key length".to_string()))
+                    .unwrap()
+                    .parse::<usize>()
+                    .unwrap(),
+            ),
         };
         let (cipher_text, mask1, mask2) = cubingmode::encrypt(encode::str_to_arr(plain_text), &key);
         write_file(
@@ -73,7 +78,7 @@ fn main() -> Result<()> {
         }?;
         let key = match opts.key_file.clone() {
             Some(file) => key::key_convert(read_file(file, Some("key_text".to_string())).unwrap()),
-            _ => key::key_generate(100),
+            _ => key::key_convert(stdin(Some("key".to_string())).unwrap()),
         };
         let mask1 = match opts.mask1_file {
             Some(file) => read_file(file, Some("mask1".to_string())),
@@ -90,7 +95,10 @@ fn main() -> Result<()> {
             &key,
         );
         write_file(plain_text.clone(), "plain_text.txt")?;
-        println!("decrypted: \n{}", (&plain_text[0..cmp::min(100, plain_text.len())]).to_string());
+        println!(
+            "decrypted: \n{}",
+            (&plain_text[0..cmp::min(100, plain_text.len())]).to_string()
+        );
     }
     Ok(())
 }
